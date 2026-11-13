@@ -1,0 +1,21 @@
+---
+interface Props {
+  label: string;
+  ratio?: '4:5' | '9:16' | '1:1' | '16:9' | '3:2';
+  class?: string;
+}
+
+const { label, ratio = '4:5', class: className = '' } = Astro.props;
+
+const ratios: Record<string, string> = {
+  '4:5': 'aspect-[4/5]',
+  '9:16': 'aspect-[9/16]',
+  '1:1': 'aspect-square',
+  '16:9': 'aspect-video',
+  '3:2': 'aspect-[3/2]',
+};
+---
+
+<div class={`placeholder-media ${ratios[ratio]} ${className}`} role="img" aria-label={label}>
+  <span>{label}</span>
+</div>

@@ -1,0 +1,97 @@
+---
+import { site } from '../config/site';
+import Wordmark from './ui/Wordmark.astro';
+
+const year = new Date().getFullYear();
+
+const columns = [
+  {
+    heading: 'Explore',
+    links: [
+      { label: 'Diet plan', href: '/plan/' },
+      { label: 'Learn', href: '/learn/' },
+      { label: 'Workouts', href: '/workouts/' },
+      { label: 'Reels', href: '/reels/' },
+      { label: 'Articles', href: '/articles/' },
+    ],
+  },
+  {
+    heading: 'Tools',
+    links: [
+      { label: 'BMI calculator', href: '/tools/bmi/' },
+      { label: 'Calorie calculator', href: '/tools/calories/' },
+      { label: 'Protein calculator', href: '/tools/protein/' },
+      { label: 'Links', href: '/links/' },
+    ],
+  },
+  {
+    heading: 'Site',
+    links: [
+      { label: 'About', href: '/about/' },
+      { label: 'Contact', href: `mailto:${site.contactEmail}` },
+      { label: 'Instagram', href: site.instagramUrl },
+    ],
+  },
+  {
+    heading: 'Legal',
+    links: [
+      { label: 'Disclaimer', href: '/disclaimer/' },
+      { label: 'Privacy', href: '/privacy/' },
+      { label: 'Affiliate disclosure', href: '/affiliate-disclosure/' },
+      { label: 'Terms', href: '/terms/' },
+    ],
+  },
+];
+---
+
+<footer class="bg-black text-inverse-text">
+  <div class="container py-16 md:py-20">
+    <div class="grid gap-12 md:grid-cols-12">
+      <div class="md:col-span-4">
+        <a href="/" aria-label={`${site.brandName} home`}>
+          <Wordmark class="text-inverse-text" />
+        </a>
+        <p class="small mt-5 max-w-[34ch] text-inverse-muted">
+          Indian food, honest numbers, and training I actually use. Built by {site.creatorName}.
+        </p>
+        <a
+          href={site.instagramUrl}
+          class="mt-6 inline-flex h-11 items-center border border-white px-5 text-sm font-semibold text-white"
+        >
+          Follow @{site.instagramHandle}
+        </a>
+      </div>
+
+      <div class="grid grid-cols-2 gap-8 md:col-span-8 md:grid-cols-4">
+        {columns.map((column) => (
+          <nav aria-label={column.heading}>
+            <h2 class="eyebrow mb-4 text-inverse-muted">{column.heading}</h2>
+            <ul class="space-y-2">
+              {column.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="text-sm text-inverse-text hover:underline hover:decoration-1 hover:underline-offset-4"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-14 space-y-3 border-t border-gray-800 pt-6">
+      <p class="small text-inverse-muted">{site.disclaimer}</p>
+      <p class="small text-inverse-muted">
+        Some article links are affiliate links. If you buy through them I may earn a commission, at
+        no extra cost to you.
+      </p>
+      <p class="label pt-2 text-inverse-muted">
+        © {year} {site.creatorName}. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,29 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  variant?: 'info' | 'warning' | 'doctor';
+  title: string;
+  class?: string;
+}
+
+const { variant = 'info', title, class: className = '' } = Astro.props;
+
+const icons = {
+  info: 'info',
+  warning: 'alert-triangle',
+  doctor: 'stethoscope',
+} as const;
+---
+
+<div class={`border-l-2 border-black bg-surface py-4 pl-5 pr-4 ${className}`}>
+  <div class="flex items-start gap-3">
+    <Icon name={icons[variant]} size={20} class="mt-0.5 shrink-0" />
+    <div>
+      <p class="font-semibold leading-snug">{title}</p>
+      <div class="small mt-1 text-muted">
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>

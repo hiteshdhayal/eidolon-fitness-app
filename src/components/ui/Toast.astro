@@ -1,0 +1,17 @@
+---
+interface Props {
+  message: string;
+  actionLabel?: string;
+  class?: string;
+}
+
+const { message, actionLabel, class: className = '' } = Astro.props;
+---
+
+<div
+  class={`flex items-center justify-between gap-4 border border-black bg-black px-4 py-3 text-white ${className}`}
+  role="status"
+>
+  <p class="small">{message}</p>
+  {actionLabel && <span class="eyebrow shrink-0 border-b border-white pb-0.5">{actionLabel}</span>}
+</div>

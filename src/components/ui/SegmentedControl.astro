@@ -1,0 +1,64 @@
+---
+interface Option {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  name: string;
+  legend: string;
+  options: Option[];
+  value?: string;
+}
+
+const { name, legend, options, value } = Astro.props;
+---
+
+<fieldset class="segmented">
+  <legend class="eyebrow mb-2">{legend}</legend>
+  <div class="inline-flex border border-black rounded-[2px] p-1">
+    {options.map((option) => (
+      <label>
+        <input type="radio" name={name} value={option.value} checked={value === option.value} />
+        <span>{option.label}</span>
+      </label>
+    ))}
+  </div>
+</fieldset>
+
+<style>
+  .segmented label {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .segmented input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .segmented span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    min-height: 40px;
+    padding-inline: 12px;
+    border-radius: 1px;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+  }
+
+  .segmented input:checked + span {
+    background: var(--color-black);
+    color: var(--color-white);
+  }
+
+  .segmented input:focus-visible + span {
+    outline: 2px solid var(--color-black);
+    outline-offset: 2px;
+  }
+</style>

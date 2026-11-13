@@ -1,0 +1,33 @@
+---
+interface Props {
+  title: string;
+  class?: string;
+}
+
+const { title, class: className = '' } = Astro.props;
+---
+
+<div class={`sheet-demo ${className}`}>
+  <div class="sheet-handle" aria-hidden="true"></div>
+  <p class="eyebrow mb-2">{title}</p>
+  <div class="small text-muted">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .sheet-demo {
+    border: 1px solid var(--color-gray-300);
+    border-bottom: 0;
+    border-radius: 2px 2px 0 0;
+    background: var(--color-surface);
+    padding: 12px 20px 24px;
+  }
+
+  .sheet-handle {
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 16px;
+    background: var(--color-gray-300);
+  }
+</style>

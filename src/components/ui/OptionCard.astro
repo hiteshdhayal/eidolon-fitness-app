@@ -1,0 +1,82 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  type?: 'radio' | 'checkbox';
+  name: string;
+  value: string;
+  label: string;
+  sublabel?: string;
+  checked?: boolean;
+}
+
+const { type = 'radio', name, value, label, sublabel, checked = false } = Astro.props;
+---
+
+<label class="option-card">
+  <input type={type} name={name} value={value} checked={checked} />
+  <span class="min-w-0">
+    <span class="block font-medium leading-snug">{label}</span>
+    {sublabel && <span class="option-sublabel mt-0.5 block text-sm">{sublabel}</span>}
+  </span>
+  <span class="option-check" aria-hidden="true">
+    <Icon name="check" size={20} />
+  </span>
+</label>
+
+<style>
+  .option-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    min-height: 60px;
+    padding: 12px 16px;
+    border: 1px solid var(--color-black);
+    border-radius: 2px;
+    background: var(--color-surface);
+    cursor: pointer;
+    transition:
+      background-color 160ms ease-out,
+      color 160ms ease-out;
+  }
+
+  .option-card input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .option-sublabel {
+    color: var(--color-muted);
+  }
+
+  .option-check {
+    opacity: 0;
+    flex-shrink: 0;
+  }
+
+  .option-card:hover {
+    background: var(--color-gray-100);
+  }
+
+  .option-card:has(input:checked) {
+    background: var(--color-black);
+    color: var(--color-white);
+  }
+
+  .option-card:has(input:checked) .option-sublabel {
+    color: var(--color-gray-300);
+  }
+
+  .option-card:has(input:checked) .option-check {
+    opacity: 1;
+  }
+
+  .option-card:has(input:focus-visible) {
+    outline: 2px solid var(--color-black);
+    outline-offset: 2px;
+  }
+</style>

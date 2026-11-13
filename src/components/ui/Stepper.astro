@@ -1,0 +1,96 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  name: string;
+  label: string;
+  value?: number;
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
+}
+
+const { name, label, value = 0, min = 0, max = 999, step = 1, unit } = Astro.props;
+---
+
+<div class="stepper" data-stepper>
+  <span class="eyebrow mb-2 block">{label}</span>
+  <div class="flex h-14 items-stretch border border-black rounded-[2px] bg-surface">
+    <button type="button" data-step="-1" class="stepper-btn" aria-label={`Decrease ${label}`}>
+      <Icon name="minus" size={18} />
+    </button>
+    <div class="relative flex flex-1 items-center">
+      <input
+        type="number"
+        name={name}
+        value={value}
+        min={min}
+        max={max}
+        step={step}
+        inputmode="decimal"
+        class="h-full w-full border-0 bg-transparent pl-4 pr-10 font-mono text-xl tabular-nums outline-none"
+        aria-label={label}
+      />
+      {unit && <span class="pointer-events-none absolute right-4 font-mono text-xs">{unit}</span>}
+    </div>
+    <button type="button" data-step="1" class="stepper-btn" aria-label={`Increase ${label}`}>
+      <Icon name="plus" size={18} />
+    </button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-stepper]').forEach((stepper) => {
+    stepper.addEventListener('click', (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-step]');
+      if (!button) return;
+      const input = stepper.querySelector<HTMLInputElement>('input');
+      if (!input) return;
+      const step = Number(input.step) || 1;
+      const min = input.min === '' ? -Infinity : Number(input.min);
+      const max = input.max === '' ? Infinity : Number(input.max);
+      const direction = Number(button.dataset.step);
+      const next = Math.min(max, Math.max(min, (Number(input.value) || 0) + direction * step));
+      input.value = String(Math.round(next * 10) / 10);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+</script>
+
+<style>
+  .stepper-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    min-height: 44px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .stepper-btn:first-child {
+    border-right: 1px solid var(--color-gray-200);
+  }
+
+  .stepper-btn:last-child {
+    border-left: 1px solid var(--color-gray-200);
+  }
+
+  .stepper-btn:hover {
+    background: var(--color-gray-100);
+  }
+
+  /* Hide native number spinners; the stepper buttons are the control. */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+</style>

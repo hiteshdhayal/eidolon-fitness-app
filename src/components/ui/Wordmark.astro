@@ -1,0 +1,13 @@
+---
+import { site } from '../../config/site';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<span class={`signature text-[19px] leading-none tracking-tight ${className}`}>
+  {site.brandName}
+</span>

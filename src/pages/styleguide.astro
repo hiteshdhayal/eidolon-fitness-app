@@ -1,0 +1,533 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import Button from '../components/ui/Button.astro';
+import OptionCard from '../components/ui/OptionCard.astro';
+import SegmentedControl from '../components/ui/SegmentedControl.astro';
+import SearchSelect from '../components/ui/SearchSelect.astro';
+import Stepper from '../components/ui/Stepper.astro';
+import Callout from '../components/ui/Callout.astro';
+import Accordion from '../components/ui/Accordion.astro';
+import StatBlock from '../components/ui/StatBlock.astro';
+import Toast from '../components/ui/Toast.astro';
+import BottomSheet from '../components/ui/BottomSheet.astro';
+import PlaceholderMedia from '../components/ui/PlaceholderMedia.astro';
+import Icon from '../components/ui/Icon.astro';
+
+const swatches = [
+  { name: 'black', value: '#0A0A0A' },
+  { name: 'gray-900', value: '#171717' },
+  { name: 'gray-800', value: '#262626' },
+  { name: 'gray-700', value: '#3F3F3F' },
+  { name: 'gray-600', value: '#525252' },
+  { name: 'gray-500', value: '#737373' },
+  { name: 'gray-400', value: '#A3A3A3' },
+  { name: 'gray-300', value: '#D4D4D4' },
+  { name: 'gray-200', value: '#E5E5E5' },
+  { name: 'gray-100', value: '#F0F0F0' },
+  { name: 'gray-50', value: '#F7F7F7' },
+  { name: 'white', value: '#FFFFFF' },
+];
+
+const faqs = [
+  {
+    question: 'Is it free?',
+    answer:
+      'Yes. The plan, the tools and the articles are free. Nothing is locked behind a sign-up.',
+  },
+  {
+    question: 'Where is my data stored?',
+    answer: 'In your browser, on your phone. Nothing is sent to a server.',
+  },
+];
+
+const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Gujarat'];
+---
+
+<BaseLayout
+  title="Styleguide"
+  description="Internal component gallery for the site design system."
+  noindex
+  hideStickyCta
+>
+  <section class="section pb-10 pt-14 md:pt-20">
+    <div class="container">
+      <p class="eyebrow mb-4">Internal · noindex</p>
+      <h1 class="display">Styleguide</h1>
+      <p class="measure mt-6 text-muted">
+        The components, tokens and type scale used across the site. Nothing here is a page — this
+        exists so the design stays consistent.
+      </p>
+      <hr class="mt-10 border-0 border-t border-black" />
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="01"
+        eyebrow="Type"
+        title="Typography"
+        intro="Archivo for headings, IBM Plex Sans for body, IBM Plex Mono for labels and numbers."
+      />
+
+      <div class="space-y-8 border-t border-border pt-8">
+        <div>
+          <p class="eyebrow mb-3">Display</p>
+          <p class="display">Eat well, train hard.</p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Heading 1</p>
+          <p class="type-h1">Your state's kitchen</p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Heading 2</p>
+          <p class="type-h2">Protein without shakes</p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Heading 3</p>
+          <p class="type-h3">How to find your step count</p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Body · 17px</p>
+          <p class="measure">
+            Dal, roti, curd and a little ghee is a complete meal. The plan keeps your usual food and
+            adjusts the portions, so you are not cooking a second dinner for yourself.
+          </p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Small · 14px</p>
+          <p class="small measure text-muted">
+            Approx. values. Cooked weights are estimates; your portion may vary slightly.
+          </p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Eyebrow and label</p>
+          <p class="eyebrow">03 — Food</p>
+          <p class="label mt-2 text-muted">1 katori · 150 ml</p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Text link</p>
+          <p>
+            <a href="#" class="text-link">
+              Read the full article
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="02"
+        eyebrow="Color"
+        title="Monochrome only"
+        intro="No hue anywhere. States use weight, borders, icons and text."
+      />
+      <ul class="grid grid-cols-2 border-t border-border sm:grid-cols-3 md:grid-cols-6">
+        {swatches.map((swatch) => (
+          <li class="border-b border-r border-border p-3 first:border-l">
+            <div
+              class="h-16 w-full border border-gray-300"
+              style={`background: ${swatch.value}`}
+              aria-hidden="true"
+            ></div>
+            <p class="label mt-2">{swatch.name}</p>
+            <p class="label text-muted">{swatch.value}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="03"
+        eyebrow="Actions"
+        title="Buttons"
+        intro="52px tall, 2px radius, one clear primary action per screen."
+      />
+
+      <div class="grid gap-10 border-t border-border pt-8 md:grid-cols-2">
+        <div class="space-y-4">
+          <p class="eyebrow">Light</p>
+          <div class="flex flex-wrap gap-3">
+            <Button href="#">Primary</Button>
+            <Button href="#" variant="secondary">
+              Secondary
+            </Button>
+            <Button href="#" arrow>
+              With arrow
+            </Button>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <Button type="button" variant="secondary" disabled>
+              Disabled
+            </Button>
+          </div>
+          <div class="max-w-sm">
+            <Button href="#" full arrow>
+              Full width on mobile
+            </Button>
+          </div>
+        </div>
+
+        <div class="space-y-4 bg-black p-6 text-inverse-text">
+          <p class="eyebrow text-inverse-muted">Dark</p>
+          <div class="flex flex-wrap gap-3">
+            <Button href="#" variant="inverse">
+              Primary
+            </Button>
+            <Button href="#" variant="inverse-secondary">
+              Secondary
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="04"
+        eyebrow="Form"
+        title="Questionnaire controls"
+        intro="Real inputs, big targets, keyboard friendly."
+      />
+
+      <div class="grid gap-12 border-t border-border pt-8 md:grid-cols-2">
+        <div class="space-y-4">
+          <p class="eyebrow">Option cards · radio</p>
+          <div class="space-y-2">
+            <OptionCard name="goal" value="lose" label="Lose fat" checked />
+            <OptionCard
+              name="goal"
+              value="muscle"
+              label="Build muscle"
+              sublabel="Keep most meals the same, add a little protein."
+            />
+            <OptionCard name="goal" value="healthy" label="Eat healthier and get fitter" />
+          </div>
+        </div>
+
+        <div class="space-y-8">
+          <div class="space-y-2">
+            <p class="eyebrow">Option cards · checkbox</p>
+            <OptionCard
+              type="checkbox"
+              name="conditions"
+              value="pcos"
+              label="PCOS / PCOD"
+              checked
+            />
+            <OptionCard type="checkbox" name="conditions" value="bp" label="High blood pressure" />
+          </div>
+
+          <div>
+            <p class="eyebrow mb-2">Input with unit</p>
+            <label for="weight-demo" class="label mb-1 block text-muted">
+              Weight
+            </label>
+            <div class="field-wrap">
+              <input id="weight-demo" class="field" type="text" inputmode="decimal" value="72.4" />
+              <span class="field-unit">KG</span>
+            </div>
+          </div>
+
+          <SegmentedControl
+            name="height-unit-demo"
+            legend="Height unit"
+            value="ft"
+            options={[
+              { value: 'cm', label: 'CM' },
+              { value: 'ft', label: 'FT · IN' },
+            ]}
+          />
+
+          <SearchSelect
+            id="state-demo"
+            label="State"
+            placeholder="Search states"
+            options={states}
+          />
+
+          <Stepper name="age-demo" label="Age" value={28} min={13} max={90} unit="YRS" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="05"
+        eyebrow="Feedback"
+        title="Callouts and feedback"
+        intro="Variants differ only by icon."
+      />
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <Callout title="Your plan is saved on this phone" variant="info">
+          Nothing is sent to a server. Clearing your browser data will remove it.
+        </Callout>
+        <Callout title="Low sugar risk with some medicines" variant="warning">
+          Insulin and glimepiride can cause low sugar when you eat less. Talk to your doctor before
+          cutting calories.
+        </Callout>
+        <Callout title="Kidney disease needs medical targets" variant="doctor">
+          Protein, potassium and phosphorus should be set by your doctor or dietitian.
+        </Callout>
+      </div>
+
+      <div class="mt-10 max-w-md">
+        <p class="eyebrow mb-3">Toast</p>
+        <Toast message="Day shuffled." actionLabel="Undo" />
+      </div>
+
+      <div class="mt-10 max-w-md">
+        <p class="eyebrow mb-3">Bottom sheet</p>
+        <BottomSheet title="Swap this meal">
+          Three alternatives with similar calories and protein.
+        </BottomSheet>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="06"
+        eyebrow="Structure"
+        title="Cards, tags and disclosure"
+        intro="Hairlines first. Cards only when a group needs its own surface."
+      />
+
+      <div class="grid gap-6 border-t border-border pt-8 md:grid-cols-2">
+        <div class="card p-6">
+          <div class="flex items-center justify-between gap-4">
+            <h3>Besan chilla</h3>
+            <span class="tag">North</span>
+          </div>
+          <p class="small mt-2 text-muted">2 chillas · 160 g · approx. 280 kcal · 14 g protein</p>
+          <p class="small mt-4">Gram flour, onion, green chilli. Cook thin on a hot tawa.</p>
+          <div class="mt-5 flex gap-4">
+            <a href="#" class="text-link small">
+              Swap
+            </a>
+            <a href="#" class="text-link small">
+              Recipe
+            </a>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex flex-wrap gap-2">
+            <span class="tag">High protein</span>
+            <span class="tag">Low GI</span>
+            <span class="tag">Jain</span>
+            <span class="tag">Under 20 min</span>
+          </div>
+          <div class="border border-gray-300 p-4">
+            <p class="eyebrow mb-2 text-muted">Affiliate disclosure</p>
+            <p class="small">
+              I earn a commission if you buy through these links, at no extra cost to you. As an
+              Amazon Associate I earn from qualifying purchases.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="07"
+        eyebrow="Data"
+        title="Numbers and tables"
+        intro="Tabular figures, mono labels, no color coding."
+      />
+
+      <div class="grid gap-8 border-y border-border py-8 sm:grid-cols-2 md:grid-cols-4">
+        <StatBlock value="1,840" label="Calories" unit="kcal" />
+        <StatBlock value="118" label="Protein" unit="g" />
+        <StatBlock value="7" label="Days planned" />
+        <StatBlock value="35" label="Fiber" unit="g" note="Target range 25–40 g" />
+      </div>
+
+      <div class="mt-10 bg-black p-8 text-inverse-text">
+        <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+          <StatBlock inverse value="1,840" label="Calories" unit="kcal" />
+          <StatBlock inverse value="118" label="Protein" unit="g" />
+          <StatBlock inverse value="3.1" label="Water" unit="L" />
+          <StatBlock inverse value="8,000" label="Steps" />
+        </div>
+      </div>
+
+      <div class="mt-10">
+        <p class="eyebrow mb-3">Progress · 2px</p>
+        <div
+          class="h-0.5 w-full max-w-md bg-gray-200"
+          role="progressbar"
+          aria-valuenow="7"
+          aria-valuemin="0"
+          aria-valuemax="18"
+          aria-label="Questionnaire progress"
+        >
+          <div class="h-0.5 bg-black" style="width: 39%"></div>
+        </div>
+        <p class="label mt-2 text-muted">07 / 18</p>
+      </div>
+
+      <div class="mt-10 overflow-x-auto">
+        <table class="data-table">
+          <caption class="sr-only">Sample workout template</caption>
+          <thead>
+            <tr>
+              <th scope="col">Exercise</th>
+              <th scope="col">Sets</th>
+              <th scope="col">Reps</th>
+              <th scope="col">Rest</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Goblet squat</th>
+              <td>3</td>
+              <td>8–12</td>
+              <td>90 s</td>
+            </tr>
+            <tr>
+              <th scope="row">Incline push-up</th>
+              <td>3</td>
+              <td>8–12</td>
+              <td>90 s</td>
+            </tr>
+            <tr>
+              <th scope="row">One-arm dumbbell row</th>
+              <td>3</td>
+              <td>10–12</td>
+              <td>60 s</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="08"
+        eyebrow="Navigation"
+        title="Tabs and accordion"
+        intro="Days of the week, and the FAQ."
+      />
+
+      <div class="grid gap-10 border-t border-border pt-8 md:grid-cols-2">
+        <div>
+          <p class="eyebrow mb-4">Tabs</p>
+          <div class="tabs">
+            <input type="radio" name="day-tabs" id="tab-mon" checked />
+            <label for="tab-mon">MON</label>
+            <input type="radio" name="day-tabs" id="tab-tue" />
+            <label for="tab-tue">TUE</label>
+            <input type="radio" name="day-tabs" id="tab-wed" />
+            <label for="tab-wed">WED</label>
+
+            <div class="tab-panel mt-4 border-t border-black pt-4">
+              <h3>Monday</h3>
+              <p class="small mt-2 text-muted">
+                Poha with peanuts, rajma chawal, lauki sabzi and roti.
+              </p>
+            </div>
+            <div class="tab-panel mt-4 border-t border-black pt-4">
+              <h3>Tuesday</h3>
+              <p class="small mt-2 text-muted">
+                Besan chilla, dal with roti, palak paneer and salad.
+              </p>
+            </div>
+            <div class="tab-panel mt-4 border-t border-black pt-4">
+              <h3>Wednesday</h3>
+              <p class="small mt-2 text-muted">
+                Upma with curd, chole with rice, bhindi sabzi and roti.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="eyebrow mb-4">Accordion</p>
+          <Accordion items={faqs} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24">
+    <div class="container">
+      <SectionHeader
+        number="09"
+        eyebrow="Media"
+        title="Image placeholders"
+        intro="Black-and-white photos only. Until real photos arrive, placeholders are labelled in mono."
+      />
+
+      <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <PlaceholderMedia label="PHOTO — portrait, gym, 4:5" ratio="4:5" />
+        <PlaceholderMedia label="REEL — thumbnail, 9:16" ratio="9:16" />
+        <PlaceholderMedia label="PHOTO — food, 1:1" ratio="1:1" />
+        <PlaceholderMedia label="PHOTO — training, 3:2" ratio="3:2" />
+      </div>
+
+      <div class="mt-10 flex items-center gap-6">
+        <p class="eyebrow">Icons</p>
+        <div class="flex gap-4">
+          <Icon name="check" />
+          <Icon name="alert-triangle" />
+          <Icon name="info" />
+          <Icon name="stethoscope" />
+          <Icon name="arrow-right" />
+          <Icon name="play" />
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 12px 16px 12px 0;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .data-table thead th {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--color-black);
+  }
+
+  .data-table tbody th {
+    font-weight: 500;
+  }
+
+  .data-table td {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
