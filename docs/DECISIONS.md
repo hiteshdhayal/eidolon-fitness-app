@@ -43,3 +43,41 @@ One line per decision. Simplest option consistent with the spec wins.
 - 2026-11-13: The mobile sticky CTA is hidden on the home page; the hero already has a full-width primary CTA, and the bar would cover it.
 - 2026-11-13: Hero tests use `page.clock` paused at install, 4 workers and a 60s timeout; page loads under 6 parallel workers were timing out.
 - 2026-11-13: The stage-edge pixel test skips edges that coincide with the viewport (full-bleed mobile), since there is no visible boundary there.
+
+## Phase 2
+
+- Food values: all 251 items are estimates computed from standard ingredient values, so every item has `source: "computed from ingredients"` and `verified: false`. None claims IFCT 2017 until a dietitian checks it against the tables (see docs/food-review.csv).
+- Food schema additions beyond §8: `gloss` (English gloss shown with the local name), `role` (complete/curry/staple/side/snack/addon, for building meals), `canSkip` (onion-garlic or root veg the cook can leave out), `scale` (allowed portion steps), `tags`, `pairsWith` (preferred staple, e.g. makki roti with sarson saag), `buys` (key ingredients for the grocery list), `raw` (weekly amounts for single-ingredient foods), `note` (prep tip), `contains.honey` (vegan/Jain), and `serving.qty` + `serving.unit` (to print "3 rotis" or "1½ katori").
+- Diet flags (`veg`, `vegan`, `jainSafe` …) are derived from `contains` rather than typed in by hand, and zod rejects any mismatch.
+- Jain-style: a dish whose onion, garlic or potato can simply be left out (dal tadka, poha) is allowed for Jain users with a "leave out …" note. Dishes where they're the point (aloo gobhi, sabudana khichdi, undhiyu) are excluded. Same logic for "No onion & garlic".
+- Region map: Rajasthan → West (as in §8); Andaman & Nicobar → East (Bengali and Tamil home cooking, rice and fish); Lakshadweep → South (Kerala-style); Ladakh and Chandigarh → North; Dadra & Nagar Haveli and Daman & Diu → West.
+- A dish counts as regional if its `states` include the person's state or its region matches theirs. Many North and West dishes also list MP/CG, so Central has enough variety.
+- Regional share counts dishes only (complete, curry, side, snack). Staples and protein add-ons are ingredients and don't count. The engine picks regional about 80% of the time (55% for "mix in"), then a repair pass swaps in regional dishes until the share reaches 70% (or 50%).
+- Selection weights: same state ×4, same region ×1.5, pan-Indian ×1, another region ×0.4. For "mostly my region", staples from another region (e.g. besan roti in Kerala) are skipped unless nothing else fits.
+- Protein, training 1–4 days: 1–2 days → 1.2 g/kg, 3–4 days → 1.4 g/kg (the spec gives the range 1.2–1.4).
+- Fat: 25% of calories by default and 30% for lower-carb conditions, never under 0.6 g/kg.
+- Lower-carb conditions (PCOS, diabetes/prediabetes, fatty liver, high cholesterol/triglycerides): carbs are held at ≤ 45% and fat takes the remainder. When protein is low, fat can pass 30%. The ≤ 45% rule wins because it is condition-specific.
+- Loss-rate cap: ~7,700 kcal per kg of fat, so the daily deficit is capped at about 11 kcal per kg of body weight (1% of body weight a week).
+- Calorie rounding to 50 never takes the target under the floor (rounds up instead).
+- Fibre target: 14 g per 1,000 kcal, clamped to 25–40 g.
+- Steps: the "More than 12,000" band uses 12,000 as the current level. "Not sure" uses 3,000 / 5,000 / 8,000 / 10,000 by day type.
+- Protein feasibility: if any day is still under 90% of the protein target after up to 4 add-ons, the target is lowered to what the plan delivers (rounded down to 5 g) and the week is re-planned against it. The plan says so in one plain sentence, and whey or plant protein is mentioned only when supplements = "Open to it".
+- Guidance mode (under 18, pregnant, kidney disease) returns regional meal ideas and tips only: no kcal, protein or weight numbers anywhere, including the "aim for X kg" target-weight message. With kidney disease, the protein-foods list is left empty too, because protein is for the doctor to set.
+- High uric acid / gout: red meat (mutton, pork, beef) and shellfish are left out entirely rather than just limited.
+- Variety: at most one animal-protein "family" (egg, chicken, fish, mutton, pork) per day across mains and add-ons, so a day never stacks an egg breakfast, egg curry and egg roast.
+- "Occasional" (rich/fried) dishes: at most one a week, snacks included.
+- "Any main at most twice a week" relaxes to 3, then 4, only when nothing else fits a very restricted diet (e.g. vegan + gluten-free + soy-free in a small region). It doesn't trigger for the six personas.
+- Hostel/mess and eat-out modes still compute targets, but return plate rules, mess tips, a region-specific ordering guide and protein back-ups instead of days and groceries.
+- Health notes: the `appliesTo` syntax is `condition:x`, `medication:x` or `restriction:x`; `a|b` means either and `+` means AND. The hypothyroid note needs the condition and thyroid medicine. The spec seeds no hyperthyroid note, so none is shown. The engine mirrors the frontmatter, and a test keeps the two in sync.
+- The engine takes the food list as an argument (`buildPlan(answers, FOODS)`) so the plan island can `await import()` the food database (about 19 KB gzipped) only when it needs it (§17).
+- Swaps: a meal-level "Swap" replaces the main dish. Alternatives are the same kind of dish, scaled to match the calories, with regional dishes favoured; 3 are shown. "Shuffle day" regenerates one day deterministically (seed + day + shuffle count) and keeps the week's variety limits.
+- Grocery list: weekly amounts are given only for single-ingredient foods (rice, atta, curd, eggs, chicken …). Dishes add their key ingredients without amounts. Jain and no-onion lists drop onion, garlic and root veg.
+- Dependencies: `zod` as a direct dependency (the engine imports it outside `astro:content`). `tsx` as a dev dependency, only to run `pnpm food:review`. The code uses the zod 3 API that also works in zod 4.
+
+### Phase 2 integration
+
+- The Phase 2 bundle arrived in `public/assets from claude/`; it was moved to `.phase2-staging/` (untracked) so it is never copied into `dist/`. It was not committed and is deleted at the end of the phase.
+- `docs/food-review.csv` was supplied twice (bundle root and `docs/`); the two files are byte-identical, so the `docs/` copy is used and the root duplicate was ignored.
+- `zod` was already a dependency at `^4.6.7`, so `pnpm add zod` was not needed; the engine's zod 3 API runs on zod 4. `tsx` was added as a dev dependency.
+- TypeScript strictness was extended with `noUnusedLocals` and `noUnusedParameters`; no compiler option was loosened.
+- `tests/unit/**` is included in Vitest and ignored by Playwright (`testIgnore: ["**/unit/**"]`).

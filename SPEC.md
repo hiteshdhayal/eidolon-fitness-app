@@ -393,6 +393,7 @@ BMR and TDEE against known values; calorie floors and caps; Asian BMI bands; eve
 - Round kcal to the nearest 10 and macros to whole grams; label "approx.".
 - Align advice with ICMR-NIN Dietary Guidelines for Indians (2024).
 - Generate `docs/food-review.csv` for dietitian review.
+- Implementation adds gloss, role, canSkip, scale, tags, pairsWith, buys, raw, note, contains.honey and serving.qty/unit — see docs/DECISIONS.md (Phase 2).
 - At least 220 items. Each region: 8 breakfasts, 10 lunch/dinner mains, 6 sides, 5 snacks, staples, protein add-ons.
 - Map all 36 states and UTs to a region, with state-level staple overrides (North: Haryana, Punjab, Delhi/UP, Himachal/Uttarakhand, J&K; West: Gujarat, Rajasthan, Maharashtra, Goa; South: Tamil Nadu, Kerala, Karnataka, Andhra/Telangana; East: West Bengal, Odisha, Bihar/Jharkhand; Northeast: Assam, Manipur, Meghalaya, Nagaland, Sikkim, Mizoram; Central: MP, Chhattisgarh).
 
