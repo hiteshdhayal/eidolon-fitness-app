@@ -1,4 +1,5 @@
 ---
+import { existsSync } from 'node:fs';
 import { site } from '../config/site';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -10,13 +11,23 @@ interface Props {
   description: string;
   noindex?: boolean;
   hideStickyCta?: boolean;
+  overlayHeader?: boolean;
+  flushTop?: boolean;
 }
 
-const { title, description, noindex = false, hideStickyCta = false } = Astro.props;
+const {
+  title,
+  description,
+  noindex = false,
+  hideStickyCta = false,
+  overlayHeader = false,
+  flushTop = false,
+} = Astro.props;
 
-const fullTitle = title.includes(site.brandName) ? title : `${title} — ${site.brandName}`;
-const canonical = new URL(Astro.url.pathname, site.url).href;
-const ogImage = new URL('/og-default.png', site.url).href;
+const canonical = new URL(Astro.url.pathname, site.siteUrl).href;
+const hasOgImage = existsSync('public/og-default.png');
+const ogImage = new URL('/og-default.png', site.siteUrl).href;
+const mainClasses = ['site-main', flushTop ? 'site-main-flush' : ''].filter(Boolean).join(' ');
 ---
 
 <!doctype html>
@@ -26,25 +37,25 @@ const ogImage = new URL('/og-default.png', site.url).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
 
-    <title>{fullTitle}</title>
+    <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.brandName} />
-    <meta property="og:title" content={fullTitle} />
+    <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
     <meta property="og:locale" content="en_IN" />
+    {hasOgImage && <meta property="og:image" content={ogImage} />}
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:card" content={hasOgImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    {hasOgImage && <meta name="twitter:image" content={ogImage} />}
 
-    <meta name="theme-color" content="#F7F7F7" />
+    <meta name="theme-color" content="#0B0C0E" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <link
@@ -62,17 +73,14 @@ const ogImage = new URL('/og-default.png', site.url).href;
       crossorigin
     />
   </head>
-  <body class="bg-bg text-black">
-    <a
-      href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-black focus:px-4 focus:py-3 focus:text-white"
-    >
+  <body data-surface="ice">
+    <a href="#main" class="skip-link">
       Skip to content
     </a>
 
-    <Header />
+    <Header overlay={overlayHeader} />
 
-    <main id="main" tabindex="-1" class={hideStickyCta ? '' : 'pb-[52px] md:pb-0'}>
+    <main id="main" tabindex="-1" class={mainClasses}>
       <slot />
     </main>
 
@@ -81,3 +89,31 @@ const ogImage = new URL('/og-default.png', site.url).href;
     {!hideStickyCta && <StickyCta />}
   </body>
 </html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+  }
+
+  .skip-link:focus {
+    position: fixed;
+    left: 16px;
+    top: 16px;
+    z-index: 100;
+    padding: 12px 16px;
+    background: var(--obsidian-900);
+    color: var(--ice-50);
+    outline: 2px solid var(--red-400);
+    outline-offset: 3px;
+  }
+
+  .site-main {
+    padding-top: var(--header-h);
+  }
+
+  .site-main-flush {
+    padding-top: 0;
+  }
+</style>

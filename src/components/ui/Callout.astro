@@ -16,14 +16,50 @@ const icons = {
 } as const;
 ---
 
-<div class={`border-l-2 border-black bg-surface py-4 pl-5 pr-4 ${className}`}>
-  <div class="flex items-start gap-3">
-    <Icon name={icons[variant]} size={20} class="mt-0.5 shrink-0" />
-    <div>
-      <p class="font-semibold leading-snug">{title}</p>
-      <div class="small mt-1 text-muted">
-        <slot />
-      </div>
+<div class={`callout callout-${variant} ${className}`}>
+  <Icon name={icons[variant]} size={20} class="callout-icon" />
+  <div>
+    <p class="callout-title">{title}</p>
+    <div class="callout-body">
+      <slot />
     </div>
   </div>
 </div>
+
+<style>
+  .callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 16px 16px 20px;
+    border-left: 3px solid var(--text);
+    background: var(--surface);
+  }
+
+  .callout-warning,
+  .callout-doctor {
+    border-left-color: var(--accent);
+  }
+
+  .callout-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .callout-warning .callout-icon,
+  .callout-doctor .callout-icon {
+    color: var(--accent-text);
+  }
+
+  .callout-title {
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .callout-body {
+    margin-top: 4px;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+</style>

@@ -1,0 +1,8 @@
+---
+import ComingSoon from '../layouts/ComingSoon.astro';
+import { stub } from '../config/site';
+
+const page = stub('/learn/');
+---
+
+<ComingSoon slug="learn" title={page.title} copy={page.copy} />

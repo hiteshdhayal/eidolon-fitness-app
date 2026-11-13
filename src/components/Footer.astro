@@ -1,8 +1,13 @@
 ---
 import { site } from '../config/site';
 import Wordmark from './ui/Wordmark.astro';
+import FollowLink from './FollowLink.astro';
 
 const year = new Date().getFullYear();
+
+const contactLink = site.contactEmail
+  ? { href: `mailto:${site.contactEmail}`, label: 'Contact' }
+  : { href: site.instagramUrl, label: 'Contact (Instagram DM)' };
 
 const columns = [
   {
@@ -28,8 +33,7 @@ const columns = [
     heading: 'Site',
     links: [
       { label: 'About', href: '/about/' },
-      { label: 'Contact', href: `mailto:${site.contactEmail}` },
-      { label: 'Instagram', href: site.instagramUrl },
+      { label: contactLink.label, href: contactLink.href },
     ],
   },
   {
@@ -44,54 +48,170 @@ const columns = [
 ];
 ---
 
-<footer class="bg-black text-inverse-text">
-  <div class="container py-16 md:py-20">
-    <div class="grid gap-12 md:grid-cols-12">
-      <div class="md:col-span-4">
+<footer class="site-footer" data-surface="obsidian">
+  <div class="container footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
         <a href="/" aria-label={`${site.brandName} home`}>
-          <Wordmark class="text-inverse-text" />
+          <Wordmark />
         </a>
-        <p class="small mt-5 max-w-[34ch] text-inverse-muted">
+        <p class="footer-bio">
           Indian food, honest numbers, and training I actually use. Built by {site.creatorName}.
         </p>
-        <a
-          href={site.instagramUrl}
-          class="mt-6 inline-flex h-11 items-center border border-white px-5 text-sm font-semibold text-white"
-        >
-          Follow @{site.instagramHandle}
-        </a>
+        <FollowLink variant="secondary" location="footer" />
       </div>
 
-      <div class="grid grid-cols-2 gap-8 md:col-span-8 md:grid-cols-4">
+      <div class="footer-columns">
         {columns.map((column) => (
           <nav aria-label={column.heading}>
-            <h2 class="eyebrow mb-4 text-inverse-muted">{column.heading}</h2>
-            <ul class="space-y-2">
+            <h2 class="eyebrow footer-heading">{column.heading}</h2>
+            <ul class="footer-list">
               {column.links.map((link) => (
                 <li>
-                  <a
-                    href={link.href}
-                    class="text-sm text-inverse-text hover:underline hover:decoration-1 hover:underline-offset-4"
-                  >
+                  <a href={link.href} class="footer-link">
                     {link.label}
                   </a>
                 </li>
               ))}
+              {column.heading === 'Site' && (
+                <li>
+                  <FollowLink variant="text" location="footer-instagram" label="Instagram" />
+                </li>
+              )}
             </ul>
           </nav>
         ))}
       </div>
     </div>
 
-    <div class="mt-14 space-y-3 border-t border-gray-800 pt-6">
-      <p class="small text-inverse-muted">{site.disclaimer}</p>
-      <p class="small text-inverse-muted">
+    <div class="footer-legal">
+      <p class="small">{site.disclaimer}</p>
+      <p class="small">
         Some article links are affiliate links. If you buy through them I may earn a commission, at
         no extra cost to you.
       </p>
-      <p class="label pt-2 text-inverse-muted">
-        © {year} {site.creatorName}. All rights reserved.
+      <p class="label footer-copy">
+        © {year} {site.creatorName} · {site.domain}
       </p>
     </div>
   </div>
 </footer>
+
+<style>
+  .site-footer {
+    background: var(--obsidian-950);
+    color: var(--ice-50);
+  }
+
+  .footer-inner {
+    padding-block: 64px 40px;
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: 48px;
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .footer-bio {
+    max-width: 34ch;
+    font-size: 0.875rem;
+    color: var(--steel-400);
+  }
+
+  .footer-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+  }
+
+  .footer-heading {
+    margin-bottom: 16px;
+    color: var(--steel-400);
+    font-weight: 500;
+  }
+
+  .footer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-link {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 2px;
+    font-size: 0.875rem;
+    color: var(--ice-200);
+    text-decoration: none;
+    background-image: linear-gradient(var(--red-500), var(--red-500));
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 0% 1px;
+    transition:
+      background-size 180ms ease-out,
+      color 160ms ease-out;
+  }
+
+  .footer-link:hover {
+    color: var(--ice-50);
+    background-size: 100% 1px;
+  }
+
+  .footer-legal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--obsidian-600);
+    color: var(--steel-400);
+  }
+
+  .footer-copy {
+    padding-top: 6px;
+    color: var(--steel-400);
+  }
+
+  :global(.footer-list .follow-text) {
+    color: var(--ice-200);
+    font-size: 0.875rem;
+  }
+
+  :global(.footer-list .follow-text:hover) {
+    color: var(--ice-50);
+  }
+
+  @media (max-width: 767px) {
+    .footer-inner {
+      padding-bottom: calc(40px + 72px);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .footer-inner {
+      padding-block: 80px 40px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: 4fr 8fr;
+      gap: 24px;
+    }
+
+    .footer-columns {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px;
+    }
+  }
+</style>

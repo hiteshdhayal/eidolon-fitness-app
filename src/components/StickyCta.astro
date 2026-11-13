@@ -2,15 +2,49 @@
 import Icon from './ui/Icon.astro';
 ---
 
-<aside
-  aria-label="Build your plan"
-  class="fixed inset-x-0 bottom-0 z-40 border-t border-black bg-white md:hidden"
->
-  <a
-    href="/plan/"
-    class="flex h-[52px] items-center justify-center gap-2 px-4 text-[15px] font-semibold text-black"
-  >
-    Build my free diet plan
+<aside aria-label="Build your plan" class="sticky-cta" data-surface="obsidian">
+  <a href="/plan/" class="sticky-link">
+    <span>Build my free diet plan</span>
     <Icon name="arrow-right" size={18} />
   </a>
 </aside>
+
+<style>
+  .sticky-cta {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 40;
+    background: var(--obsidian-900);
+    border-top: 1px solid var(--obsidian-600);
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .sticky-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 48px;
+    background: var(--red-500);
+    color: var(--ice-0);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: background-color 180ms ease-out;
+  }
+
+  .sticky-link:hover {
+    background: var(--red-600);
+  }
+
+  @media (min-width: 768px) {
+    .sticky-cta {
+      display: none;
+    }
+  }
+</style>

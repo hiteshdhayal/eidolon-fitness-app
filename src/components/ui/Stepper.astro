@@ -16,11 +16,11 @@ const { name, label, value = 0, min = 0, max = 999, step = 1, unit } = Astro.pro
 
 <div class="stepper" data-stepper>
   <span class="eyebrow mb-2 block">{label}</span>
-  <div class="flex h-14 items-stretch border border-black rounded-[2px] bg-surface">
+  <div class="stepper-track">
     <button type="button" data-step="-1" class="stepper-btn" aria-label={`Decrease ${label}`}>
       <Icon name="minus" size={18} />
     </button>
-    <div class="relative flex flex-1 items-center">
+    <div class="stepper-input">
       <input
         type="number"
         name={name}
@@ -29,10 +29,9 @@ const { name, label, value = 0, min = 0, max = 999, step = 1, unit } = Astro.pro
         max={max}
         step={step}
         inputmode="decimal"
-        class="h-full w-full border-0 bg-transparent pl-4 pr-10 font-mono text-xl tabular-nums outline-none"
         aria-label={label}
       />
-      {unit && <span class="pointer-events-none absolute right-4 font-mono text-xs">{unit}</span>}
+      {unit && <span class="stepper-unit">{unit}</span>}
     </div>
     <button type="button" data-step="1" class="stepper-btn" aria-label={`Increase ${label}`}>
       <Icon name="plus" size={18} />
@@ -59,6 +58,15 @@ const { name, label, value = 0, min = 0, max = 999, step = 1, unit } = Astro.pro
 </script>
 
 <style>
+  .stepper-track {
+    display: flex;
+    align-items: stretch;
+    height: 56px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: var(--surface);
+  }
+
   .stepper-btn {
     display: inline-flex;
     align-items: center;
@@ -67,22 +75,56 @@ const { name, label, value = 0, min = 0, max = 999, step = 1, unit } = Astro.pro
     min-height: 44px;
     border: 0;
     background: transparent;
+    color: var(--text);
     cursor: pointer;
   }
 
   .stepper-btn:first-child {
-    border-right: 1px solid var(--color-gray-200);
+    border-right: 1px solid var(--border);
   }
 
   .stepper-btn:last-child {
-    border-left: 1px solid var(--color-gray-200);
+    border-left: 1px solid var(--border);
   }
 
   .stepper-btn:hover {
-    background: var(--color-gray-100);
+    background: var(--border);
   }
 
-  /* Hide native number spinners; the stepper buttons are the control. */
+  .stepper-input {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+  }
+
+  .stepper-input input {
+    width: 100%;
+    height: 100%;
+    padding: 0 40px 0 16px;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    outline: none;
+  }
+
+  .stepper-input input:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+
+  .stepper-unit {
+    position: absolute;
+    right: 16px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
   input[type='number']::-webkit-outer-spin-button,
   input[type='number']::-webkit-inner-spin-button {
     -webkit-appearance: none;

@@ -1,9 +1,10 @@
-import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
 
 const pages = [
   { path: '/', heading: /diet plan built on the food/i },
   { path: '/styleguide/', heading: /styleguide/i },
+  { path: '/plan/', heading: /diet plan/i },
 ];
 
 for (const page of pages) {
@@ -16,8 +17,17 @@ for (const page of pages) {
   });
 }
 
-test('mobile menu opens and closes without JavaScript routing', async ({ page, viewport }) => {
-  test.skip((viewport?.width ?? 1440) >= 768, 'Mobile menu only exists below 768px');
+test('404 page renders and has no axe violations', async ({ page }) => {
+  const response = await page.goto('/this-page-does-not-exist/');
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText("doesn't exist");
+
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+});
+
+test('mobile menu opens and closes', async ({ page, viewport }) => {
+  test.skip((viewport?.width ?? 1440) >= 1024, 'Menu button is hidden on desktop');
   await page.goto('/');
   await page.getByRole('button', { name: 'Open menu' }).click();
   await expect(page.getByRole('button', { name: 'Close menu' })).toBeVisible();
@@ -29,4 +39,13 @@ test('home has a working plan call to action', async ({ page }) => {
   await page.goto('/');
   const cta = page.getByRole('link', { name: /build my plan/i }).first();
   await expect(cta).toHaveAttribute('href', '/plan/');
+});
+
+test('header turns solid after scrolling past the hero sentinel', async ({ page }) => {
+  await page.goto('/');
+  const header = page.locator('[data-site-header]');
+  await expect(header).not.toHaveAttribute('data-scrolled', '');
+
+  await page.evaluate(() => window.scrollTo(0, 240));
+  await expect(header).toHaveAttribute('data-scrolled', '');
 });

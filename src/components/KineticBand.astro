@@ -1,0 +1,114 @@
+---
+const dishes = [
+  'BAJRA ROTI',
+  'PUTTU',
+  'SAMBAR',
+  'KADHI',
+  'DALMA',
+  'THEPLA',
+  'RAGI MUDDE',
+  'MACHER JHOL',
+  'POHA',
+  'JADOH',
+  'NO SHAKES REQUIRED',
+];
+---
+
+<div class="band-shell" aria-hidden="true">
+  <div class="band">
+    <div class="band-track">
+      {[0, 1].map(() => (
+        <div class="band-group">
+          {dishes.map((dish) => (
+            <>
+              <span class="band-word">{dish}</span>
+              <span class="band-sep" />
+            </>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .band-shell {
+    position: relative;
+    z-index: 5;
+    margin-block: -32px;
+    overflow-x: clip;
+  }
+
+  .band {
+    display: flex;
+    align-items: center;
+    width: 110vw;
+    height: 64px;
+    margin-left: -5vw;
+    overflow: hidden;
+    background: var(--red-500);
+    transform: rotate(-2deg);
+  }
+
+  .band-track {
+    display: flex;
+    width: max-content;
+    animation: band-scroll 45s linear infinite;
+  }
+
+  .band:hover .band-track {
+    animation-play-state: paused;
+  }
+
+  .band-group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .band-word {
+    padding-inline: 24px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 110%;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--ice-0);
+  }
+
+  .band-sep {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    background: var(--obsidian-900);
+  }
+
+  @keyframes band-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .band {
+      height: 48px;
+    }
+
+    .band-word {
+      padding-inline: 16px;
+      font-size: 16px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .band-track {
+      animation: none;
+    }
+  }
+</style>

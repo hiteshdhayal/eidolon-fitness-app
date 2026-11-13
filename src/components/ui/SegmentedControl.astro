@@ -16,7 +16,7 @@ const { name, legend, options, value } = Astro.props;
 
 <fieldset class="segmented">
   <legend class="eyebrow mb-2">{legend}</legend>
-  <div class="inline-flex border border-black rounded-[2px] p-1">
+  <div class="segmented-track">
     {options.map((option) => (
       <label>
         <input type="radio" name={name} value={option.value} checked={value === option.value} />
@@ -27,6 +27,14 @@ const { name, legend, options, value } = Astro.props;
 </fieldset>
 
 <style>
+  .segmented-track {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    padding: 3px;
+    background: var(--surface);
+  }
+
   .segmented label {
     position: relative;
     cursor: pointer;
@@ -46,19 +54,20 @@ const { name, legend, options, value } = Astro.props;
     min-width: 64px;
     min-height: 40px;
     padding-inline: 12px;
-    border-radius: 1px;
+    border-radius: 0;
     font-family: var(--font-mono);
     font-size: 0.8125rem;
     letter-spacing: 0.04em;
+    color: var(--text);
   }
 
   .segmented input:checked + span {
-    background: var(--color-black);
-    color: var(--color-white);
+    background: var(--text);
+    color: var(--bg);
   }
 
   .segmented input:focus-visible + span {
-    outline: 2px solid var(--color-black);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 </style>

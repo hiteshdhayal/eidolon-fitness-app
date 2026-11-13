@@ -8,6 +8,34 @@ interface Props {
 const { class: className = '' } = Astro.props;
 ---
 
-<span class={`signature text-[19px] leading-none tracking-tight ${className}`}>
-  {site.brandName}
+<span class={`wordmark ${className}`}>
+  <span class="wordmark-text">{site.brandName.toUpperCase()}</span>
+  <span class="wordmark-dot" aria-hidden="true"></span>
 </span>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 4px;
+    color: currentColor;
+  }
+
+  .wordmark-text {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: 20px;
+    line-height: 0.9;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .wordmark-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-bottom: 2px;
+    background: var(--red-500);
+  }
+</style>

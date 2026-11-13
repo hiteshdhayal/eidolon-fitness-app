@@ -4,7 +4,8 @@ import Icon from './Icon.astro';
 interface Props {
   href?: string;
   type?: 'button' | 'submit';
-  variant?: 'primary' | 'secondary' | 'inverse' | 'inverse-secondary';
+  variant?: 'primary' | 'secondary';
+  size?: 'md' | 'sm';
   arrow?: boolean;
   full?: boolean;
   class?: string;
@@ -16,6 +17,7 @@ const {
   href,
   type = 'button',
   variant = 'primary',
+  size = 'md',
   arrow = false,
   full = false,
   class: className = '',
@@ -23,21 +25,13 @@ const {
   ariaLabel,
 } = Astro.props;
 
-const variants: Record<string, string> = {
-  primary: 'bg-black text-white border-black hover:bg-gray-800 hover:border-gray-800',
-  secondary: 'bg-transparent text-black border-black hover:bg-black hover:text-white',
-  inverse: 'bg-white text-black border-white hover:bg-gray-300 hover:border-gray-300',
-  'inverse-secondary': 'bg-transparent text-white border-white hover:bg-white hover:text-black',
-};
-
 const Tag = href ? 'a' : 'button';
 const classes = [
-  'group inline-flex h-[52px] items-center justify-center gap-2 rounded-[2px] border px-6',
-  'font-sans text-[15px] font-semibold leading-none no-underline',
-  'transition-colors duration-200 ease-out',
-  variants[variant],
-  full ? 'w-full md:w-auto' : '',
-  disabled ? 'pointer-events-none opacity-40' : '',
+  'btn',
+  `btn-${variant}`,
+  size === 'sm' ? 'btn-sm' : '',
+  full ? 'btn-full' : '',
+  disabled ? 'btn-disabled' : '',
   className,
 ]
   .filter(Boolean)
@@ -55,11 +49,94 @@ const classes = [
   <span>
     <slot />
   </span>
-  {arrow && (
-    <Icon
-      name="arrow-right"
-      size={18}
-      class="transition-transform duration-200 ease-out motion-safe:group-hover:translate-x-0.5"
-    />
-  )}
+  {arrow && <Icon name="arrow-right" size={18} class="btn-arrow" />}
 </Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 52px;
+    padding-inline: 24px;
+    border: 1px solid transparent;
+    border-radius: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color 180ms ease-out,
+      color 180ms ease-out,
+      border-color 180ms ease-out;
+  }
+
+  .btn-sm {
+    height: 44px;
+    padding-inline: 16px;
+    font-size: 12px;
+  }
+
+  .btn-full {
+    width: 100%;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--ice-0);
+    border-color: var(--accent);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+
+  .btn-primary:active {
+    background: var(--red-700);
+    border-color: var(--red-700);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    background-image: linear-gradient(var(--text), var(--text));
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 0% 100%;
+    color: var(--text);
+    border-color: var(--border-strong);
+    transition:
+      background-size 220ms ease-out,
+      color 220ms ease-out;
+  }
+
+  .btn-secondary:hover {
+    background-size: 100% 100%;
+    color: var(--bg);
+  }
+
+  .btn-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .btn :global(.btn-arrow) {
+    transition: transform 180ms ease-out;
+  }
+
+  .btn:hover :global(.btn-arrow) {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 767px) {
+    .btn-full {
+      width: 100%;
+    }
+  }
+</style>

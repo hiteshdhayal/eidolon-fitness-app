@@ -14,18 +14,58 @@ interface Props {
 const { items, class: className = '' } = Astro.props;
 ---
 
-<div class={`border-t border-black ${className}`}>
+<div class={`accordion ${className}`}>
   {items.map((item) => (
-    <details class="group border-b border-border">
-      <summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-5 [&::-webkit-details-marker]:hidden">
+    <details class="accordion-item">
+      <summary>
         <span class="font-medium">{item.question}</span>
-        <Icon
-          name="chevron-down"
-          size={20}
-          class="shrink-0 transition-transform duration-200 ease-out group-open:rotate-180"
-        />
+        <Icon name="chevron-down" size={20} class="accordion-icon" />
       </summary>
-      <p class="measure small pb-6 pr-8 text-muted">{item.answer}</p>
+      <p class="measure small accordion-answer">{item.answer}</p>
     </details>
   ))}
 </div>
+
+<style>
+  .accordion {
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .accordion-item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-block: 20px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary:hover .accordion-icon {
+    color: var(--accent-text);
+  }
+
+  .accordion-icon {
+    flex-shrink: 0;
+    transition:
+      transform 200ms ease-out,
+      color 160ms ease-out;
+  }
+
+  .accordion-item[open] .accordion-icon {
+    transform: rotate(180deg);
+  }
+
+  .accordion-answer {
+    padding: 0 32px 24px 0;
+    color: var(--text-muted);
+  }
+</style>

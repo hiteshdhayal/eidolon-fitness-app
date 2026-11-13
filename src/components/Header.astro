@@ -2,83 +2,214 @@
 import { site } from '../config/site';
 import Wordmark from './ui/Wordmark.astro';
 import Button from './ui/Button.astro';
+import FollowLink from './FollowLink.astro';
 import Icon from './ui/Icon.astro';
+
+interface Props {
+  overlay?: boolean;
+}
+
+const { overlay = false } = Astro.props;
+const path = Astro.url.pathname;
+
+function isActive(href: string) {
+  return path === href || path.startsWith(href);
+}
 ---
 
-<header class="border-b border-black bg-bg">
-  <div class="container flex h-[72px] items-center justify-between gap-6">
-    <a href="/" class="shrink-0" aria-label={`${site.brandName} home`}>
+<header
+  class="site-header"
+  data-surface="obsidian"
+  data-site-header
+  data-overlay={overlay ? '' : undefined}
+>
+  <div class="container header-inner">
+    <a href="/" class="wordmark-link" aria-label={`${site.brandName} home`}>
       <Wordmark />
     </a>
 
-    <nav class="hidden items-center gap-8 md:flex" aria-label="Primary">
+    <nav class="desktop-nav" aria-label="Primary">
       {site.nav.map((item) => (
-        <a
-          href={item.href}
-          class="text-[15px] font-medium text-black hover:underline hover:decoration-1 hover:underline-offset-4"
-        >
+        <a href={item.href} class:list={['nav-link', { 'is-active': isActive(item.href) }]}>
           {item.label}
         </a>
       ))}
     </nav>
 
-    <div class="hidden md:block">
-      <Button
-        href={site.instagramUrl}
-        variant="secondary"
-        class="h-11 px-5 text-sm"
-        ariaLabel={`Follow on Instagram, @${site.instagramHandle}`}
-      >
-        Follow
+    <div class="header-actions">
+      <FollowLink variant="secondary" size="sm" location="header" />
+      <Button href="/plan/" size="sm" arrow>
+        Build my plan
       </Button>
     </div>
 
-    <button
-      type="button"
-      popovertarget="mobile-menu"
-      class="flex h-11 items-center gap-2 md:hidden"
-      aria-label="Open menu"
-    >
+    <button type="button" popovertarget="mobile-menu" class="menu-button" aria-label="Open menu">
       <Icon name="menu" size={20} />
       <span class="eyebrow">Menu</span>
     </button>
   </div>
 
-  <div id="mobile-menu" popover class="mobile-menu" aria-label="Site menu">
-    <div class="container flex h-[72px] items-center justify-between">
-      <Wordmark class="text-white" />
+  <div id="mobile-menu" popover class="mobile-menu" data-surface="obsidian" aria-label="Site menu">
+    <div class="container mobile-menu-top">
+      <Wordmark />
       <button
         type="button"
         popovertarget="mobile-menu"
         popovertargetaction="hide"
-        class="flex h-11 items-center gap-2 text-white"
+        class="menu-button"
         aria-label="Close menu"
       >
         <span class="eyebrow">Close</span>
         <Icon name="x" size={20} />
       </button>
     </div>
-    <nav class="container mt-10 flex flex-col" aria-label="Mobile">
-      {site.nav.map((item) => (
-        <a
-          href={item.href}
-          class="border-b border-gray-800 py-5 font-display text-[clamp(2rem,6vw,2.75rem)] font-extrabold leading-none tracking-tight text-white"
-        >
-          {item.label}
+
+    <nav class="container mobile-nav" aria-label="Mobile">
+      {site.nav.map((item, index) => (
+        <a href={item.href} class="mobile-nav-link">
+          <span class="mobile-nav-index" aria-hidden="true">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <span>{item.label}</span>
         </a>
       ))}
-      <a
-        href={site.instagramUrl}
-        class="mt-10 inline-flex h-[52px] w-full items-center justify-center border border-white px-6 text-[15px] font-semibold text-white"
-      >
-        Follow @{site.instagramHandle}
-      </a>
-      <p class="small mt-8 text-inverse-muted">{site.disclaimer}</p>
     </nav>
+
+    <div class="container mobile-menu-actions">
+      <Button href="/plan/" arrow full>
+        Build my plan
+      </Button>
+      <FollowLink variant="secondary" location="mobile-menu" />
+      <p class="small mobile-menu-note">{site.disclaimer}</p>
+    </div>
   </div>
 </header>
 
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  const sentinel = document.getElementById('header-sentinel');
+
+  if (header) {
+    if (sentinel && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          if (!entry) return;
+          header.toggleAttribute('data-scrolled', !entry.isIntersecting);
+        },
+        { threshold: 0 },
+      );
+      observer.observe(sentinel);
+    } else {
+      header.setAttribute('data-scrolled', '');
+    }
+  }
+</script>
+
 <style>
+  .site-header {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 50;
+    height: var(--header-h);
+    background: var(--obsidian-900);
+    border-bottom: 1px solid var(--obsidian-600);
+    color: var(--ice-50);
+    transition:
+      background-color 200ms ease-out,
+      border-color 200ms ease-out;
+  }
+
+  .site-header[data-overlay]:not([data-scrolled]) {
+    background: transparent;
+    border-bottom-color: transparent;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 100%;
+  }
+
+  .wordmark-link {
+    flex-shrink: 0;
+  }
+
+  .desktop-nav {
+    display: none;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .nav-link {
+    position: relative;
+    padding-block: 6px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--ice-200);
+    transition: color 160ms ease-out;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--red-500);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 180ms ease-out;
+  }
+
+  .nav-link:hover {
+    color: var(--ice-50);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.is-active::after {
+    transform: scaleX(1);
+  }
+
+  .header-actions {
+    display: none;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .menu-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ice-50);
+    cursor: pointer;
+  }
+
+  @media (min-width: 768px) {
+    .desktop-nav {
+      display: flex;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .header-actions {
+      display: flex;
+    }
+
+    .menu-button {
+      display: none;
+    }
+  }
+
   .mobile-menu {
     position: fixed;
     inset: 0;
@@ -89,12 +220,66 @@ import Icon from './ui/Icon.astro';
     max-height: none;
     border: 0;
     padding: 0;
-    background: var(--color-black);
-    color: var(--color-white);
+    background: var(--obsidian-950);
+    color: var(--ice-50);
     overflow-y: auto;
   }
 
   .mobile-menu::backdrop {
-    background: var(--color-black);
+    background: var(--obsidian-950);
+  }
+
+  .mobile-menu-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);
+    border-bottom: 1px solid var(--obsidian-600);
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+  }
+
+  .mobile-nav-link {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--obsidian-600);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 105%;
+    font-size: clamp(1.75rem, 6vw, 2.5rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--ice-50);
+  }
+
+  .mobile-nav-link:hover {
+    color: var(--red-400);
+  }
+
+  .mobile-nav-index {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--red-400);
+  }
+
+  .mobile-menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-block: 32px 40px;
+  }
+
+  .mobile-menu-note {
+    margin-top: 16px;
+    color: var(--steel-400);
   }
 </style>

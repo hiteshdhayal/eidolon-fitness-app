@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './tests',
   fullyParallel: true,
   reporter: [['list']],
   use: {
@@ -18,6 +18,10 @@ export default defineConfig({
     {
       name: 'mobile-375',
       use: { viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true },
+    },
+    {
+      name: 'tablet-768',
+      use: { viewport: { width: 768, height: 1024 }, hasTouch: true },
     },
     {
       name: 'desktop-1440',

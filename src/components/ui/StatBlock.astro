@@ -4,20 +4,50 @@ interface Props {
   label: string;
   unit?: string;
   note?: string;
-  inverse?: boolean;
   class?: string;
 }
 
-const { value, label, unit, note, inverse = false, class: className = '' } = Astro.props;
+const { value, label, unit, note, class: className = '' } = Astro.props;
 ---
 
 <div class={className}>
-  <p class={`signature leading-none ${inverse ? 'text-inverse-text' : 'text-black'}`}>
-    <span class="text-[clamp(2rem,1.4rem+2vw,3.25rem)]">{value}</span>
-    {unit && (
-      <span class="ml-1 font-mono text-sm font-medium normal-case tracking-normal">{unit}</span>
-    )}
+  <p class="stat-value">
+    <span>{value}</span>
+    {unit && <span class="stat-unit">{unit}</span>}
   </p>
-  <p class={`eyebrow mt-3 ${inverse ? 'text-inverse-muted' : 'text-muted'}`}>{label}</p>
-  {note && <p class={`small mt-1 ${inverse ? 'text-inverse-muted' : 'text-muted'}`}>{note}</p>}
+  <p class="eyebrow stat-label">{label}</p>
+  {note && <p class="small stat-note">{note}</p>}
 </div>
+
+<style>
+  .stat-value {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: clamp(2rem, 1.4rem + 2vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .stat-unit {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .stat-label {
+    margin-top: 12px;
+    color: var(--text-muted);
+  }
+
+  .stat-note {
+    margin-top: 4px;
+    color: var(--text-muted);
+  }
+</style>

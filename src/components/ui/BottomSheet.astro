@@ -10,17 +10,17 @@ const { title, class: className = '' } = Astro.props;
 <div class={`sheet-demo ${className}`}>
   <div class="sheet-handle" aria-hidden="true"></div>
   <p class="eyebrow mb-2">{title}</p>
-  <div class="small text-muted">
+  <div class="small sheet-body">
     <slot />
   </div>
 </div>
 
 <style>
   .sheet-demo {
-    border: 1px solid var(--color-gray-300);
+    border: 1px solid var(--border);
     border-bottom: 0;
     border-radius: 2px 2px 0 0;
-    background: var(--color-surface);
+    background: var(--surface);
     padding: 12px 20px 24px;
   }
 
@@ -28,6 +28,10 @@ const { title, class: className = '' } = Astro.props;
     width: 40px;
     height: 4px;
     margin: 0 auto 16px;
-    background: var(--color-gray-300);
+    background: var(--border);
+  }
+
+  .sheet-body {
+    color: var(--text-muted);
   }
 </style>

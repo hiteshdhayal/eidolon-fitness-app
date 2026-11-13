@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
 import Button from '../components/ui/Button.astro';
+import FollowLink from '../components/FollowLink.astro';
 import OptionCard from '../components/ui/OptionCard.astro';
 import SegmentedControl from '../components/ui/SegmentedControl.astro';
 import SearchSelect from '../components/ui/SearchSelect.astro';
@@ -11,22 +12,28 @@ import Accordion from '../components/ui/Accordion.astro';
 import StatBlock from '../components/ui/StatBlock.astro';
 import Toast from '../components/ui/Toast.astro';
 import BottomSheet from '../components/ui/BottomSheet.astro';
-import PlaceholderMedia from '../components/ui/PlaceholderMedia.astro';
 import Icon from '../components/ui/Icon.astro';
+import { pageTitle } from '../config/site';
 
 const swatches = [
-  { name: 'black', value: '#0A0A0A' },
-  { name: 'gray-900', value: '#171717' },
-  { name: 'gray-800', value: '#262626' },
-  { name: 'gray-700', value: '#3F3F3F' },
-  { name: 'gray-600', value: '#525252' },
-  { name: 'gray-500', value: '#737373' },
-  { name: 'gray-400', value: '#A3A3A3' },
-  { name: 'gray-300', value: '#D4D4D4' },
-  { name: 'gray-200', value: '#E5E5E5' },
-  { name: 'gray-100', value: '#F0F0F0' },
-  { name: 'gray-50', value: '#F7F7F7' },
-  { name: 'white', value: '#FFFFFF' },
+  { name: 'obsidian-950', value: '#060607' },
+  { name: 'obsidian-900', value: '#0B0C0E' },
+  { name: 'obsidian-800', value: '#131417' },
+  { name: 'obsidian-700', value: '#1C1E22' },
+  { name: 'obsidian-600', value: '#2A2D33' },
+  { name: 'obsidian-500', value: '#3A3E45' },
+  { name: 'steel-500', value: '#5E6570' },
+  { name: 'steel-400', value: '#8B939D' },
+  { name: 'steel-300', value: '#AEB5BE' },
+  { name: 'ice-300', value: '#C3CBD3' },
+  { name: 'ice-200', value: '#D3DAE1' },
+  { name: 'ice-100', value: '#E4E9EE' },
+  { name: 'ice-50', value: '#F1F4F7' },
+  { name: 'ice-0', value: '#F8FAFB' },
+  { name: 'red-700', value: '#9E0B07' },
+  { name: 'red-600', value: '#C10A04' },
+  { name: 'red-500', value: '#E10600' },
+  { name: 'red-400', value: '#FF3B30' },
 ];
 
 const faqs = [
@@ -45,36 +52,41 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
 ---
 
 <BaseLayout
-  title="Styleguide"
-  description="Internal component gallery for the site design system."
+  title={pageTitle('Styleguide')}
+  description="Internal component gallery for the Eidolon design system."
   noindex
   hideStickyCta
 >
-  <section class="section pb-10 pt-14 md:pt-20">
+  <section class="section intro" data-surface="ice">
     <div class="container">
-      <p class="eyebrow mb-4">Internal · noindex</p>
+      <p class="eyebrow-row mb-4">
+        <span class="speed-bar" aria-hidden="true"></span>
+        <span class="eyebrow">Internal · noindex</span>
+      </p>
       <h1 class="display">Styleguide</h1>
       <p class="measure mt-6 text-muted">
-        The components, tokens and type scale used across the site. Nothing here is a page — this
-        exists so the design stays consistent.
+        Obsidian, ice and racing red. Components are shown on both surfaces; every colour comes from
+        a token.
       </p>
-      <hr class="mt-10 border-0 border-t border-black" />
+      <hr class="rule-strong mt-10" />
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="01"
         eyebrow="Type"
         title="Typography"
-        intro="Archivo for headings, IBM Plex Sans for body, IBM Plex Mono for labels and numbers."
+        intro="Archivo for display and headings, IBM Plex Sans for body, IBM Plex Mono for labels."
       />
 
-      <div class="space-y-8 border-t border-border pt-8">
+      <div class="stack">
         <div>
-          <p class="eyebrow mb-3">Display</p>
-          <p class="display">Eat well, train hard.</p>
+          <p class="eyebrow mb-3">Display · italic accent</p>
+          <p class="display">
+            Food you <em class="accent-italic">already eat.</em>
+          </p>
         </div>
         <div>
           <p class="eyebrow mb-3">Heading 1</p>
@@ -102,9 +114,18 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
           </p>
         </div>
         <div>
-          <p class="eyebrow mb-3">Eyebrow and label</p>
-          <p class="eyebrow">03 — Food</p>
+          <p class="eyebrow mb-3">Eyebrow, label and speed bar</p>
+          <p class="eyebrow-row">
+            <span class="speed-bar" aria-hidden="true"></span>
+            <span class="eyebrow">03 — Food</span>
+          </p>
           <p class="label mt-2 text-muted">1 katori · 150 ml</p>
+        </div>
+        <div>
+          <p class="eyebrow mb-3">Section number · outlined, fills red on hover</p>
+          <p class="section-number" aria-hidden="true">
+            01
+          </p>
         </div>
         <div>
           <p class="eyebrow mb-3">Text link</p>
@@ -118,105 +139,106 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="02"
         eyebrow="Color"
-        title="Monochrome only"
-        intro="No hue anywhere. States use weight, borders, icons and text."
+        title="Obsidian, ice, racing red"
+        intro="Red is the accent, never body text and never a background wash."
       />
-      <ul class="grid grid-cols-2 border-t border-border sm:grid-cols-3 md:grid-cols-6">
+
+      <ul class="swatches">
         {swatches.map((swatch) => (
-          <li class="border-b border-r border-border p-3 first:border-l">
-            <div
-              class="h-16 w-full border border-gray-300"
-              style={`background: ${swatch.value}`}
-              aria-hidden="true"
-            ></div>
+          <li class="swatch">
+            <div class="swatch-chip" style={`background: ${swatch.value}`} aria-hidden="true" />
             <p class="label mt-2">{swatch.name}</p>
-            <p class="label text-muted">{swatch.value}</p>
+            <p class="label swatch-hex">{swatch.value}</p>
           </li>
         ))}
       </ul>
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="03"
         eyebrow="Actions"
-        title="Buttons"
-        intro="52px tall, 2px radius, one clear primary action per screen."
+        title="Buttons and links"
+        intro="One red primary action per screen. Secondary buttons wipe from the left."
       />
 
-      <div class="grid gap-10 border-t border-border pt-8 md:grid-cols-2">
-        <div class="space-y-4">
-          <p class="eyebrow">Light</p>
-          <div class="flex flex-wrap gap-3">
-            <Button href="#">Primary</Button>
-            <Button href="#" variant="secondary">
-              Secondary
-            </Button>
-            <Button href="#" arrow>
-              With arrow
-            </Button>
-          </div>
-          <div class="flex flex-wrap gap-3">
-            <Button type="button" variant="secondary" disabled>
-              Disabled
-            </Button>
-          </div>
-          <div class="max-w-sm">
-            <Button href="#" full arrow>
-              Full width on mobile
-            </Button>
-          </div>
-        </div>
+      <p class="eyebrow mb-4">On ice</p>
+      <div class="actions-row">
+        <Button href="#">Primary</Button>
+        <Button href="#" variant="secondary">
+          Secondary
+        </Button>
+        <Button href="#" arrow>
+          With arrow
+        </Button>
+        <Button type="button" variant="secondary" disabled>
+          Disabled
+        </Button>
+      </div>
 
-        <div class="space-y-4 bg-black p-6 text-inverse-text">
-          <p class="eyebrow text-inverse-muted">Dark</p>
-          <div class="flex flex-wrap gap-3">
-            <Button href="#" variant="inverse">
-              Primary
-            </Button>
-            <Button href="#" variant="inverse-secondary">
-              Secondary
-            </Button>
-          </div>
-        </div>
+      <div class="actions-row mt-6">
+        <FollowLink variant="primary" location="styleguide-primary" />
+        <FollowLink variant="secondary" location="styleguide-secondary" />
+        <FollowLink variant="text" location="styleguide-text" />
       </div>
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="obsidian">
+    <div class="container">
+      <p class="eyebrow-row mb-6">
+        <span class="speed-bar" aria-hidden="true"></span>
+        <span class="eyebrow">On obsidian</span>
+      </p>
+      <div class="actions-row">
+        <Button href="#">Primary</Button>
+        <Button href="#" variant="secondary">
+          Secondary
+        </Button>
+        <Button href="#" arrow>
+          With arrow
+        </Button>
+      </div>
+      <div class="actions-row mt-6">
+        <FollowLink variant="primary" location="styleguide-dark-primary" />
+        <FollowLink variant="secondary" location="styleguide-dark-secondary" />
+        <FollowLink variant="text" location="styleguide-dark-text" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="04"
         eyebrow="Form"
         title="Questionnaire controls"
-        intro="Real inputs, big targets, keyboard friendly."
+        intro="Real inputs, 44px targets, red focus rings."
       />
 
-      <div class="grid gap-12 border-t border-border pt-8 md:grid-cols-2">
-        <div class="space-y-4">
+      <div class="two-col">
+        <div class="stack-sm">
           <p class="eyebrow">Option cards · radio</p>
-          <div class="space-y-2">
-            <OptionCard name="goal" value="lose" label="Lose fat" checked />
-            <OptionCard
-              name="goal"
-              value="muscle"
-              label="Build muscle"
-              sublabel="Keep most meals the same, add a little protein."
-            />
-            <OptionCard name="goal" value="healthy" label="Eat healthier and get fitter" />
-          </div>
+          <OptionCard name="goal" value="lose" label="Lose fat" checked />
+          <OptionCard
+            name="goal"
+            value="muscle"
+            label="Build muscle"
+            sublabel="Keep most meals the same, add a little protein."
+          />
+          <OptionCard name="goal" value="healthy" label="Eat healthier and get fitter" />
         </div>
 
-        <div class="space-y-8">
-          <div class="space-y-2">
-            <p class="eyebrow">Option cards · checkbox</p>
+        <div class="stack">
+          <div>
+            <p class="eyebrow mb-2">Option cards · checkbox</p>
             <OptionCard
               type="checkbox"
               name="conditions"
@@ -228,8 +250,7 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
           </div>
 
           <div>
-            <p class="eyebrow mb-2">Input with unit</p>
-            <label for="weight-demo" class="label mb-1 block text-muted">
+            <label for="weight-demo" class="eyebrow mb-2 block">
               Weight
             </label>
             <div class="field-wrap">
@@ -261,16 +282,51 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="obsidian">
+    <div class="container">
+      <p class="eyebrow-row mb-6">
+        <span class="speed-bar" aria-hidden="true"></span>
+        <span class="eyebrow">Form controls on obsidian</span>
+      </p>
+      <div class="two-col">
+        <div class="stack-sm">
+          <OptionCard name="goal-dark" value="lose" label="Lose fat" checked />
+          <OptionCard name="goal-dark" value="muscle" label="Build muscle" />
+        </div>
+        <div class="stack">
+          <div>
+            <label for="weight-dark" class="eyebrow mb-2 block">
+              Weight
+            </label>
+            <div class="field-wrap">
+              <input id="weight-dark" class="field" type="text" inputmode="decimal" value="72.4" />
+              <span class="field-unit">KG</span>
+            </div>
+          </div>
+          <SegmentedControl
+            name="height-unit-dark"
+            legend="Height unit"
+            value="cm"
+            options={[
+              { value: 'cm', label: 'CM' },
+              { value: 'ft', label: 'FT · IN' },
+            ]}
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="05"
         eyebrow="Feedback"
-        title="Callouts and feedback"
-        intro="Variants differ only by icon."
+        title="Callouts and toasts"
+        intro="The bar turns red only when the message is a warning or a medical note."
       />
 
-      <div class="grid gap-4 md:grid-cols-3">
+      <div class="callout-grid">
         <Callout title="Your plan is saved on this phone" variant="info">
           Nothing is sent to a server. Clearing your browser data will remove it.
         </Callout>
@@ -283,7 +339,7 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
         </Callout>
       </div>
 
-      <div class="mt-10 max-w-md">
+      <div class="toast-demo">
         <p class="eyebrow mb-3">Toast</p>
         <Toast message="Day shuffled." actionLabel="Undo" />
       </div>
@@ -297,7 +353,7 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="06"
@@ -306,7 +362,7 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
         intro="Hairlines first. Cards only when a group needs its own surface."
       />
 
-      <div class="grid gap-6 border-t border-border pt-8 md:grid-cols-2">
+      <div class="two-col">
         <div class="card p-6">
           <div class="flex items-center justify-between gap-4">
             <h3>Besan chilla</h3>
@@ -324,15 +380,15 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
           </div>
         </div>
 
-        <div class="space-y-4">
+        <div class="stack-sm">
           <div class="flex flex-wrap gap-2">
             <span class="tag">High protein</span>
             <span class="tag">Low GI</span>
             <span class="tag">Jain</span>
             <span class="tag">Under 20 min</span>
           </div>
-          <div class="border border-gray-300 p-4">
-            <p class="eyebrow mb-2 text-muted">Affiliate disclosure</p>
+          <div class="card p-4">
+            <p class="eyebrow mb-2">Affiliate disclosure</p>
             <p class="small">
               I earn a commission if you buy through these links, at no extra cost to you. As an
               Amazon Associate I earn from qualifying purchases.
@@ -343,42 +399,33 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="07"
         eyebrow="Data"
         title="Numbers and tables"
-        intro="Tabular figures, mono labels, no color coding."
+        intro="Tabular figures, mono labels. Red marks the target and current value; steel does everything else."
       />
 
-      <div class="grid gap-8 border-y border-border py-8 sm:grid-cols-2 md:grid-cols-4">
+      <div class="stat-grid">
         <StatBlock value="1,840" label="Calories" unit="kcal" />
         <StatBlock value="118" label="Protein" unit="g" />
         <StatBlock value="7" label="Days planned" />
         <StatBlock value="35" label="Fiber" unit="g" note="Target range 25–40 g" />
       </div>
 
-      <div class="mt-10 bg-black p-8 text-inverse-text">
-        <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
-          <StatBlock inverse value="1,840" label="Calories" unit="kcal" />
-          <StatBlock inverse value="118" label="Protein" unit="g" />
-          <StatBlock inverse value="3.1" label="Water" unit="L" />
-          <StatBlock inverse value="8,000" label="Steps" />
-        </div>
-      </div>
-
       <div class="mt-10">
-        <p class="eyebrow mb-3">Progress · 2px</p>
+        <p class="eyebrow mb-3">Progress · 3px</p>
         <div
-          class="h-0.5 w-full max-w-md bg-gray-200"
+          class="progress-track max-w-md"
           role="progressbar"
           aria-valuenow="7"
           aria-valuemin="0"
           aria-valuemax="18"
           aria-label="Questionnaire progress"
         >
-          <div class="h-0.5 bg-black" style="width: 39%"></div>
+          <div class="progress-fill" style="width: 39%"></div>
         </div>
         <p class="label mt-2 text-muted">07 / 18</p>
       </div>
@@ -419,7 +466,7 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="08"
@@ -428,7 +475,7 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
         intro="Days of the week, and the FAQ."
       />
 
-      <div class="grid gap-10 border-t border-border pt-8 md:grid-cols-2">
+      <div class="two-col">
         <div>
           <p class="eyebrow mb-4">Tabs</p>
           <div class="tabs">
@@ -439,19 +486,19 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
             <input type="radio" name="day-tabs" id="tab-wed" />
             <label for="tab-wed">WED</label>
 
-            <div class="tab-panel mt-4 border-t border-black pt-4">
+            <div class="tab-panel mt-4 border-t border-line pt-4">
               <h3>Monday</h3>
               <p class="small mt-2 text-muted">
                 Poha with peanuts, rajma chawal, lauki sabzi and roti.
               </p>
             </div>
-            <div class="tab-panel mt-4 border-t border-black pt-4">
+            <div class="tab-panel mt-4 border-t border-line pt-4">
               <h3>Tuesday</h3>
               <p class="small mt-2 text-muted">
                 Besan chilla, dal with roti, palak paneer and salad.
               </p>
             </div>
-            <div class="tab-panel mt-4 border-t border-black pt-4">
+            <div class="tab-panel mt-4 border-t border-line pt-4">
               <h3>Wednesday</h3>
               <p class="small mt-2 text-muted">
                 Upma with curd, chole with rice, bhindi sabzi and roti.
@@ -468,25 +515,35 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
     </div>
   </section>
 
-  <section class="pb-16 md:pb-24">
+  <section class="section" data-surface="ice">
     <div class="container">
       <SectionHeader
         number="09"
-        eyebrow="Media"
-        title="Image placeholders"
-        intro="Black-and-white photos only. Until real photos arrive, placeholders are labelled in mono."
+        eyebrow="Media and motion"
+        title="Photos and movement"
+        intro="Photos are real, grayscale and blended into the page. There are no boxes, frames or placeholders."
       />
 
-      <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <PlaceholderMedia label="PHOTO — portrait, gym, 4:5" ratio="4:5" />
-        <PlaceholderMedia label="REEL — thumbnail, 9:16" ratio="9:16" />
-        <PlaceholderMedia label="PHOTO — food, 1:1" ratio="1:1" />
-        <PlaceholderMedia label="PHOTO — training, 3:2" ratio="3:2" />
+      <div class="note-grid">
+        <div class="card p-6">
+          <h3>Photo treatment</h3>
+          <p class="small mt-2 text-muted">
+            Build-time grayscale, cool tint, high contrast. Cut-out photos fade at the bottom edge;
+            photos with a background fade left, bottom, top and right. Never a visible rectangle.
+          </p>
+        </div>
+        <div class="card p-6">
+          <h3>Motion</h3>
+          <p class="small mt-2 text-muted">
+            One kinetic band per page. Headline lines rise once on load. Section reveals use
+            scroll-driven CSS. Everything is static with reduced motion.
+          </p>
+        </div>
       </div>
 
-      <div class="mt-10 flex items-center gap-6">
+      <div class="icons-row">
         <p class="eyebrow">Icons</p>
-        <div class="flex gap-4">
+        <div class="icon-set">
           <Icon name="check" />
           <Icon name="alert-triangle" />
           <Icon name="info" />
@@ -500,6 +557,89 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
 </BaseLayout>
 
 <style>
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .stack-sm {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .two-col {
+    display: grid;
+    gap: 48px;
+  }
+
+  .actions-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .swatch {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  .swatch-chip {
+    height: 64px;
+    border: 1px solid var(--border);
+  }
+
+  .swatch-hex {
+    color: var(--text-muted);
+  }
+
+  .callout-grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .toast-demo {
+    max-width: 420px;
+    margin-top: 40px;
+  }
+
+  .stat-grid {
+    display: grid;
+    gap: 32px;
+    padding-block: 32px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .note-grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .icons-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .icon-set {
+    display: flex;
+    gap: 16px;
+  }
+
   .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -510,7 +650,7 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
   .data-table td {
     padding: 12px 16px 12px 0;
     text-align: left;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--border);
   }
 
   .data-table thead th {
@@ -519,7 +659,7 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    border-bottom: 1px solid var(--color-black);
+    border-bottom: 1px solid var(--border-strong);
   }
 
   .data-table tbody th {
@@ -529,5 +669,27 @@ const states = ['Haryana', 'Punjab', 'Tamil Nadu', 'Kerala', 'West Bengal', 'Guj
   .data-table td {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
+  }
+
+  @media (min-width: 768px) {
+    .two-col {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .swatches {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .callout-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .stat-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .note-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 </style>

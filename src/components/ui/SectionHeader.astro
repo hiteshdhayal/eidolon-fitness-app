@@ -5,19 +5,32 @@ interface Props {
   title: string;
   intro?: string;
   id?: string;
+  rule?: boolean;
   class?: string;
 }
 
-const { number, eyebrow, title, intro, id, class: className = '' } = Astro.props;
+const { number, eyebrow, title, intro, id, rule = true, class: className = '' } = Astro.props;
 ---
 
 <header id={id} class={`mb-10 md:mb-14 ${className}`}>
-  <p class="eyebrow mb-4">
-    <span class="signature mr-2">{number}</span> — {eyebrow}
+  <p class="eyebrow-row mb-4">
+    <span class="speed-bar" aria-hidden="true"></span>
+    <span class="eyebrow">
+      <span class="section-header-number">{number}</span> — {eyebrow}
+    </span>
   </p>
   <div class="grid gap-6 md:grid-cols-12 md:gap-6">
     <h2 class="md:col-span-6">{title}</h2>
     {intro && <p class="measure text-muted md:col-span-5 md:col-start-8 md:pt-2">{intro}</p>}
   </div>
-  <hr class="mt-8 border-0 border-t border-black md:mt-10" />
+  {rule && <hr class="rule-strong mt-8 md:mt-10" />}
 </header>
+
+<style>
+  .section-header-number {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 125%;
+    letter-spacing: 0;
+  }
+</style>

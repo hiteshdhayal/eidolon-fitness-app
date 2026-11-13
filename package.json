@@ -4,18 +4,21 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/process-hero.mjs",
     "dev": "astro dev",
-    "build": "astro build",
+    "prebuild": "node scripts/process-hero.mjs",
+    "build": "astro build && node scripts/check-placeholders.mjs && node scripts/check-links.mjs",
     "preview": "astro preview",
+    "typecheck": "astro check",
     "check": "astro check",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
-    "screenshots": "node scripts/screenshots.mjs",
-    "verify": "pnpm check && pnpm lint && pnpm test && pnpm build"
+    "test:e2e": "pnpm build && playwright test",
+    "screenshots": "node scripts/screenshots-phase15.mjs",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "engines": {
     "node": ">=22.12.0"
@@ -38,6 +41,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@astrojs/sitemap": "^3.7.4",
     "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.0",
     "@tailwindcss/postcss": "^4.3.5",
@@ -47,6 +51,7 @@
     "eslint-plugin-jsx-a11y-x": "^0.2.0",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
+    "sharp": "^0.35.5",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.2",
     "vitest": "^5.1.0"

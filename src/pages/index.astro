@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/ui/Button.astro';
-import PlaceholderMedia from '../components/ui/PlaceholderMedia.astro';
+import FollowLink from '../components/FollowLink.astro';
+import HeroPortrait from '../components/HeroPortrait.astro';
+import KineticBand from '../components/KineticBand.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
-import { site } from '../config/site';
+import { defaultTitle } from '../config/site';
 
 const steps = [
   {
@@ -25,80 +27,415 @@ const steps = [
 ---
 
 <BaseLayout
-  title="Indian diet plan, built on your food"
-  description="Free 7-day Indian diet plans from your state's kitchen. Veg, non-veg, Jain or vegan. No sign-up, no protein shakes required."
+  title={defaultTitle}
+  description="A free 7-day Indian diet plan from your state's kitchen. Veg, non-veg, Jain or vegan. No sign-up, no protein shakes required."
+  overlayHeader
+  flushTop
 >
-  <section class="section pt-14 md:pt-20">
-    <div class="container">
-      <div class="grid gap-12 md:grid-cols-12 md:items-end md:gap-6">
-        <div class="md:col-span-7">
-          <p class="eyebrow mb-6">Free · 2 minutes · No sign-up</p>
-          <h1 class="display">A diet plan built on the food you already eat.</h1>
-          <p class="measure mt-6 text-lg text-muted">
-            A few taps. A 7-day plan from your state's kitchen — veg, non-veg, Jain or vegan. No
-            shakes required.
-          </p>
-          <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Button href="/plan/" arrow full class="sm:w-auto">
-              Build my plan
-            </Button>
-            <Button href={site.instagramUrl} variant="secondary" full class="sm:w-auto">
-              Follow @{site.instagramHandle}
-            </Button>
-          </div>
-          <p class="small mt-6 max-w-[46ch] text-muted">
-            General education, not medical advice. Your answers never leave your phone.
-          </p>
+  <section class="hero" data-surface="obsidian">
+    <div id="header-sentinel" class="header-sentinel" aria-hidden="true"></div>
+
+    <div class="container hero-inner">
+      <span class="hero-word text-outline" aria-hidden="true">
+        EIDOLON
+      </span>
+
+      <div class="hero-photo">
+        <HeroPortrait position="center top" />
+      </div>
+
+      <div class="hero-scrim" aria-hidden="true"></div>
+
+      <div class="hero-copy">
+        <p class="eyebrow-row">
+          <span class="speed-bar" aria-hidden="true"></span>
+          <span class="eyebrow">Free · 2 minutes · No sign-up</span>
+        </p>
+
+        <h1 class="display hero-title">
+          <span class="reveal-line">
+            <span>A diet plan</span>
+          </span>
+          <span class="reveal-line">
+            <span>built on the</span>
+          </span>
+          <span class="reveal-line">
+            <span>food you</span>
+          </span>
+          <span class="reveal-line">
+            <span>
+              <em class="accent-italic">already eat.</em>
+            </span>
+          </span>
+        </h1>
+
+        <p class="hero-sub hero-fade">
+          A few taps. A 7-day plan from your state's kitchen — veg, non-veg, Jain or vegan. No
+          shakes required.
+        </p>
+
+        <div class="hero-ctas hero-fade">
+          <Button href="/plan/" arrow>
+            Build my plan
+          </Button>
+          <FollowLink variant="secondary" location="hero" />
         </div>
-        <div class="md:col-span-5 md:col-start-8">
-          <PlaceholderMedia label="PHOTO — portrait, gym, 4:5" ratio="4:5" />
-        </div>
+
+        <p class="hero-proof hero-fade">
+          VEG · NON-VEG · EGGETARIAN · JAIN · VEGAN — ALL 36 STATES &amp; UTS
+        </p>
       </div>
     </div>
   </section>
 
-  <section class="section pt-0">
-    <div class="container">
+  <KineticBand />
+
+  <section class="section how" data-surface="ice">
+    <div class="container section-reveal">
       <SectionHeader
         number="01"
         eyebrow="How it works"
-        title="Three steps, then your week is sorted."
+        title="Three steps. Your week is sorted."
         intro="The plan comes from a food database built around Indian home cooking, not a generic template."
+        rule={false}
       />
 
-      <ol class="border-t border-black">
+      <ol class="steps">
         {steps.map((step) => (
-          <li class="grid gap-4 border-b border-border py-8 md:grid-cols-12 md:gap-6">
-            <p class="signature text-[clamp(1.5rem,1.2rem+1vw,2rem)] md:col-span-1">
+          <li class="step-row">
+            <span class="section-number" aria-hidden="true">
               {step.number}
-            </p>
-            <h3 class="md:col-span-5">{step.title}</h3>
-            <p class="measure text-muted md:col-span-5 md:col-start-7">{step.text}</p>
+            </span>
+            <h3 class="step-title">{step.title}</h3>
+            <p class="step-text">{step.text}</p>
           </li>
         ))}
       </ol>
     </div>
   </section>
 
-  <section class="bg-black text-inverse-text">
-    <div class="container py-16 md:py-24">
-      <div class="grid gap-8 md:grid-cols-12 md:items-end">
-        <div class="md:col-span-7">
-          <p class="eyebrow mb-4 text-inverse-muted">Free · No sign-up</p>
-          <h2>Your plan is 2 minutes away.</h2>
-        </div>
-        <div class="md:col-span-4 md:col-start-9">
-          <Button href="/plan/" variant="inverse" arrow full>
-            Build my plan
-          </Button>
-          <a
-            href={site.instagramUrl}
-            class="mt-4 inline-block text-sm text-inverse-text underline decoration-1 underline-offset-4 hover:decoration-2"
-          >
-            Follow @{site.instagramHandle}
-          </a>
-        </div>
+  <section class="final-cta section" data-surface="obsidian">
+    <div class="container section-reveal">
+      <span class="cta-rule" aria-hidden="true"></span>
+
+      <p class="eyebrow-row">
+        <span class="speed-bar" aria-hidden="true"></span>
+        <span class="eyebrow">Free · No sign-up</span>
+      </p>
+
+      <h2 class="display cta-title">
+        Your plan is <em class="accent-italic">2 minutes</em> away.
+      </h2>
+
+      <div class="cta-actions">
+        <Button href="/plan/" arrow>
+          Build my plan
+        </Button>
+        <FollowLink variant="secondary" location="final-cta" />
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: clip;
+    min-height: 100svh;
+  }
+
+  .header-sentinel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 80px;
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: center;
+    gap: 24px;
+    min-height: 100svh;
+    padding-top: var(--header-h);
+  }
+
+  .hero-word {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    z-index: 0;
+    width: 100vw;
+    transform: translateX(-50%);
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: 17vw;
+    line-height: 0.75;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  .hero-photo {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 50%;
+    height: 92%;
+    animation: fade-up 700ms ease-out both;
+    animation-delay: 620ms;
+  }
+
+  .hero-scrim {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    z-index: 2;
+    width: 68%;
+    background: linear-gradient(90deg, var(--obsidian-900) 30%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 3;
+    grid-column: 1 / 9;
+    padding-block: 72px 48px;
+    transform: translateY(16px);
+  }
+
+  .hero-title {
+    max-width: 16ch;
+    margin-top: 24px;
+    font-size: clamp(2.75rem, 1rem + 4.8vw, 5rem);
+  }
+
+  .reveal-line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.06em;
+  }
+
+  .reveal-line > span {
+    display: block;
+    animation: rise 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .reveal-line:nth-child(2) > span {
+    animation-delay: 90ms;
+  }
+
+  .reveal-line:nth-child(3) > span {
+    animation-delay: 180ms;
+  }
+
+  .hero-sub {
+    max-width: 44ch;
+    margin-top: 24px;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    animation-delay: 420ms;
+  }
+
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+    animation-delay: 480ms;
+  }
+
+  .hero-proof {
+    margin-top: 28px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--steel-400);
+    animation-delay: 540ms;
+  }
+
+  .hero-fade {
+    animation: fade-up 500ms ease-out both;
+  }
+
+  .how {
+    position: relative;
+    z-index: 1;
+  }
+
+  .steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .step-row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+    padding-block: 40px;
+    border-bottom: 1px solid var(--border);
+    transition: border-color 160ms ease-out;
+  }
+
+  .step-row:last-child {
+    border-bottom: 0;
+  }
+
+  .step-row:hover {
+    border-color: var(--border-strong);
+  }
+
+  .step-row > .section-number {
+    grid-column: 1 / 3;
+  }
+
+  .step-title {
+    grid-column: 3 / 8;
+    font-size: 1.375rem;
+    font-stretch: 105%;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  .step-text {
+    grid-column: 8 / 13;
+    max-width: 46ch;
+    color: var(--text-muted);
+  }
+
+  .final-cta {
+    padding-block: clamp(72px, 12vw, 160px);
+  }
+
+  .cta-rule {
+    display: block;
+    width: 120px;
+    height: 2px;
+    margin-bottom: 32px;
+    background: var(--accent);
+  }
+
+  .cta-title {
+    max-width: 18ch;
+    margin-top: 20px;
+  }
+
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      height: min(100svh, 940px);
+      min-height: 720px;
+    }
+
+    .hero-inner {
+      min-height: 100%;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .hero-photo {
+      width: 55%;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hero-inner {
+      display: block;
+      min-height: 100svh;
+      padding-top: 0;
+    }
+
+    /* No photo yet: keep the hero compact instead of reserving 64svh of empty space. */
+    .hero:not(:has(.portrait)) {
+      min-height: auto;
+    }
+
+    .hero:not(:has(.portrait)) .hero-inner {
+      min-height: auto;
+      padding-block: calc(var(--header-h) + 40px) 64px;
+    }
+
+    .hero:not(:has(.portrait)) .hero-copy {
+      padding-top: 0;
+    }
+
+    .hero-photo {
+      width: 100%;
+      height: 64svh;
+      top: 0;
+      right: auto;
+      left: 0;
+    }
+
+    .hero-word,
+    .hero-scrim {
+      display: none;
+    }
+
+    .hero-copy {
+      padding-top: 44svh;
+      padding-bottom: 56px;
+      transform: none;
+    }
+
+    .hero-title {
+      max-width: 12ch;
+      font-size: 2.5rem;
+      font-stretch: 100%;
+    }
+
+    .hero-ctas {
+      flex-direction: column;
+    }
+
+    .hero-ctas > :global(*) {
+      width: 100%;
+    }
+
+    .step-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .step-row > .section-number,
+    .step-title,
+    .step-text {
+      grid-column: 1 / -1;
+    }
+
+    .step-row > .section-number {
+      margin-bottom: 8px;
+    }
+
+    .cta-actions {
+      flex-direction: column;
+    }
+
+    .cta-actions > :global(*) {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-line > span,
+    .hero-fade,
+    .hero-photo {
+      animation: none !important;
+    }
+  }
+</style>
