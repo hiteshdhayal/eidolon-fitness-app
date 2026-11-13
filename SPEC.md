@@ -141,7 +141,7 @@ Borrow the _feel_ of F1 broadcast graphics, Porsche Motorsport, Nike Training an
 - **Body and UI: IBM Plex Sans** at 400, 500 and 600.
 - **Labels, data, macros, eyebrows: IBM Plex Mono** at 400 and 500, with tabular numerals. Eyebrows are uppercase, 12px, tracking 0.12em.
 - **Display (hero and final CTA):** Archivo 900, width 110, UPPERCASE, line-height 0.9, tracking -0.01em, `clamp(2.75rem, 1rem + 7vw, 7rem)`.
-- **Headline accent phrase:** Archivo Italic 900 in `--accent`. Load the italic variable file but do not preload it.
+- **Headline accent phrase:** Archivo Italic 900 in `--accent`. Use the static Latin italic file (not the heavy variable italic) and do not preload it.
 - **h2:** Archivo 800, width 105, UPPERCASE, `clamp(1.75rem, 1rem + 3vw, 3.25rem)`, line-height 0.95.
 - **h3:** Archivo 700, width 100, sentence case, 1.375rem.
 - **Body:** Plex Sans, 1.0625rem (17px), line-height 1.65; article body 1.125rem. Paragraph measure 60–72ch.
@@ -178,10 +178,12 @@ All of these live on `/styleguide` (noindex), shown on both obsidian and ice sur
 
 ### 3.6 Imagery and icons
 
-- Use only real black-and-white photos of the creator, supplied in `src/assets/hero/` and `src/assets/reels/`.
-- Never use stock photos, AI-generated images, 3D renders, illustrations of people, or food stock photography.
-- Process photos at build time: grayscale with a cool tint (`#E4E9EE`) and high contrast, so they match obsidian and ice.
+- Use only real black-and-white photos of the creator, supplied in `src/assets/hero/slides/` and `src/assets/reels/`.
+- Never use stock photos, AI-generated images, 3D renders, illustrations of people, or food stock photography. Food photos must be the creator's own.
+- Hero slides live in `src/assets/hero/slides/`, ordered by filename (`01-…`, `02-…`), max 8. `src/data/hero-slides.json` carries alt text, focal point and scale for each slide; the build reads it, so no code changes are needed. Alt text describes what is actually visible. Any photo showing another person, a before/after, a transformation, or burned-in captions is not used.
+- Process photos at build time: grayscale with a cool tint (`#E4E9EE`) and high contrast, so they match obsidian and ice. Cut-outs are normalised to a 4:5 transparent canvas; background photos are cropped 4:5 around their focal point and their near-black areas are pulled toward obsidian.
 - Photos blend into the background. No boxes, borders, dashed outlines, shadows, rounded corners or visible rectangle edges. Use masks for fades.
+- The hero stage rotates slides every 5.5s with opacity-only transitions, pause/play, segments, keyboard and swipe control. It respects reduced motion, pauses on hover, focus, hidden tabs and when off-screen, and keeps slide 1 visible without JavaScript.
 - Lucide icons at 1.5px stroke and 20px, only where they help scanning. Never put icons inside circles.
 
 ### 3.7 Motion
@@ -237,7 +239,11 @@ Until a real page ships, every linked route has a polished noindex placeholder (
 
 ## 5. Home page (top to bottom)
 
-1. **Hero (obsidian):** eyebrow with speed bar, display headline with a red italic phrase, sub, primary CTA to `/plan`, Follow link, proof line, giant outlined background wordmark, blended photo, text scrim. See §D8.
+1. **Hero (obsidian):** eyebrow with speed bar, display headline with a red italic phrase, sub, primary CTA to `/plan`, Follow link, proof line, giant outlined background wordmark, text scrim, and a rotating photo stage in the right column.
+   - **Stage:** 4:5, stacked slides, masks that melt every edge into obsidian. Slides rotate every 5.5s with opacity-only transitions (cut-outs fade out/in with a brief gap; background photos crossfade). Hover, focus, hidden tabs and off-screen state pause it; a 44px pause/play button is always available. Segment bars show progress in red, plus a mono counter. Arrow keys, segment clicks and a 50px swipe change slides. Reduced motion starts paused; no-JS shows slide 1.
+   - **Message under the controls:** speed bar + "NO ONE DIET FITS ALL"; "Every body needs a different diet."; "Yours should fit your goal, your schedule, your food and your week. That's what the plan builder does."; a static mono strip "YOUR GOAL ■ YOUR SCHEDULE ■ YOUR FOOD ■ YOUR BODY". The message does not change with the slides.
+   - **Layout:** desktop, right column spans columns 6–12 and bottom-aligns the stage above a 150–170px message block; tablet stage ≈55% wide; mobile order is stage → controls → compact message → headline → sub → CTAs, with the primary CTA fully visible in the first 812px at 375px.
+   - **No box, ever:** no border, fill, shadow, rounded corner, dashed outline or visible rectangle edge around any slide.
 2. **Kinetic red band:** rotated, overlapping the hero and How it works. See §D7.1.
 3. **How it works (ice):** 01 Answer a few taps, 02 Get a 7-day plan from your region's food, 03 Track progress and swap meals. One rule above the first row, one between rows. Outlined numbers fill red on hover.
 4. **"Your state's kitchen":** a state picker (Haryana, Punjab, Tamil Nadu, Kerala, West Bengal, Gujarat, Maharashtra, Assam…) with a sample veg day and non-veg day that update instantly.
@@ -463,8 +469,9 @@ No header or nav; under 30 KB total. Wordmark, one-line bio, full-width stacked 
 - LCP < 2.0 s, CLS < 0.05, INP < 200 ms on a throttled mid-range Android profile.
 - Zero JS on article, reel and learn pages, apart from analytics and the tap-to-load embed.
 - Questionnaire and plan island under 80 KB gzipped. Food database loaded lazily.
-- Images through `astro:assets` as AVIF/WebP with srcset and explicit dimensions, lazy unless above the fold.
-- The 1080w AVIF hero is ≤ 180 KB.
+- Content images through `astro:assets` as AVIF/WebP with srcset and explicit dimensions, lazy unless above the fold.
+- Hero slides are pre-processed by `scripts/process-hero.mjs` into AVIF/WebP at 480/768/1080/1440 and referenced with `<picture>` plus explicit dimensions. Slides 2+ hydrate after the window load event so they never compete with the LCP image.
+- The 1080w AVIF hero slide is ≤ 180 KB; other slides ≤ 150 KB.
 
 ## 18. Analytics
 
@@ -497,12 +504,13 @@ Ubuntu LTS with Nginx serving static `dist/` from `/var/www/eidolon.cloud/curren
 
 1. **Foundation:** Astro setup, tokens, fonts, base layout, header and footer, and every component on `/styleguide`.
 2. **Phase 1.5:** real Eidolon config, FollowLink everywhere, no 404s (stubs + link checker), Obsidian/Ice/Red identity, kinetic band, blended hero photo, restyled styleguide, 404 and stubs, screenshots.
-3. **Engine and food database:** safety gates, 220+ foods, `food-review.csv`, and 40+ passing tests.
-4. **Questionnaire and plan page:** full flow with autosave, swap/shuffle, groceries, PDF, related reels and follow CTA. Playwright personas: veg male from Haryana; non-veg female from Kerala with PCOS; Jain from Gujarat; a teen; a pregnant user; hostel mode.
-5. **Progress tracker:** logging, chart, gentle rules, export/import/delete.
-6. **Content system:** reels, articles and affiliate components; learn, workouts, tools and `/links`; scaffolding scripts and seed content.
-7. **Polish:** home, about and legal pages, SEO, analytics, performance and accessibility pass.
-8. **Deployment:** configs, scripts and DEPLOY.md.
+3. **Phase 1.6:** rotating hero stage (up to 8 slides, manifest, processed AVIF/WebP, mask variants), pause/play + segment/keyboard/swipe controls, reduced-motion and no-JS fallbacks, "No one diet fits all" message block, stage-edge pixel test, screenshots.
+4. **Engine and food database:** safety gates, 220+ foods, `food-review.csv`, and 40+ passing tests.
+5. **Questionnaire and plan page:** full flow with autosave, swap/shuffle, groceries, PDF, related reels and follow CTA. Playwright personas: veg male from Haryana; non-veg female from Kerala with PCOS; Jain from Gujarat; a teen; a pregnant user; hostel mode.
+6. **Progress tracker:** logging, chart, gentle rules, export/import/delete.
+7. **Content system:** reels, articles and affiliate components; learn, workouts, tools and `/links`; scaffolding scripts and seed content.
+8. **Polish:** home, about and legal pages, SEO, analytics, performance and accessibility pass.
+9. **Deployment:** configs, scripts and DEPLOY.md.
 
 Before reporting any UI phase as done, review screenshots against §3.8 and §3.9 and fix every violation.
 

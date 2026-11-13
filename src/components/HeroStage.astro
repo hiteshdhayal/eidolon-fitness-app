@@ -1,0 +1,627 @@
+---
+import Icon from './ui/Icon.astro';
+import { site } from '../config/site';
+import { getHeroSlides } from '../lib/hero-slides';
+
+const { slides, sizes } = getHeroSlides();
+const count = slides.length;
+const multi = count > 1;
+const stageLabel = `Photos of ${site.creatorName}`;
+
+if (count === 0 && import.meta.env.DEV) {
+  console.warn(
+    '[HeroStage] No hero slides found. Add images to src/assets/hero/slides/ and restart the dev server.',
+  );
+}
+---
+
+<div class="hero-stage" data-hero-stage data-count={count} data-index="0">
+  {count > 0 && (
+    <div class="stage-area">
+      <div
+        class="stage"
+        role="group"
+        aria-roledescription="carousel"
+        aria-label={stageLabel}
+        aria-live="off"
+        tabindex="0"
+      >
+        {slides.map((slide, index) => (
+          <div
+            class:list={['slide', { 'is-active': index === 0 }]}
+            data-slide
+            data-index={index}
+            data-variant={slide.variant}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${index + 1} of ${count}`}
+            aria-hidden={index === 0 ? 'false' : 'true'}
+          >
+            <picture data-deferred={index > 0 ? '' : undefined}>
+              <source
+                type="image/avif"
+                srcset={index === 0 ? slide.avifSrcset : undefined}
+                data-srcset={index === 0 ? undefined : slide.avifSrcset}
+                sizes={sizes}
+              />
+              <source
+                type="image/webp"
+                srcset={index === 0 ? slide.webpSrcset : undefined}
+                data-srcset={index === 0 ? undefined : slide.webpSrcset}
+                sizes={sizes}
+              />
+              <img
+                src={index === 0 ? slide.fallback : undefined}
+                data-src={index === 0 ? undefined : slide.fallback}
+                alt={slide.alt || `Photo of ${site.creatorName}`}
+                width={slide.width}
+                height={slide.height}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                fetchpriority={index === 0 ? 'high' : 'low'}
+                decoding="async"
+                draggable="false"
+                style={`--focal-x:${slide.focalX}%;--focal-y:${slide.focalY}%;--slide-scale:${slide.scale}`}
+              />
+            </picture>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {multi && (
+    <div class="controls">
+      <div class="segments" role="group" aria-label="Choose a photo">
+        {slides.map((_, index) => (
+          <button
+            type="button"
+            class="segment"
+            data-go={index}
+            aria-label={`Show photo ${index + 1} of ${count}`}
+            aria-current={index === 0 ? 'true' : 'false'}
+          />
+        ))}
+      </div>
+
+      <p class="counter" data-counter>
+        {String(1).padStart(2, '0')} / {String(count).padStart(2, '0')}
+      </p>
+
+      <button type="button" class="pause" data-pause aria-label="Pause photo rotation">
+        <span class="icon icon-pause">
+          <Icon name="pause" size={18} />
+        </span>
+        <span class="icon icon-play">
+          <Icon name="play" size={18} />
+        </span>
+      </button>
+    </div>
+  )}
+
+  <div class="message">
+    <p class="eyebrow-row">
+      <span class="speed-bar" aria-hidden="true"></span>
+      <span class="eyebrow">No one diet fits all</span>
+    </p>
+    <p class="message-line">Every body needs a different diet.</p>
+    <p class="message-support">
+      Yours should fit your goal, your schedule, your food and your week. That&rsquo;s what the plan
+      builder does.
+    </p>
+    <p class="message-strip">
+      <span>YOUR GOAL</span>
+      <span class="strip-square" aria-hidden="true"></span>
+      <span>YOUR SCHEDULE</span>
+      <span class="strip-square" aria-hidden="true"></span>
+      <span>YOUR FOOD</span>
+      <span class="strip-square" aria-hidden="true"></span>
+      <span>YOUR BODY</span>
+    </p>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-hero-stage]');
+  const stage = root?.querySelector<HTMLElement>('.stage');
+
+  if (root && stage) {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
+    const segments = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-go]'));
+    const counter = root.querySelector<HTMLElement>('[data-counter]');
+    const pauseBtn = root.querySelector<HTMLButtonElement>('[data-pause]');
+
+    // Slides after the first are hydrated after the window load event, one at
+    // a time, so they don't compete with the hero image for bandwidth during LCP.
+    const hydrateSlide = (slideIndex: number) => {
+      const picture =
+        slides[slideIndex]?.querySelector<HTMLPictureElement>('picture[data-deferred]');
+      if (!picture) return;
+
+      picture.querySelectorAll<HTMLSourceElement>('source[data-srcset]').forEach((source) => {
+        if (source.dataset.srcset) source.srcset = source.dataset.srcset;
+        source.removeAttribute('data-srcset');
+      });
+
+      const image = picture.querySelector<HTMLImageElement>('img[data-src]');
+      if (image?.dataset.src) {
+        image.src = image.dataset.src;
+        image.removeAttribute('data-src');
+      }
+    };
+
+    let nextToLoad = 1;
+    const loadNextSlide = () => {
+      if (nextToLoad >= slides.length) return;
+      hydrateSlide(nextToLoad);
+      nextToLoad += 1;
+      window.setTimeout(loadNextSlide, 400);
+    };
+
+    if (document.readyState === 'complete') {
+      loadNextSlide();
+    } else {
+      window.addEventListener('load', loadNextSlide, { once: true });
+    }
+
+    if (slides.length > 1 && segments.length && counter && pauseBtn) {
+      const count = slides.length;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let index = 0;
+      let manual = reduce.matches;
+      let hover = false;
+      let focus = false;
+      let visible = true;
+      let hidden = document.hidden;
+      let controlled = false;
+      let timer = 0;
+
+      const pad = (value: number) => String(value).padStart(2, '0');
+      const paused = () => manual || hover || focus || !visible || hidden;
+
+      const update = () => {
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('is-active', i === index);
+          slide.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+        });
+
+        segments.forEach((segment, i) => {
+          segment.classList.toggle('is-current', i === index);
+          segment.classList.toggle('is-done', i < index);
+          segment.setAttribute('aria-current', i === index ? 'true' : 'false');
+        });
+
+        counter.textContent = `${pad(index + 1)} / ${pad(count)}`;
+        root.setAttribute('data-index', String(index));
+      };
+
+      const restartProgress = () => {
+        const current = segments[index];
+        if (!current) return;
+        current.classList.remove('is-current');
+        void current.offsetWidth;
+        current.classList.add('is-current');
+      };
+
+      const sync = () => {
+        const isPaused = paused();
+        root.toggleAttribute('data-paused', isPaused);
+        root.toggleAttribute('data-manual-paused', manual);
+        stage.setAttribute('aria-live', isPaused || controlled ? 'polite' : 'off');
+        pauseBtn.setAttribute(
+          'aria-label',
+          manual ? 'Play photo rotation' : 'Pause photo rotation',
+        );
+
+        window.clearTimeout(timer);
+        if (!isPaused) {
+          timer = window.setTimeout(next, 5500);
+          restartProgress();
+        }
+      };
+
+      const next = () => {
+        if (paused()) return;
+        controlled = false;
+        hydrateSlide((index + 1) % count);
+        index = (index + 1) % count;
+        update();
+        sync();
+      };
+
+      const go = (value: number) => {
+        manual = false;
+        controlled = true;
+        const target = (value + count) % count;
+        hydrateSlide(target);
+        index = target;
+        update();
+        sync();
+      };
+
+      pauseBtn.addEventListener('click', () => {
+        manual = !manual;
+        sync();
+      });
+
+      segments.forEach((segment) => {
+        segment.addEventListener('click', () => go(Number(segment.dataset.go ?? 0)));
+      });
+
+      root.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          go(index + 1);
+        }
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          go(index - 1);
+        }
+      });
+
+      let startX = 0;
+      let startY = 0;
+      let tracking = false;
+
+      stage.addEventListener('pointerdown', (event) => {
+        startX = event.clientX;
+        startY = event.clientY;
+        tracking = true;
+      });
+
+      stage.addEventListener('pointerup', (event) => {
+        if (!tracking) return;
+        tracking = false;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) {
+          go(index + (dx < 0 ? 1 : -1));
+        }
+      });
+
+      stage.addEventListener('pointercancel', () => {
+        tracking = false;
+      });
+
+      const hoverable = window.matchMedia('(hover: hover)');
+      stage.addEventListener('pointerenter', () => {
+        if (hoverable.matches) {
+          hover = true;
+          sync();
+        }
+      });
+      stage.addEventListener('pointerleave', () => {
+        if (hoverable.matches) {
+          hover = false;
+          sync();
+        }
+      });
+
+      stage.addEventListener('focusin', () => {
+        focus = true;
+        sync();
+      });
+      stage.addEventListener('focusout', (event) => {
+        if (!(event.relatedTarget instanceof Node) || !stage.contains(event.relatedTarget)) {
+          focus = false;
+          sync();
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        hidden = document.hidden;
+        sync();
+      });
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            if (!entry) return;
+            visible = entry.isIntersecting;
+            sync();
+          },
+          { threshold: 0.01 },
+        );
+        observer.observe(stage);
+      }
+
+      update();
+      sync();
+    }
+  }
+</script>
+
+<style>
+  .hero-stage {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+  }
+
+  .stage-area {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-end;
+    min-height: 0;
+  }
+
+  .stage {
+    position: relative;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    aspect-ratio: 4 / 5;
+    overflow: clip;
+  }
+
+  .stage:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 700ms ease-out;
+  }
+
+  .slide.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .slide[data-variant='cutout'] {
+    transition-duration: 400ms;
+  }
+
+  .slide[data-variant='cutout'].is-active {
+    transition-delay: 300ms;
+  }
+
+  picture,
+  picture img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .slide img {
+    object-fit: cover;
+    object-position: var(--focal-x) var(--focal-y);
+    transform: scale(var(--slide-scale));
+    transform-origin: var(--focal-x) var(--focal-y);
+  }
+
+  .slide[data-variant='background'] img {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, #000 38%),
+      linear-gradient(to top, transparent 0%, #000 28%),
+      linear-gradient(to left, transparent 0%, #000 10%),
+      linear-gradient(to bottom, transparent 0%, #000 18%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0%, #000 38%),
+      linear-gradient(to top, transparent 0%, #000 28%),
+      linear-gradient(to left, transparent 0%, #000 10%),
+      linear-gradient(to bottom, transparent 0%, #000 18%);
+    mask-composite: intersect;
+  }
+
+  .slide[data-variant='cutout'] img {
+    object-fit: contain;
+    object-position: center bottom;
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 12%);
+    mask-image: linear-gradient(to top, transparent 0%, #000 12%);
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 44px;
+    margin-top: 8px;
+  }
+
+  .segments {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 6px;
+    max-width: 260px;
+  }
+
+  .segment {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 14px;
+    max-width: 40px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .segment::before,
+  .segment::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 3px;
+    transform: translateY(-50%);
+  }
+
+  .segment::before {
+    width: 100%;
+    background: var(--border);
+  }
+
+  .segment::after {
+    width: 0;
+    background: var(--accent);
+  }
+
+  .segment:hover::before {
+    background: var(--steel-500);
+  }
+
+  .segment.is-done::after {
+    width: 100%;
+  }
+
+  .segment.is-current::after {
+    animation: segment-fill 5500ms linear forwards;
+  }
+
+  .hero-stage[data-paused] .segment.is-current::after {
+    animation-play-state: paused;
+  }
+
+  .counter {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--steel-400);
+    white-space: nowrap;
+  }
+
+  .pause {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ice-200);
+    cursor: pointer;
+  }
+
+  .pause:hover {
+    color: var(--ice-50);
+  }
+
+  .pause .icon {
+    display: inline-flex;
+  }
+
+  .pause .icon-play {
+    display: none;
+  }
+
+  .hero-stage[data-manual-paused] .pause .icon-pause {
+    display: none;
+  }
+
+  .hero-stage[data-manual-paused] .pause .icon-play {
+    display: inline-flex;
+  }
+
+  .message {
+    margin-top: 14px;
+    padding-bottom: 4px;
+  }
+
+  .message-line {
+    max-width: 30ch;
+    margin-top: 12px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 105%;
+    font-size: clamp(1.75rem, 1.5rem + 0.4vw, 1.875rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .message-support {
+    max-width: 44ch;
+    margin-top: 10px;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+
+  .message-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--steel-400);
+  }
+
+  .strip-square {
+    width: 4px;
+    height: 4px;
+    background: var(--obsidian-600);
+  }
+
+  @keyframes segment-fill {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .stage-area {
+      flex: 0 0 auto;
+      width: 100vw;
+      height: clamp(180px, 28svh, 260px);
+      margin-left: calc(50% - 50vw);
+    }
+
+    .stage {
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      aspect-ratio: auto;
+    }
+
+    .slide[data-variant='background'] img {
+      -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 40%);
+      mask-image: linear-gradient(to top, transparent 0%, #000 40%);
+    }
+
+    .slide[data-variant='cutout'] img {
+      -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 12%);
+      mask-image: linear-gradient(to top, transparent 0%, #000 12%);
+    }
+
+    .message {
+      margin-top: 12px;
+    }
+
+    .message-line {
+      max-width: 26ch;
+      margin-top: 8px;
+    }
+
+    .message-support,
+    .message-strip {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .segment.is-current::after {
+      animation: none;
+      width: 0;
+    }
+  }
+</style>

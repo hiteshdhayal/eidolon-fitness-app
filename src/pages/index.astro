@@ -2,10 +2,14 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/ui/Button.astro';
 import FollowLink from '../components/FollowLink.astro';
-import HeroPortrait from '../components/HeroPortrait.astro';
+import HeroStage from '../components/HeroStage.astro';
 import KineticBand from '../components/KineticBand.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
 import { defaultTitle } from '../config/site';
+import { getHeroSlides, heroSizes } from '../lib/hero-slides';
+
+const { slides: heroSlides } = getHeroSlides();
+const heroPreload = heroSlides[0];
 
 const steps = [
   {
@@ -31,7 +35,21 @@ const steps = [
   description="A free 7-day Indian diet plan from your state's kitchen. Veg, non-veg, Jain or vegan. No sign-up, no protein shakes required."
   overlayHeader
   flushTop
+  hideStickyCta
 >
+  <Fragment slot="head">
+    {heroPreload && (
+      <link
+        rel="preload"
+        as="image"
+        type="image/avif"
+        imagesrcset={heroPreload.avifSrcset}
+        imagesizes={heroSizes}
+        fetchpriority="high"
+      />
+    )}
+  </Fragment>
+
   <section class="hero" data-surface="obsidian">
     <div id="header-sentinel" class="header-sentinel" aria-hidden="true"></div>
 
@@ -40,8 +58,8 @@ const steps = [
         EIDOLON
       </span>
 
-      <div class="hero-photo">
-        <HeroPortrait position="center top" />
+      <div class="hero-stage-col">
+        <HeroStage />
       </div>
 
       <div class="hero-scrim" aria-hidden="true"></div>
@@ -180,15 +198,17 @@ const steps = [
     white-space: nowrap;
   }
 
-  .hero-photo {
+  .hero-stage-col {
     position: absolute;
+    top: 0;
     right: 0;
     bottom: 0;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
     width: 50%;
-    height: 92%;
-    animation: fade-up 700ms ease-out both;
-    animation-delay: 620ms;
+    padding-top: var(--header-h);
+    padding-bottom: 64px;
   }
 
   .hero-scrim {
@@ -207,6 +227,11 @@ const steps = [
     grid-column: 1 / 9;
     padding-block: 72px 48px;
     transform: translateY(16px);
+    pointer-events: none;
+  }
+
+  .hero-copy :is(a, button) {
+    pointer-events: auto;
   }
 
   .hero-title {
@@ -348,8 +373,18 @@ const steps = [
   }
 
   @media (min-width: 768px) and (max-width: 1023px) {
-    .hero-photo {
-      width: 55%;
+    .hero-copy {
+      grid-column: 1 / 7;
+    }
+
+    .hero-title {
+      max-width: 14ch;
+      font-size: 2.5rem;
+    }
+
+    .hero-stage-col {
+      width: 48%;
+      padding-bottom: 88px;
     }
   }
 
@@ -360,26 +395,26 @@ const steps = [
       padding-top: 0;
     }
 
-    /* No photo yet: keep the hero compact instead of reserving 64svh of empty space. */
-    .hero:not(:has(.portrait)) {
+    /* No slides yet: keep the hero compact instead of reserving empty media space. */
+    .hero:not(:has(.stage)) {
       min-height: auto;
     }
 
-    .hero:not(:has(.portrait)) .hero-inner {
+    .hero:not(:has(.stage)) .hero-inner {
       min-height: auto;
       padding-block: calc(var(--header-h) + 40px) 64px;
     }
 
-    .hero:not(:has(.portrait)) .hero-copy {
+    .hero:not(:has(.stage)) .hero-copy {
       padding-top: 0;
     }
 
-    .hero-photo {
+    .hero-stage-col {
+      position: static;
       width: 100%;
-      height: 64svh;
-      top: 0;
-      right: auto;
-      left: 0;
+      height: auto;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     .hero-word,
@@ -388,19 +423,24 @@ const steps = [
     }
 
     .hero-copy {
-      padding-top: 44svh;
-      padding-bottom: 56px;
+      padding-top: 16px;
+      padding-bottom: 32px;
       transform: none;
+    }
+
+    .hero-copy > .eyebrow-row {
+      display: none;
     }
 
     .hero-title {
       max-width: 12ch;
-      font-size: 2.5rem;
+      font-size: 2.25rem;
       font-stretch: 100%;
     }
 
     .hero-ctas {
       flex-direction: column;
+      margin-top: 24px;
     }
 
     .hero-ctas > :global(*) {
@@ -433,8 +473,7 @@ const steps = [
 
   @media (prefers-reduced-motion: reduce) {
     .reveal-line > span,
-    .hero-fade,
-    .hero-photo {
+    .hero-fade {
       animation: none !important;
     }
   }

@@ -1,0 +1,42 @@
+[
+  {
+    "alt": "Avocado toast with boiled eggs, a bowl of porridge with banana and walnuts, and a coffee.",
+    "focalX": 50,
+    "focalY": 55,
+    "scale": 1,
+    "skip": false,
+    "file": "01-breakfast-toast-eggs.jpeg"
+  },
+  {
+    "alt": "A bowl of grilled chicken, quinoa, avocado, tomatoes and cucumber.",
+    "focalX": 50,
+    "focalY": 45,
+    "scale": 1,
+    "skip": false,
+    "file": "02-chicken-quinoa-bowl.jpeg"
+  },
+  {
+    "alt": "A whey protein pack, a green smoothie, peanut butter, a protein bar, a banana and sliced fruit.",
+    "focalX": 55,
+    "focalY": 50,
+    "scale": 1,
+    "skip": false,
+    "file": "03-whey-and-fruit.jpeg"
+  },
+  {
+    "alt": "A bowl of sprout and corn salad next to halved boiled eggs.",
+    "focalX": 50,
+    "focalY": 50,
+    "scale": 1,
+    "skip": false,
+    "file": "04-sprout-salad-eggs.jpeg"
+  },
+  {
+    "alt": "Protein oats, creatine, peanut butter, eggs and ashwagandha on a bed.",
+    "focalX": 50,
+    "focalY": 50,
+    "scale": 1,
+    "skip": false,
+    "file": "05-supplements-flatlay.jpeg"
+  }
+]

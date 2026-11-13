@@ -210,6 +210,14 @@ function isActive(href: string) {
     }
   }
 
+  @media (max-width: 767px) {
+    /* The mobile hero photo starts under the header, so keep the header solid for contrast. */
+    .site-header[data-overlay]:not([data-scrolled]) {
+      background: var(--obsidian-900);
+      border-bottom-color: var(--obsidian-600);
+    }
+  }
+
   .mobile-menu {
     position: fixed;
     inset: 0;

@@ -58,12 +58,15 @@ const mainClasses = ['site-main', flushTop ? 'site-main-flush' : ''].filter(Bool
     <meta name="theme-color" content="#0B0C0E" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
+    <slot name="head" />
+
     <link
       rel="preload"
       href="/fonts/archivo-latin-var.woff2"
       as="font"
       type="font/woff2"
       crossorigin
+      fetchpriority="low"
     />
     <link
       rel="preload"
@@ -71,6 +74,7 @@ const mainClasses = ['site-main', flushTop ? 'site-main-flush' : ''].filter(Bool
       as="font"
       type="font/woff2"
       crossorigin
+      fetchpriority="low"
     />
   </head>
   <body data-surface="ice">

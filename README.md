@@ -21,14 +21,20 @@ pnpm screenshots    # phase screenshots to docs/screenshots
 pnpm verify         # typecheck, lint, tests, build
 ```
 
-## Hero photo
+## Hero slides
 
-Drop your photo in `src/assets/hero/`:
+Drop photos in `src/assets/hero/slides/` as `01-name.png`, `02-name.jpg`, `03-name.webp`, ... (up to 8, ordered by filename). Supported: PNG, JPG/JPEG, WebP.
 
-- `src/assets/hero/hero.png` — cut-out with transparent background (preferred). Anchored to the bottom with a soft bottom fade.
-- `src/assets/hero/hero.jpg` — photo with a background. The build darkens the background toward obsidian and fades the left, bottom, top and right edges.
+`src/data/hero-slides.json` controls each slide:
 
-Either filename works; PNG wins if both exist. `pnpm dev` and `pnpm build` process it automatically into `src/assets/hero/processed/` (gitignored). With no photo, the hero renders the outlined wordmark alone and the mobile hero stays compact.
+- `alt` — written from what is actually in the photo.
+- `focalX` / `focalY` — 0–100, keeps the subject in frame when cropped to 4:5.
+- `scale` — nudges the subject size.
+- `skip` — hides a slide without deleting it.
+
+`pnpm dev` and `pnpm build` process the slides into AVIF/WebP at 480/768/1080/1440 and write `src/assets/hero/processed/` (gitignored). The stage rotates every 5.5s with pause/play, segment bars, arrow keys and swipe; hover, focus, hidden tabs and off-screen pause it; reduced motion starts paused; without JS, slide 1 and the message still render.
+
+If the slides folder is empty, `hero.png` or `hero.jpg` in `src/assets/hero/` is used as one static slide. With no image at all, the outlined wordmark carries the hero and the mobile hero stays compact.
 
 ## Site config
 
@@ -40,11 +46,12 @@ Stub routes live in the same file. They are `noindex` and excluded from the site
 
 ```
 src/
-  assets/hero/    your photo + processed output
-  components/     header, footer, FollowLink, hero portrait, kinetic band, UI
+  assets/hero/    hero slides + processed output
+  components/     header, footer, FollowLink, HeroStage, kinetic band, UI
   config/         site placeholders, navigation, stubs
+  data/           hero-slides.json (alt, focal point, scale, skip)
   layouts/        BaseLayout, ComingSoon
-  lib/            pure TypeScript (engine lands in Phase 3)
+  lib/            pure TypeScript (hero helpers; engine lands in Phase 3)
   pages/          routes (stubs until their phase)
   styles/         tokens, fonts and base styles
 public/fonts/     self-hosted Archivo and IBM Plex subsets
