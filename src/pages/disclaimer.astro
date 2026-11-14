@@ -1,8 +1,69 @@
 ---
-import ComingSoon from '../layouts/ComingSoon.astro';
-import { stub } from '../config/site';
+import LegalLayout from '../layouts/LegalLayout.astro';
 
-const page = stub('/disclaimer/');
+const sections = [
+  { id: 'not-medical-advice', label: 'Not medical advice' },
+  { id: 'the-numbers', label: 'The numbers' },
+  { id: 'who-should-be-careful', label: 'Who should be careful' },
+  { id: 'supplements', label: 'Supplements' },
+  { id: 'in-an-emergency', label: 'In an emergency' },
+];
 ---
 
-<ComingSoon slug="disclaimer" title={page.title} copy={page.copy} />
+<LegalLayout
+  title="Disclaimer"
+  description="What Eidolon is and isn't, in plain language — not medical advice, estimates not lab results."
+  sections={sections}
+>
+  <h2 id="not-medical-advice">Not medical advice</h2>
+  <p>
+    Eidolon gives general educational information about food and training. It is not medical advice,
+    and it doesn't replace a consultation with a doctor or a registered dietitian. If you have a
+    medical condition, take regular medicines, or are pregnant or breastfeeding, talk to your doctor
+    before changing how you eat or train. Nothing on this site diagnoses or treats anything.
+  </p>
+
+  <h2 id="the-numbers">The numbers are estimates</h2>
+  <p>
+    Your calorie, protein and other targets come from standard formulas (Mifflin-St Jeor for
+    calories, grams of protein per kg of body weight, and similar). They're a reasonable starting
+    point, not a lab measurement of your body. Results vary from person to person, and a plan that
+    fits one person's week won't fit everyone's.
+  </p>
+  <p>
+    The food values behind each dish — calories, protein, carbs, fat — are careful estimates built
+    from standard food composition references. They have <strong>not</strong> yet been reviewed by a
+    dietitian. I'm working through that review dish by dish; until a dish is marked reviewed, treat
+    its numbers as a close estimate, not a certified figure.
+  </p>
+
+  <h2 id="who-should-be-careful">Who should be careful</h2>
+  <p>
+    Plans here are built for adults. If you tell the questionnaire you're under 18, you get general
+    food guidance with no calorie or weight-loss numbers — growing bodies need an adult who knows
+    them, not an app, making that call. The same general-guidance mode applies if you're pregnant or
+    breastfeeding, or if a safety check flags something that needs a doctor's judgement rather than
+    a formula's.
+  </p>
+  <p>
+    If you're on medicines for diabetes, a heart condition, or you're 65 or older, any calorie
+    reduction the plan suggests is kept small on purpose, and the plan asks you to check with your
+    doctor first. These rules exist because a formula can't see your test results or your medicine
+    doses — your doctor can.
+  </p>
+
+  <h2 id="supplements">Supplements</h2>
+  <p>
+    Every plan gets its protein and nutrients from food first. Where supplements come up — in an
+    article or a product pick — I don't claim any supplement cures or treats a condition. Anything I
+    recommend is a food-first suggestion, not a substitute for a balanced diet or for medical
+    treatment.
+  </p>
+
+  <h2 id="in-an-emergency">In an emergency</h2>
+  <p>
+    This site cannot help in a medical emergency. If you or someone around you needs urgent medical
+    care, contact a doctor or your local emergency services right away — don't wait on anything
+    you've read here.
+  </p>
+</LegalLayout>

@@ -1,8 +1,120 @@
 ---
-import ComingSoon from '../layouts/ComingSoon.astro';
-import { stub } from '../config/site';
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site } from '../config/site';
 
-const page = stub('/privacy/');
+const sections = [
+  { id: 'what-stays-on-your-device', label: 'What stays on your device' },
+  { id: 'nothing-sent-to-a-server', label: 'Nothing sent to a server' },
+  { id: 'export-or-delete', label: 'Export or delete' },
+  { id: 'analytics', label: 'Analytics' },
+  { id: 'server-logs', label: 'Server logs' },
+  { id: 'instagram', label: 'Instagram' },
+  { id: 'affiliate-links', label: 'Affiliate links' },
+  { id: 'dpdp-act', label: "India's DPDP Act" },
+  { id: 'children', label: 'Children' },
+  { id: 'contact', label: 'Contact' },
+  { id: 'changes', label: 'Changes to this policy' },
+];
 ---
 
-<ComingSoon slug="privacy" title={page.title} copy={page.copy} />
+<LegalLayout
+  title="Privacy"
+  description="What Eidolon stores, where it stores it, and what it never sends anywhere."
+  sections={sections}
+>
+  <h2 id="what-stays-on-your-device">What stays on your device</h2>
+  <p>
+    Your questionnaire answers, your plan, your check-ins and your grocery list live only in your
+    browser's local storage, under keys that start with <code>eidolon:</code>. That's it — there's
+    no account and no database on my end.
+  </p>
+
+  <h2 id="nothing-sent-to-a-server">Nothing is sent to a server</h2>
+  <p>
+    I don't collect your height, weight, age, health conditions, medicines or name anywhere. The
+    plan is built and stored entirely in your browser. If you close the tab without saving, it's
+    gone — I never saw it either way.
+  </p>
+
+  <h2 id="export-or-delete">How to export or delete your data</h2>
+  <p>
+    Open your plan and go to the "Your data" section — it has buttons to export your data as a file
+    or delete it from this device. You can also delete everything at once by clearing this site's
+    data in your browser settings.
+  </p>
+
+  <h2 id="analytics">Analytics</h2>
+  <p>
+    I use a self-hosted, cookieless analytics tool (Umami) to see which pages get read. It records
+    the page URL with query strings removed, the referrer, your browser, OS, device type and country
+    — never your IP address. It records only these events, and nothing else:
+  </p>
+  <ul>
+    <li>
+      <code>plan_start</code>
+    </li>
+    <li>
+      <code>plan_step</code> (just the step number)
+    </li>
+    <li>
+      <code>plan_complete</code> (your goal, region and diet type only)
+    </li>
+    <li>
+      <code>follow_click</code>
+    </li>
+    <li>
+      <code>affiliate_click</code>
+    </li>
+    <li>
+      <code>reel_open</code>
+    </li>
+    <li>
+      <code>pdf_download</code>
+    </li>
+    <li>
+      <code>progress_log</code>
+    </li>
+  </ul>
+  <p>None of these carry your name, age, weight or health details.</p>
+
+  <h2 id="server-logs">Server logs</h2>
+  <p>
+    The web server that serves this site keeps standard access logs — including IP addresses — for
+    security purposes, for up to 14 days, after which they're deleted automatically.
+  </p>
+
+  <h2 id="instagram">Instagram</h2>
+  <p>
+    Reel embeds on this site only load after you tap play. Until then, nothing is requested from
+    Instagram. Once you tap play, Instagram's own privacy policy applies to that embed.
+  </p>
+
+  <h2 id="affiliate-links">Affiliate links</h2>
+  <p>
+    Some articles link to products through affiliate programmes. If you click through, the retailer
+    (for example Amazon) may set its own cookies on their site — that's between you and them,
+    governed by their privacy policy.
+  </p>
+
+  <h2 id="dpdp-act">India's DPDP Act, 2023</h2>
+  <p>
+    Health information is treated as sensitive personal data under India's Digital Personal Data
+    Protection Act. That's exactly why none of it is kept on a server — it stays on your device,
+    under your control.
+  </p>
+
+  <h2 id="children">Children</h2>
+  <p>
+    Numeric diet plans on this site are built for adults (18+). Anyone who tells the questionnaire
+    they're under 18 gets general food guidance with no calorie numbers.
+  </p>
+
+  <h2 id="contact">Contact</h2>
+  <p>
+    Questions about this policy? DM me on Instagram
+    {site.contactEmail && <Fragment> or email {site.contactEmail}</Fragment>}.
+  </p>
+
+  <h2 id="changes">Changes to this policy</h2>
+  <p>If anything here changes, I'll update this page and the "last updated" date above.</p>
+</LegalLayout>

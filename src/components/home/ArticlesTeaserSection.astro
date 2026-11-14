@@ -1,0 +1,68 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import { readingTime } from '../../lib/content/readingTime';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  number: string;
+  surface: 'obsidian' | 'ice';
+  articles: CollectionEntry<'articles'>[];
+}
+
+const { number, surface, articles } = Astro.props;
+const featured = articles.slice(0, 4);
+
+const dateFmt = new Intl.DateTimeFormat('en-IN', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+{featured.length > 0 && (
+  <section class="section articles-teaser" data-surface={surface} id="latest-articles">
+    <div class="container section-reveal">
+      <SectionHeader number={number} eyebrow="LATEST ARTICLES" title="LATEST" accent="ARTICLES." />
+
+      <ul class="ruled-list">
+        {featured.map((entry) => (
+          <li class="ruled-row">
+            <p class="row-date">
+              <time datetime={entry.data.date.toISOString()}>
+                {dateFmt.format(entry.data.date)}
+              </time>
+            </p>
+            <div class="row-body">
+              <p class="row-title">
+                <a href={`/articles/${entry.id}/`}>{entry.data.title}</a>
+              </p>
+              <p class="row-dek">{entry.data.description}</p>
+              <p class="row-meta">{readingTime(entry.body ?? '')}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <a class="all-link" href="/articles/">
+        All articles →
+      </a>
+    </div>
+  </section>
+)}
+
+<style>
+  .all-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 24px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+</style>

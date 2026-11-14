@@ -1,8 +1,61 @@
 ---
-import ComingSoon from '../layouts/ComingSoon.astro';
-import { stub } from '../config/site';
+import LegalLayout from '../layouts/LegalLayout.astro';
 
-const page = stub('/terms/');
+const sections = [
+  { id: 'using-this-site', label: 'Using this site' },
+  { id: 'no-warranty', label: 'No warranty' },
+  { id: 'your-decisions', label: 'Your decisions' },
+  { id: 'content-ownership', label: 'Content ownership' },
+  { id: 'third-party-sites', label: 'Third-party sites' },
+  { id: 'changes', label: 'Changes to these terms' },
+  { id: 'governing-law', label: 'Governing law' },
+];
 ---
 
-<ComingSoon slug="terms" title={page.title} copy={page.copy} />
+<LegalLayout
+  title="Terms"
+  description="The terms for using Eidolon — information only, no warranty, governed by Indian law."
+  sections={sections}
+>
+  <h2 id="using-this-site">Using this site</h2>
+  <p>
+    Eidolon is free to use. By using it, you agree to these terms. The questionnaire, the diet plan,
+    the tools, the tracker and the content here are provided for your personal, non- commercial use.
+  </p>
+
+  <h2 id="no-warranty">No warranty</h2>
+  <p>
+    This site is provided "as is", without any warranty of accuracy, completeness or fitness for a
+    particular purpose. The plans and numbers are built on standard formulas and estimates — see the{' '}
+    <a href="/disclaimer/">disclaimer</a> for what that means in practice.
+  </p>
+
+  <h2 id="your-decisions">Your decisions, your responsibility</h2>
+  <p>
+    Any decision you make about your diet, training or health based on this site is yours. I'm not
+    responsible for outcomes from using a plan, a calculator or any advice on this site. If you have
+    a medical condition, check with a doctor first.
+  </p>
+
+  <h2 id="content-ownership">Content ownership</h2>
+  <p>
+    The text, design and video content on this site belong to me unless stated otherwise. You're
+    welcome to share a link to a page; please don't copy whole articles or the food database
+    elsewhere without asking.
+  </p>
+
+  <h2 id="third-party-sites">Third-party sites</h2>
+  <p>
+    Links to Instagram, retailers and other third-party sites take you off Eidolon. Their own terms
+    and privacy policies apply once you're there — I don't control what happens on those sites.
+  </p>
+
+  <h2 id="changes">Changes to these terms</h2>
+  <p>
+    I may update these terms as the site changes. The "last updated" date above will change when I
+    do.
+  </p>
+
+  <h2 id="governing-law">Governing law</h2>
+  <p>These terms are governed by the laws of India.</p>
+</LegalLayout>

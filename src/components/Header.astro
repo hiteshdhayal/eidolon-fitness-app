@@ -4,6 +4,7 @@ import Wordmark from './ui/Wordmark.astro';
 import Button from './ui/Button.astro';
 import FollowLink from './FollowLink.astro';
 import Icon from './ui/Icon.astro';
+import { isNavActive } from '../lib/nav';
 
 interface Props {
   overlay?: boolean;
@@ -13,7 +14,7 @@ const { overlay = false } = Astro.props;
 const path = Astro.url.pathname;
 
 function isActive(href: string) {
-  return path === href || path.startsWith(href);
+  return isNavActive(path, href);
 }
 ---
 

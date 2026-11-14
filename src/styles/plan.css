@@ -41,6 +41,18 @@
   color: var(--text-muted);
 }
 
+.qc-disclaimer a {
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.qc-disclaimer a:hover {
+  color: var(--text);
+  text-decoration-color: var(--red-500);
+}
+
 .qc-actions {
   display: flex;
   flex-wrap: wrap;
@@ -780,6 +792,29 @@
   color: var(--text-muted);
 }
 
+.pv-privacy-link {
+  margin-top: 16px;
+}
+
+.pv-privacy-link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ice-200);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.pv-privacy-link a:hover {
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--red-500);
+}
+
 /* Ruled accordion rows: one rule above the first row, one between rows. */
 .pv-steps {
   margin: 0;
@@ -1175,6 +1210,18 @@
   max-width: 62ch;
   font-size: 0.875rem;
   color: var(--text-muted);
+}
+
+.pv-disclaimer a {
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.pv-disclaimer a:hover {
+  color: var(--text);
+  text-decoration-color: var(--red-500);
 }
 
 .pv-toast {

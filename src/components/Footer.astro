@@ -55,7 +55,9 @@ const columns = [
         <a href="/" aria-label={`${site.brandName} home`}>
           <Wordmark />
         </a>
-        <p class="footer-bio">{site.bio} Built by {site.creatorName}.</p>
+        <p class="footer-bio">
+          {site.bio} Built by {site.creatorName}.
+        </p>
         <FollowLink variant="secondary" location="footer" />
       </div>
 
@@ -83,10 +85,18 @@ const columns = [
     </div>
 
     <div class="footer-legal">
-      <p class="small">{site.disclaimer}</p>
+      <p class="small">
+        {site.disclaimer}{' '}
+        <a class="footer-inline-link" href="/disclaimer/">
+          Read the disclaimer →
+        </a>
+      </p>
       <p class="small">
         Some article links are affiliate links. If you buy through them I may earn a commission, at
         no extra cost to you.
+        <a class="footer-inline-link" href="/affiliate-disclosure/">
+          Affiliate disclosure →
+        </a>
       </p>
       <p class="label footer-copy">
         © {year} {site.creatorName} · {site.domain}
@@ -178,6 +188,19 @@ const columns = [
   .footer-copy {
     padding-top: 6px;
     color: var(--steel-400);
+  }
+
+  .footer-inline-link {
+    color: var(--steel-400);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+  }
+
+  .footer-inline-link:hover {
+    color: var(--ice-50);
+    text-decoration-color: var(--red-500);
   }
 
   :global(.footer-list .follow-text) {

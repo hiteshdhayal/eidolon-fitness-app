@@ -1,8 +1,185 @@
 ---
-import ComingSoon from '../layouts/ComingSoon.astro';
-import { stub } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/content/PageHero.astro';
+import FinalCta from '../components/content/FinalCta.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import PortraitSlot from '../components/content/PortraitSlot.astro';
+import FollowLink from '../components/FollowLink.astro';
+import { site, pageTitle } from '../config/site';
+import '../styles/content.css';
 
-const page = stub('/about/');
+const howMade = [
+  'Calories from the Mifflin-St Jeor formula, adjusted for your steps and training.',
+  'BMI with the WHO Asia-Pacific cut-offs used in India.',
+  'Protein set per kg of your body weight, and reached from food.',
+  'Salt kept under 5 g a day, as ICMR-NIN and WHO advise.',
+  'A database of 251 home-style dishes from every state and union territory.',
+  'Food values are careful estimates and are being reviewed by a dietitian.',
+  'Safety rules: no calorie numbers for under-18s, pregnancy or kidney disease; small cuts only with diabetes medicines, heart conditions or age 65+.',
+];
 ---
 
-<ComingSoon slug="about" title={page.title} copy={page.copy} />
+<BaseLayout
+  title={pageTitle('About')}
+  description="Who built Eidolon, why, and how the plans are made."
+>
+  <PageHero eyebrow="ABOUT" titleBefore="BUILT FOR" accent="YOUR KITCHEN." />
+
+  <section class="section" data-surface="ice">
+    <div class="container section-reveal">
+      <SectionHeader number="01" eyebrow="WHO I AM" title="WHO I" accent="AM." />
+
+      <div class="about-grid">
+        <PortraitSlot class="about-portrait" />
+
+        <div class="about-copy measure">
+          <p>I'm Hitesh Dhayal. I make short fitness and food videos on Instagram.</p>
+          <p>
+            I built Eidolon because most diet plans online are written for someone else's kitchen —
+            oats, quinoa and shakes. Yours should be built on rajma, idli, macher jhol or thepla.
+          </p>
+          {site.aboutLong && <p>{site.aboutLong}</p>}
+          {site.credentials && <p class="about-credentials">{site.credentials}</p>}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-surface="obsidian">
+    <div class="container section-reveal">
+      <SectionHeader number="02" eyebrow="WHY I BUILT THIS" title="WHY I" accent="BUILT THIS." />
+      <div class="measure">
+        <p>
+          Most of the diet content I saw growing up assumed you'd swap your meals for oats, quinoa
+          and protein shakes. That's not how most of India eats, and it's not how I eat. I wanted
+          something that starts from your actual kitchen — your state, your staples, your dal — and
+          builds a plan around that, instead of around a template built for someone else's pantry.
+        </p>
+        <p>
+          Eidolon is free, with no sign-up. You answer a few questions — about two minutes — and get
+          a 7-day plan built from a database of home-style Indian dishes. It works on a mid-range
+          phone, on a slow connection, without an account. Everything you enter stays on your
+          device; nothing is sent anywhere.
+        </p>
+        <p>
+          I've tried to be honest about what this is and isn't. The numbers are estimates, not lab
+          results, and the food data is still being reviewed by a dietitian. Where a question needs
+          a doctor's judgement — a medical condition, medicines, pregnancy — the plan says so and
+          asks you to check with one, instead of guessing for you.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-surface="ice">
+    <div class="container section-reveal">
+      <SectionHeader
+        number="03"
+        eyebrow="HOW THE PLANS ARE MADE"
+        title="HOW THE PLANS"
+        accent="ARE MADE."
+      />
+
+      <ul class="ruled-list">
+        {howMade.map((line) => (
+          <li class="ruled-row how-made-row">
+            <p class="row-dek">{line}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" data-surface="obsidian">
+    <div class="container section-reveal">
+      <SectionHeader number="04" eyebrow="WHAT THIS ISN'T" title="WHAT THIS" accent="ISN'T." />
+      <div class="measure">
+        <p>
+          This isn't medical advice, and it isn't a substitute for a doctor or a registered
+          dietitian.
+        </p>
+        <p>
+          If food or weight is causing you stress, please talk to a professional — a plan from this
+          site is a starting point, not a replacement for care that looks at the whole of you.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-surface="ice">
+    <div class="container section-reveal">
+      <SectionHeader number="05" eyebrow="GET IN TOUCH" title="GET IN" accent="TOUCH." />
+      <div class="about-contact">
+        <FollowLink variant="primary" location="about-contact" label="DM me on Instagram" />
+        {site.contactEmail && (
+          <a class="about-email" href={`mailto:${site.contactEmail}`}>
+            {site.contactEmail}
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <FinalCta
+    titleBefore="Your plan is"
+    accent="2 minutes"
+    titleAfter="away."
+    location="about-final-cta"
+  />
+</BaseLayout>
+
+<style>
+  .about-grid {
+    display: grid;
+    gap: 32px;
+  }
+
+  .about-portrait {
+    max-width: 320px;
+  }
+
+  .about-copy p {
+    margin-top: 16px;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .about-copy p:first-child {
+    margin-top: 0;
+  }
+
+  .about-credentials {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--text);
+  }
+
+  .how-made-row {
+    grid-template-columns: 1fr;
+  }
+
+  .about-contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .about-email {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  @media (min-width: 768px) {
+    .about-grid {
+      grid-template-columns: minmax(0, 280px) 1fr;
+      align-items: start;
+      gap: 48px;
+    }
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+/**
+ * The About-me portrait, 4:5 (spec Phase 6 §A2/§B1). Looks for an explicit
+ * `src/assets/hero/hero.{png,jpg,jpeg}` portrait first. The hero carousel
+ * slides are food photography, not a portrait of the creator, so they are
+ * deliberately NOT used as a fallback here (see docs/DECISIONS.md) — an
+ * unlabelled placeholder is more honest than a mislabelled stock photo.
+ */
+import { Image } from 'astro:assets';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/hero/hero.{png,jpg,jpeg}',
+  { eager: true },
+);
+const photo = Object.values(modules)[0]?.default ?? null;
+---
+
+{photo ? (
+  <div class:list={['portrait-slot', className]}>
+    <Image src={photo} alt="Hitesh Dhayal" width={640} height={800} />
+  </div>
+) : (
+  <div class:list={['portrait-slot', 'portrait-placeholder', className]} aria-hidden="true">
+    <span class="portrait-placeholder-label">PHOTO — portrait, 4:5</span>
+  </div>
+)}
+
+<style>
+  .portrait-slot {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .portrait-slot :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1);
+  }
+
+  .portrait-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    background: var(--obsidian-900);
+  }
+
+  .portrait-placeholder-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    color: var(--steel-400);
+  }
+</style>

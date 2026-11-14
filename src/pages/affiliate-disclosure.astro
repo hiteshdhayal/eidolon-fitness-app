@@ -1,8 +1,61 @@
 ---
-import ComingSoon from '../layouts/ComingSoon.astro';
-import { stub } from '../config/site';
+import LegalLayout from '../layouts/LegalLayout.astro';
 
-const page = stub('/affiliate-disclosure/');
+const sections = [
+  { id: 'the-short-version', label: 'The short version' },
+  { id: 'amazon-associates', label: 'Amazon Associates' },
+  { id: 'how-i-pick-products', label: 'How I pick products' },
+  { id: 'no-paid-placements', label: 'No paid placements' },
+  { id: 'prices', label: 'Prices' },
+];
 ---
 
-<ComingSoon slug="affiliate-disclosure" title={page.title} copy={page.copy} />
+<LegalLayout
+  title="Affiliate disclosure"
+  description="How affiliate links work on Eidolon, how products are picked, and what I never do."
+  sections={sections}
+>
+  <h2 id="the-short-version">The short version</h2>
+  <p>
+    Some articles on this site — mostly the ones comparing products like protein powders or
+    supplements — contain affiliate links. I earn a commission if you buy through these links, at no
+    extra cost to you. The price you pay is the same whether you use my link or go to the site
+    directly.
+  </p>
+
+  <h2 id="amazon-associates">Amazon Associates</h2>
+  <p>
+    As an Amazon Associate, I earn from qualifying purchases made through links to Amazon on this
+    site.
+  </p>
+
+  <h2 id="how-i-pick-products">How I pick products</h2>
+  <p>
+    I don't pick a product just because it pays the highest commission. Before I recommend anything,
+    I check:
+  </p>
+  <ul>
+    <li>Whether it's been tested by an independent, third-party lab</li>
+    <li>Whether the brand holds a valid FSSAI licence</li>
+    <li>
+      What's actually in it — the ingredient list and quantities, not just the marketing claims
+    </li>
+  </ul>
+  <p>
+    This follows the Advertising Standards Council of India's (ASCI) guidelines for influencer
+    advertising — if a post contains an affiliate link, it's labelled, on the page and here.
+  </p>
+
+  <h2 id="no-paid-placements">No paid placements</h2>
+  <p>
+    I don't run paid product placements without a clear label. If a brand ever pays for a mention,
+    that post will say so plainly — the same ASCI guidelines apply to that as they do to affiliate
+    links.
+  </p>
+
+  <h2 id="prices">Prices</h2>
+  <p>
+    Product pages on this site don't show prices, because they change often and I'd rather send you
+    to the retailer's page for the current price than show you something out of date.
+  </p>
+</LegalLayout>

@@ -1,0 +1,81 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import ReelThumb from '../content/ReelThumb.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  number: string;
+  surface: 'obsidian' | 'ice';
+  reels: CollectionEntry<'reels'>[];
+}
+
+const { number, surface, reels } = Astro.props;
+const featured = reels.slice(0, 6);
+---
+
+{featured.length > 0 && (
+  <section class="section reels-teaser" data-surface={surface} id="latest-reels">
+    <div class="container section-reveal">
+      <SectionHeader number={number} eyebrow="LATEST REELS" title="LATEST" accent="REELS." />
+
+      <div class="reels-scroll">
+        {featured.map((reel) => (
+          <ReelThumb
+            href={`/reels/${reel.id}/`}
+            title={reel.data.title}
+            date={reel.data.date}
+            thumbnail={reel.data.thumbnail}
+          />
+        ))}
+      </div>
+
+      <a class="all-link" href="/reels/">
+        All reels →
+      </a>
+    </div>
+  </section>
+)}
+
+<style>
+  .reels-scroll {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 16px;
+  }
+
+  .all-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 32px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 767px) {
+    .reels-scroll {
+      grid-auto-flow: column;
+      grid-auto-columns: 42%;
+      grid-template-columns: none;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 8px;
+    }
+
+    .reels-scroll > :global(*) {
+      scroll-snap-align: start;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .reels-scroll {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+</style>

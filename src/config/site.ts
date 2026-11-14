@@ -9,6 +9,10 @@ export const site = {
   /** Empty until supplied. UI that depends on these hides itself. */
   credentials: '',
   contactEmail: '',
+  /** Longer "why I built this" / background copy for /about/. Empty hides the extra paragraphs. */
+  aboutLong: '',
+  umamiWebsiteId: '',
+  umamiSrc: 'https://stats.eidolon.cloud/script.js',
   nav: [
     { label: 'Diet plan', href: '/plan/' },
     { label: 'Learn', href: '/learn/' },
@@ -59,17 +63,6 @@ export const stubPages: Record<string, { title: string; copy: string }> = {
     title: 'Links',
     copy: 'All my links in one place.',
   },
-  '/about/': {
-    title: 'About',
-    copy: 'Who I am and why I built this.',
-  },
-  '/disclaimer/': { title: 'Disclaimer', copy: 'This page is being written.' },
-  '/privacy/': { title: 'Privacy', copy: 'This page is being written.' },
-  '/affiliate-disclosure/': {
-    title: 'Affiliate disclosure',
-    copy: 'This page is being written.',
-  },
-  '/terms/': { title: 'Terms', copy: 'This page is being written.' },
 };
 
 export const stubRoutes = Object.keys(stubPages);
