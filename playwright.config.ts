@@ -29,7 +29,11 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: `SHOW_DRAFTS=1 pnpm build && SHOW_DRAFTS=1 pnpm exec astro preview --port ${draftsPort} --host 127.0.0.1`,
+      // Assumes dist-drafts/ already exists (built by `pnpm test:e2e`, which
+      // runs SHOW_DRAFTS=1 pnpm build before this) — rebuilding here inline
+      // made this server's own startup timeout a frequent source of flake,
+      // since hero AVIF/WebP encoding alone can take minutes.
+      command: `SHOW_DRAFTS=1 pnpm exec astro preview --port ${draftsPort} --host 127.0.0.1`,
       url: draftsBaseURL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
