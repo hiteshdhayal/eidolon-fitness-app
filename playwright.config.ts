@@ -29,7 +29,7 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: `SHOW_DRAFTS=1 pnpm build && SHOW_DRAFTS=1 astro preview --port ${draftsPort} --host 127.0.0.1`,
+      command: `SHOW_DRAFTS=1 pnpm build && SHOW_DRAFTS=1 pnpm exec astro preview --port ${draftsPort} --host 127.0.0.1`,
       url: draftsBaseURL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
