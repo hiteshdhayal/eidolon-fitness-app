@@ -1,6 +1,25 @@
 ---
+import { getCollection, render } from 'astro:content';
+import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PlanView from '../islands/PlanView';
+import RelatedReels from '../components/RelatedReels.astro';
 import '../styles/plan.css';
+
+const entries = await getCollection('healthNotes');
+const container = await AstroContainer.create();
+const notes = await Promise.all(
+  entries.map(async (entry) => {
+    const { Content } = await render(entry);
+    const html = await container.renderToString(Content);
+    return {
+      id: entry.id,
+      title: entry.data.title,
+      reviewedBy: entry.data.reviewedBy,
+      html,
+    };
+  }),
+);
 ---
 
 <BaseLayout
@@ -9,9 +28,71 @@ import '../styles/plan.css';
   noindex
   hideStickyCta
 >
-  <section class="pv-section section" data-surface="ice">
-    <div class="container pv-width">
-      <h1>Your plan</h1>
-    </div>
-  </section>
+  <PlanView client:load notes={notes} />
+  <RelatedReels />
 </BaseLayout>
+
+<style is:global>
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  .print-only {
+    display: none;
+  }
+
+  @media print {
+    .site-header,
+    footer,
+    .sticky-cta,
+    .pv-screen,
+    .pv-sheet {
+      display: none !important;
+    }
+
+    .print-only {
+      display: block !important;
+    }
+
+    html,
+    body {
+      background: #fff !important;
+      color: #000 !important;
+    }
+
+    * {
+      color: #000 !important;
+      background: transparent !important;
+      border-color: #000 !important;
+      box-shadow: none !important;
+      font-family: var(--font-mono) !important;
+    }
+
+    .print-only h1,
+    .print-only h2,
+    .print-only h3 {
+      font-family: var(--font-display) !important;
+    }
+
+    .print-only h2 {
+      margin-top: 8px;
+      margin-bottom: 6px;
+    }
+
+    .print-only ul {
+      margin: 4px 0 0;
+      padding-left: 18px;
+    }
+
+    .pv-print-day {
+      break-before: page;
+      page-break-before: always;
+    }
+
+    .pv-print-day:first-of-type {
+      break-before: auto;
+      page-break-before: auto;
+    }
+  }
+</style>

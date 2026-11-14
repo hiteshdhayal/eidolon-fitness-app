@@ -1,0 +1,8 @@
+---
+// Renders nothing until the reels collection exists and has entries
+// (Phase 5). No placeholder boxes.
+const reels = import.meta.glob('../content/reels/*.md');
+const hasReels = Object.keys(reels).length > 0;
+---
+
+{hasReels ? <section class="section" data-surface="ice"></section> : null}

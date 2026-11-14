@@ -93,3 +93,8 @@ One line per decision. Simplest option consistent with the spec wins.
 - `/plan/` is indexable and in the sitemap; `/my-plan/` is `noindex` and excluded from the sitemap.
 - `src/content/health-notes/*.md` is in `.prettierignore` so the inline frontmatter the engine test reads stays intact.
 - The home page's `a.plan-cta` labels switch to "Open my plan" when `eidolon:plan:v1` exists; with no plan or no JS they stay "Build my plan".
+- The Progress tab is a Phase 4 placeholder: one paragraph and the follow link, no logging or chart yet.
+- `RelatedReels` checks for `src/content/reels` and renders nothing until Phase 5 supplies entries; there are no placeholder cards.
+- `/my-plan` renders the health notes at build time (`getCollection("healthNotes")` + `AstroContainer.renderToString`) and passes `{ id, title, reviewedBy, html }` to the island. `reviewedBy` stays hidden while empty.
+- Print output uses a print-only copy of the plan (all 7 days, then targets, groceries and disclaimer) so the A4 order and page breaks do not depend on the interactive tab state.
+- The swap/shuffle engine and food database are lazy-imported on the first Swap or Shuffle; the plan view renders from the saved plan alone.
