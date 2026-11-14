@@ -4,6 +4,7 @@ import { site } from '../../config/site';
 import { topicLabel, type Topic } from '../../config/topics';
 import { AMAZON_LINE, DISCLOSURE } from '../../lib/content/affiliate';
 import { readingTime } from '../../lib/content/readingTime';
+import { showDraftTag } from '../../lib/content/published';
 import Callout from '../ui/Callout.astro';
 import FollowLink from '../FollowLink.astro';
 import PageHero from './PageHero.astro';
@@ -81,7 +82,7 @@ const jsonLd = {
 <PageHero
   eyebrow={`${kind === 'guide' ? 'Guide' : 'Article'} · ${dateFmt.format(date)}`}
   titleBefore={title}
-  draft={draft}
+  draft={showDraftTag(draft)}
   sub={description}
   tags={tags.map((tag) => ({ label: topicLabel(tag as Topic) }))}
 >

@@ -6,9 +6,10 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { distDir } from './dist-dir.mjs';
 
 const LIMIT_KB = 80;
-const DIR = process.env.SHOW_DRAFTS === '1' ? 'dist-drafts' : 'dist';
+const DIR = distDir();
 const pages = [
   { name: 'Questionnaire (/plan)', html: `${DIR}/plan/index.html` },
   { name: 'PlanView (/my-plan)', html: `${DIR}/my-plan/index.html` },

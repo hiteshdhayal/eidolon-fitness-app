@@ -6,6 +6,8 @@
 export interface PublishEnv {
   dev: boolean;
   showDrafts: boolean;
+  /** LH_AUDIT=1 (spec Phase 6 Part E): drafts render without the DRAFT tag or noindex. */
+  lhAudit: boolean;
 }
 
 export interface DraftableEntry {
@@ -19,7 +21,17 @@ export function currentEnv(): PublishEnv {
   return {
     dev: Boolean(viteEnv.DEV),
     showDrafts: viteEnv.SHOW_DRAFTS === '1' || nodeEnv.SHOW_DRAFTS === '1',
+    lhAudit: viteEnv.LH_AUDIT === '1' || nodeEnv.LH_AUDIT === '1',
   };
+}
+
+/**
+ * Whether a draft page should still look and behave like a draft (the
+ * DRAFT tag, noindex). False in LH_AUDIT mode, so Lighthouse can score the
+ * page as if it shipped — the content itself is unchanged.
+ */
+export function showDraftTag(draft: boolean | undefined, env: PublishEnv = currentEnv()): boolean {
+  return Boolean(draft) && !env.lhAudit;
 }
 
 /** True for non-drafts, or for everything in dev / SHOW_DRAFTS mode. */

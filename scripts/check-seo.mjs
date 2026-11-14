@@ -8,8 +8,9 @@
  */
 import { readdir, readFile, access } from 'node:fs/promises';
 import { join, relative, resolve, sep } from 'node:path';
+import { distDir } from './dist-dir.mjs';
 
-const DIST = resolve(process.env.SHOW_DRAFTS === '1' ? 'dist-drafts' : 'dist');
+const DIST = resolve(distDir());
 const SITE_URL = 'https://eidolon.cloud';
 const BANNED_JSONLD_TYPES = new Set(['Review', 'AggregateRating', 'Offer']);
 
@@ -146,7 +147,7 @@ for (const file of files) {
 // Only checked for the real production build: a SHOW_DRAFTS preview build
 // renders draft content pages (correctly noindex) that the sitemap filter
 // can't see per-page, since it's never deployed anyway.
-if (process.env.SHOW_DRAFTS !== '1') {
+if (process.env.SHOW_DRAFTS !== '1' && process.env.LH_AUDIT !== '1') {
   const sitemapFiles = (await walk(DIST)).filter((file) => /sitemap.*\.xml$/i.test(file));
   const sitemapUrls = new Set();
   for (const file of sitemapFiles) {

@@ -17,6 +17,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "pnpm build && SHOW_DRAFTS=1 pnpm build && playwright test",
+    "perf": "LH_AUDIT=1 SHOW_DRAFTS=1 pnpm build && lhci autorun",
     "screenshots": "node scripts/screenshots-phase16.mjs",
     "food:review": "tsx scripts/food-review.ts",
     "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
@@ -47,6 +48,7 @@
     "@astrojs/check": "^0.9.12",
     "@astrojs/sitemap": "^3.7.4",
     "@axe-core/playwright": "^4.14.0",
+    "@lhci/cli": "^0.16.1",
     "@playwright/test": "^1.65.0",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/postcss": "^4.3.5",

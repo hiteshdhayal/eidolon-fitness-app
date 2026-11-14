@@ -5,7 +5,7 @@ import FinalCta from '../../components/content/FinalCta.astro';
 import Callout from '../../components/ui/Callout.astro';
 import SectionHeader from '../../components/ui/SectionHeader.astro';
 import { getCollection, getEntry, render } from 'astro:content';
-import { publishedOnly } from '../../lib/content/published';
+import { publishedOnly, showDraftTag } from '../../lib/content/published';
 import { breadcrumbListJsonLd } from '../../lib/seo/jsonld';
 import { ogImagePathFor } from '../../lib/seo/ogSlug';
 import { muscleLabel, equipmentLabel, levelLabel } from '../../lib/content/exerciseLabels';
@@ -49,7 +49,7 @@ const jsonLd = breadcrumbListJsonLd([
 <BaseLayout
   title={pageTitle(name)}
   description={summary}
-  noindex={draft}
+  noindex={showDraftTag(draft)}
   ogImage={ogImagePathFor(`/learn/${entry.id}`)}
 >
   <Fragment slot="head">
@@ -59,7 +59,7 @@ const jsonLd = breadcrumbListJsonLd([
   <PageHero
     eyebrow={`Exercise · ${levelLabel(level)}`}
     titleBefore={name}
-    draft={draft}
+    draft={showDraftTag(draft)}
     sub={summary}
     tags={[
       ...muscles.map((m) => ({ label: muscleLabel(m) })),

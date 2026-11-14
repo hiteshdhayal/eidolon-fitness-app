@@ -5,7 +5,7 @@ import FinalCta from '../../components/content/FinalCta.astro';
 import SectionHeader from '../../components/ui/SectionHeader.astro';
 import Callout from '../../components/ui/Callout.astro';
 import { getCollection, getEntry } from 'astro:content';
-import { publishedOnly } from '../../lib/content/published';
+import { publishedOnly, showDraftTag } from '../../lib/content/published';
 import { breadcrumbListJsonLd } from '../../lib/seo/jsonld';
 import { ogImagePathFor } from '../../lib/seo/ogSlug';
 import { levelLabel, whereLabel } from '../../lib/content/exerciseLabels';
@@ -45,7 +45,7 @@ const jsonLd = breadcrumbListJsonLd([
 <BaseLayout
   title={pageTitle(title)}
   description={summary}
-  noindex={draft}
+  noindex={showDraftTag(draft)}
   ogImage={ogImagePathFor(`/workouts/${entry.id}`)}
 >
   <Fragment slot="head">
@@ -55,7 +55,7 @@ const jsonLd = breadcrumbListJsonLd([
   <PageHero
     eyebrow="Workout"
     titleBefore={title}
-    draft={draft}
+    draft={showDraftTag(draft)}
     sub={summary}
     tags={[
       { label: levelLabel(level) },

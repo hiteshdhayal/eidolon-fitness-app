@@ -5,7 +5,7 @@ import FinalCta from '../../components/content/FinalCta.astro';
 import ReelEmbed from '../../components/content/ReelEmbed.astro';
 import SectionHeader from '../../components/ui/SectionHeader.astro';
 import { getCollection, getEntry, render } from 'astro:content';
-import { publishedOnly } from '../../lib/content/published';
+import { publishedOnly, showDraftTag } from '../../lib/content/published';
 import { relatedForReel } from '../../lib/content/related';
 import { topicLabel, type Topic } from '../../config/topics';
 import { pageTitle } from '../../config/site';
@@ -35,12 +35,12 @@ const dateFmt = new Intl.DateTimeFormat('en-IN', {
 <BaseLayout
   title={pageTitle(reel.data.title)}
   description={`Notes from my reel: ${reel.data.title}`}
-  noindex={reel.data.draft}
+  noindex={showDraftTag(reel.data.draft)}
 >
   <PageHero
     eyebrow={`Reel · ${dateFmt.format(reel.data.date)}`}
     titleBefore={reel.data.title}
-    draft={reel.data.draft}
+    draft={showDraftTag(reel.data.draft)}
     tags={reel.data.topics.map((topic) => ({
       label: topicLabel(topic as Topic),
       href: `/reels/topic/${topic}/`,
