@@ -230,6 +230,16 @@ function HeightField({ initialCm, initialUnit, invalid, describedBy, onChange }:
   );
 }
 
+const TYPING_KINDS = new Set(['number', 'height', 'text']);
+
+function attemptReason(question: QuestionDef): string {
+  if (question.id === 'meats') return 'Pick at least one to continue.';
+  if (question.kind === 'number' || question.kind === 'height') {
+    return 'Enter a value to continue.';
+  }
+  return 'Pick one to continue.';
+}
+
 export default function Questionnaire() {
   const [answers, setAnswers] = useState<DraftAnswers>({ supplements: 'foodOnly' });
   const [stepId, setStepId] = useState<string>(INTRO);
@@ -237,6 +247,7 @@ export default function Questionnaire() {
   const [returnToReview, setReturnToReview] = useState(false);
   const [building, setBuilding] = useState(false);
   const [buildError, setBuildError] = useState(false);
+  const [notice, setNotice] = useState('');
   const [ready, setReady] = useState(false);
 
   const legendRef = useRef<HTMLLegendElement>(null);
@@ -248,6 +259,7 @@ export default function Questionnaire() {
   const currentQuestion = stepId !== INTRO && stepId !== REVIEW ? questionById(stepId) : undefined;
   const questionIndex = Math.max(0, steps.indexOf(stepId));
   const counterIndex = stepId === REVIEW ? steps.length : questionIndex + 1;
+  const isLastQuestion = stepId === (steps[steps.length - 1] ?? REVIEW);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -287,10 +299,21 @@ export default function Questionnaire() {
     writeDraft({ v: 1, answers, stepId, updatedAt: new Date().toISOString() });
   }, [answers, stepId, ready]);
 
+  // Any change to the answers clears the "you must pick something" notice.
+  useEffect(() => {
+    setNotice('');
+  }, [answers, stepId]);
+
+  // Typing steps open the phone keyboard straight away; choice steps keep the
+  // legend focused and still announce the question.
   useEffect(() => {
     if (!ready || !currentQuestion) return;
     track('plan_step', { step: questionIndex + 1 });
-    legendRef.current?.focus();
+    if (TYPING_KINDS.has(currentQuestion.kind)) {
+      focusField(currentQuestion);
+    } else {
+      legendRef.current?.focus();
+    }
   }, [ready, stepId, currentQuestion, questionIndex]);
 
   useEffect(() => {
@@ -337,6 +360,13 @@ export default function Questionnaire() {
     else go(steps[index + 1] ?? REVIEW);
   }
   nextRef.current = next;
+
+  function focusField(question: QuestionDef) {
+    const selector = question.kind === 'height' ? '.qc-height input' : `#${question.id}-input`;
+    const element = document.querySelector<HTMLElement>(selector);
+    if (element) element.focus();
+    else legendRef.current?.focus();
+  }
 
   function back() {
     if (stepId === INTRO) return;
@@ -392,6 +422,7 @@ export default function Questionnaire() {
   }
 
   async function build() {
+    if (building) return;
     setBuilding(true);
     setBuildError(false);
     try {
@@ -556,168 +587,223 @@ export default function Questionnaire() {
           answers.heightCm,
         )} kg or above.`
       : null;
+  const skipVisible =
+    !!currentQuestion?.skippable &&
+    ((answers[currentQuestion.id as keyof DraftAnswers] as string | number | undefined) ===
+      undefined ||
+      (answers[currentQuestion.id as keyof DraftAnswers] as string | number | undefined) === '');
 
   if (!ready) {
-    return <div class="qc-section" aria-busy="true" />;
+    return <section class="qc-section" aria-busy="true" />;
   }
 
   if (stepId === INTRO) {
     return (
-      <div class="qc-intro">
-        <p class="sr-only" aria-live="polite" />
-        <h1 class="qc-intro-title">Build your plan</h1>
-        <p class="qc-lede">
-          Takes about 2 minutes. Your answers stay on your phone — nothing is sent to a server.
-        </p>
-        <p class="qc-disclaimer">This is general guidance, not medical advice.</p>
-        <div class="qc-actions">
-          {resumeStep ? (
-            <>
-              <button type="button" class="qc-next" onClick={continueDraft}>
-                Continue where you left off
-              </button>
-              <button type="button" class="qc-secondary" onClick={startOver}>
-                Start over
-              </button>
-            </>
-          ) : (
-            <button type="button" class="qc-next" onClick={startFresh}>
-              Start →
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div class="qc-shell" data-step={stepId}>
-      <h1 class="sr-only">Build your plan</h1>
-      <TopBar index={counterIndex} total={steps.length} canBack={stepId !== INTRO} onBack={back} />
-
-      <p class="sr-only" aria-live="polite">
-        {currentQuestion
-          ? `Question ${questionIndex + 1} of ${steps.length}: ${currentQuestion.legend}`
-          : ''}
-      </p>
-
-      {stepId === REVIEW ? (
-        <div class="qc-step-anim" key="review">
-          <fieldset class="qc-step">
-            <legend class="qc-legend" tabIndex={-1} ref={legendRef}>
-              Check your answers
-            </legend>
-          </fieldset>
-          <ul class="qc-review">
-            {steps
-              .filter(
-                (id) =>
-                  isStepComplete(id, answers) &&
-                  !(id === 'trainingType' && (answers.trainingType ?? []).length === 0) &&
-                  !(id === 'firstName' && !answers.firstName?.trim()),
-              )
-              .map((id) => {
-                const question = questionById(id);
-                return (
-                  <li class="qc-review-row" key={id}>
-                    <div>
-                      <p class="qc-review-question">{question?.legend ?? id}</p>
-                      <p class="qc-review-answer">{describeAnswer(id, answers)}</p>
-                    </div>
-                    <button
-                      type="button"
-                      class="qc-edit"
-                      onClick={() => {
-                        setReturnToReview(true);
-                        go(id);
-                      }}
-                    >
-                      Edit
-                    </button>
-                  </li>
-                );
-              })}
-          </ul>
-
-          {buildError ? (
-            <Callout tone="warning">
-              Something went wrong building your plan. Your answers are saved — please try again.
-            </Callout>
-          ) : null}
-
-          <div class="qc-next-wrap">
-            {building ? (
-              <p class="qc-building" aria-busy="true">
-                Building your plan…
-              </p>
+      <section class="qc-hero" data-surface="obsidian">
+        <div class="container">
+          <p class="sr-only" aria-live="polite" />
+          <p class="eyebrow-row">
+            <span class="speed-bar" aria-hidden="true" />
+            <span class="eyebrow">Free · 2 minutes · No sign-up</span>
+          </p>
+          <h1 class="display qc-intro-title">
+            Build your <em class="accent-italic">plan.</em>
+          </h1>
+          <p class="qc-lede">
+            Takes about 2 minutes. Your answers stay on your phone — nothing is sent to a server.
+          </p>
+          <p class="qc-disclaimer">This is general guidance, not medical advice.</p>
+          <div class="qc-actions">
+            {resumeStep ? (
+              <>
+                <button type="button" class="qc-next" onClick={continueDraft}>
+                  Continue where you left off
+                </button>
+                <button type="button" class="qc-secondary" onClick={startOver}>
+                  Start over
+                </button>
+              </>
             ) : (
-              <button type="button" class="qc-next" onClick={build}>
-                Build my plan →
+              <button type="button" class="qc-next" onClick={startFresh}>
+                Start
+                <span aria-hidden="true"> →</span>
               </button>
             )}
           </div>
         </div>
-      ) : currentQuestion ? (
-        <div
-          class="qc-step-anim"
-          key={currentQuestion.id}
-          onKeyDown={(event) => {
-            // Enter advances from a focused radio; the Next button handles the rest.
-            if (
-              event.key === 'Enter' &&
-              event.target instanceof HTMLInputElement &&
-              event.target.type === 'radio' &&
-              complete
-            ) {
-              event.preventDefault();
-              next();
-            }
-          }}
-        >
-          <fieldset class="qc-step">
-            <legend
-              class="qc-legend"
-              tabIndex={-1}
-              id={`${currentQuestion.id}-legend`}
-              ref={legendRef}
+      </section>
+    );
+  }
+
+  function attemptNext() {
+    if (!currentQuestion) return;
+    if (complete) {
+      next();
+      return;
+    }
+    if (!message) setNotice(attemptReason(currentQuestion));
+    focusField(currentQuestion);
+  }
+
+  return (
+    <section class="qc-section section" data-surface="ice">
+      <div class="container">
+        <TopBar
+          index={counterIndex}
+          total={steps.length}
+          canBack={stepId !== INTRO}
+          onBack={back}
+        />
+
+        <p class="sr-only" aria-live="polite">
+          {currentQuestion
+            ? `Question ${questionIndex + 1} of ${steps.length}: ${currentQuestion.legend}`
+            : ''}
+        </p>
+
+        <div class="qc-shell" data-step={stepId}>
+          <h1 class="sr-only">Build your plan</h1>
+
+          {stepId === REVIEW ? (
+            <div class="qc-step-anim" key="review">
+              <fieldset class="qc-step">
+                <legend class="qc-legend" tabIndex={-1} ref={legendRef}>
+                  Check your answers
+                </legend>
+              </fieldset>
+              <ul class="qc-review">
+                {steps
+                  .filter(
+                    (id) =>
+                      isStepComplete(id, answers) &&
+                      !(id === 'trainingType' && (answers.trainingType ?? []).length === 0) &&
+                      !(id === 'firstName' && !answers.firstName?.trim()),
+                  )
+                  .map((id) => {
+                    const question = questionById(id);
+                    return (
+                      <li class="qc-review-row" key={id}>
+                        <div>
+                          <p class="qc-review-question">{question?.legend ?? id}</p>
+                          <p class="qc-review-answer">{describeAnswer(id, answers)}</p>
+                        </div>
+                        <button
+                          type="button"
+                          class="qc-edit"
+                          onClick={() => {
+                            setReturnToReview(true);
+                            go(id);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </li>
+                    );
+                  })}
+              </ul>
+
+              {buildError ? (
+                <Callout tone="warning">
+                  Something went wrong building your plan. Your answers are saved — please try
+                  again.
+                </Callout>
+              ) : null}
+
+              <div class="qc-next-wrap">
+                <button
+                  type="button"
+                  class="qc-next"
+                  aria-disabled={building ? 'true' : undefined}
+                  onClick={build}
+                >
+                  {building ? (
+                    'Building your plan…'
+                  ) : (
+                    <>
+                      Build my plan
+                      <span aria-hidden="true"> →</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : currentQuestion ? (
+            <div
+              class="qc-step-anim"
+              key={currentQuestion.id}
+              onKeyDown={(event) => {
+                // Enter advances from a focused radio; the Next button handles the rest.
+                if (
+                  event.key === 'Enter' &&
+                  event.target instanceof HTMLInputElement &&
+                  event.target.type === 'radio' &&
+                  complete
+                ) {
+                  event.preventDefault();
+                  next();
+                }
+              }}
             >
-              {currentQuestion.legend}
-            </legend>
+              <fieldset class="qc-step">
+                <legend
+                  class="qc-legend"
+                  tabIndex={-1}
+                  id={`${currentQuestion.id}-legend`}
+                  ref={legendRef}
+                >
+                  {currentQuestion.legend}
+                </legend>
 
-            {currentQuestion.helper ? (
-              <p class="qc-helper" id={`${currentQuestion.id}-helper`}>
-                {currentQuestion.helper}
-              </p>
-            ) : null}
+                {currentQuestion.helper ? (
+                  <p class="qc-helper" id={`${currentQuestion.id}-helper`}>
+                    {currentQuestion.helper}
+                  </p>
+                ) : null}
 
-            {renderQuestion(currentQuestion)}
+                {renderQuestion(currentQuestion)}
 
-            {message ? (
-              <p class="qc-error" id={`${currentQuestion.id}-error`} role="alert">
-                <AlertIcon />
-                <span>{message}</span>
-              </p>
-            ) : null}
+                {skipVisible ? (
+                  <button type="button" class="qc-skip qc-skip-inline" onClick={skipStep}>
+                    Skip this question
+                  </button>
+                ) : null}
 
-            {targetWarning ? <Callout tone="warning">{targetWarning}</Callout> : null}
-          </fieldset>
+                {message ? (
+                  <p class="qc-error" id={`${currentQuestion.id}-error`} role="alert">
+                    <AlertIcon />
+                    <span>{message}</span>
+                  </p>
+                ) : null}
 
-          <div class="qc-next-wrap">
-            <button type="button" class="qc-next" disabled={!complete} onClick={next}>
-              Next
-            </button>
-            {currentQuestion.skippable &&
-            ((answers[currentQuestion.id as keyof DraftAnswers] as string | number | undefined) ===
-              undefined ||
-              (answers[currentQuestion.id as keyof DraftAnswers] as string | number | undefined) ===
-                '') ? (
-              <button type="button" class="qc-skip" onClick={skipStep}>
-                Skip
-              </button>
-            ) : null}
-          </div>
+                {notice ? (
+                  <p class="qc-notice" role="status">
+                    {notice}
+                  </p>
+                ) : null}
+
+                {targetWarning ? <Callout tone="warning">{targetWarning}</Callout> : null}
+              </fieldset>
+
+              <div class="qc-next-wrap">
+                <button
+                  type="button"
+                  class="qc-next"
+                  aria-disabled={complete ? undefined : 'true'}
+                  onClick={attemptNext}
+                >
+                  {isLastQuestion ? 'Review answers' : 'Next'}
+                  <span aria-hidden="true"> →</span>
+                </button>
+                {skipVisible ? (
+                  <button type="button" class="qc-skip qc-skip-desktop" onClick={skipStep}>
+                    Skip this question
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </div>
-      ) : null}
-    </div>
+      </div>
+    </section>
   );
 }

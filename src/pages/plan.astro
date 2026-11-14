@@ -9,20 +9,19 @@ import '../styles/plan.css';
   description="A 7-day Indian diet plan from your state's food in about 2 minutes. Free, no sign-up, and your answers stay on your phone."
   hideStickyCta
 >
-  <section class="qc-section section" data-surface="ice">
-    <div class="container">
-      <Questionnaire client:load />
-    </div>
-  </section>
+  <Questionnaire client:load />
 
   <noscript>
-    <div class="container qc-noscript">
-      <p>The plan builder needs JavaScript turned on.</p>
-      <p>
-        <a class="qc-edit" href="/">
-          Back to home
-        </a>
-      </p>
-    </div>
+    <section class="qc-section section" data-surface="ice">
+      <div class="container qc-noscript">
+        <p>The plan builder needs JavaScript turned on.</p>
+        <p>
+          <a class="qc-edit" href="/">
+            {' '}
+            Back to home{' '}
+          </a>
+        </p>
+      </div>
+    </section>
   </noscript>
 </BaseLayout>

@@ -57,7 +57,8 @@ test.describe('questionnaire personas', () => {
 
   test('teen gets guidance with no numbers', async ({ page }) => {
     await fillQuestionnaire(page, TEEN);
-    await expect(page.locator('.pv-guidance-headline')).toBeVisible();
+    await expect(page.locator('[data-kind="guidance"]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /simple meals/i })).toBeVisible();
     const text = await page.locator('main').innerText();
     expect(text).not.toMatch(/kcal|\d+\s?g protein|\d+\s?kg/i);
     await expect(page.getByText(/parent or doctor/i).first()).toBeVisible();
@@ -122,14 +123,20 @@ test.describe('questionnaire behaviour', () => {
     await expect(page.locator('.qc-legend')).toHaveText('Your sex');
   });
 
-  test('rejects an age outside 13–90 and keeps Next disabled', async ({ page }) => {
+  test('rejects an age outside 13–90 and keeps Next aria-disabled', async ({ page }) => {
     await page.goto('/plan/');
     await page.getByRole('button', { name: /^Start/ }).click();
     await clickText(page, 'Lose fat');
     await clickText(page, 'Male');
     await page.locator('#age-input').fill('12');
     await expect(page.getByText('Enter an age between 13 and 90.')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled();
+    const next = page.getByRole('button', { name: 'Next', exact: true });
+    await expect(next).toHaveAttribute('aria-disabled', 'true');
+    // Pressing it must not advance, and the reason stays visible. force:true
+    // because Playwright treats aria-disabled as a disabled control.
+    await next.click({ force: true });
+    await expect(page.locator('.qc-legend')).toHaveText('How old are you?');
+    await expect(page.getByText('Enter an age between 13 and 90.')).toBeVisible();
   });
 
   test('warns when the target weight is below a healthy BMI', async ({ page }) => {

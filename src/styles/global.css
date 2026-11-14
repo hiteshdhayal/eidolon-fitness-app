@@ -372,6 +372,14 @@
     transition: color 200ms ease-out;
   }
 
+  /* The display number inside a section eyebrow ("01 — How it works"). */
+  .section-header-number {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 125%;
+    letter-spacing: 0;
+  }
+
   .step-row:hover .section-number,
   .step-row:focus-within .section-number {
     color: var(--accent);

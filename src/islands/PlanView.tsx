@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import type { ComponentChildren } from 'preact';
 import { site } from '../config/site';
 import { track } from '../lib/analytics';
 import { readGroceries, readPlan, writeGroceries, writePlan, type SavedPlan } from '../lib/storage';
 import { STATES } from '../lib/engine/regions';
+import { capitalize, itemMeta } from '../lib/plan/format';
 import { formatNumber } from '../lib/utils/format';
 import type { Plan } from '../lib/engine/types';
 import Callout from './ui/Callout';
@@ -47,6 +49,7 @@ const MEAL_LABELS: Record<string, string> = {
 };
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const FULL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function todayIndex(): number {
   return (new Date().getDay() + 6) % 7;
@@ -56,6 +59,10 @@ function stateName(code?: string): string {
   if (!code) return '—';
   if (code === 'OUT') return 'Outside India';
   return STATES.find((state) => state.code === code)?.name ?? '—';
+}
+
+function regionCodeOf(answers: SavedPlan['answers']): string | undefined {
+  return answers.state === 'OUT' ? answers.homeRegion : answers.state;
 }
 
 function formatDate(value: string): string {
@@ -70,6 +77,41 @@ function formatDate(value: string): string {
   }
 }
 
+function heroSub(plan: Plan, answers: SavedPlan['answers']): string {
+  const goal = GOAL_LABELS[answers.goal] ?? answers.goal;
+  const region = stateName(regionCodeOf(answers));
+  if (plan.kind === 'guidance') return `Balanced meal ideas from ${region} food.`;
+  if (plan.kind === 'plateRules') {
+    const where = answers.foodSource === 'eatOut' ? 'out' : 'at the mess';
+    return `Your plate rules for eating ${where}, built for your goal: ${goal}.`;
+  }
+  return `A 7-day plan from ${region} food, built for your goal: ${goal}.`;
+}
+
+interface PlanHeaderProps {
+  number: string;
+  eyebrow: string;
+  intro?: string;
+  children: ComponentChildren;
+}
+
+function PlanHeader({ number, eyebrow, intro, children }: PlanHeaderProps) {
+  return (
+    <header class="pv-sechead">
+      <p class="eyebrow-row">
+        <span class="speed-bar" aria-hidden="true" />
+        <span class="eyebrow">
+          <span class="section-header-number">{number}</span> — {eyebrow}
+        </span>
+      </p>
+      <div class="pv-sechead-grid">
+        <h2>{children}</h2>
+        {intro ? <p class="pv-sechead-intro">{intro}</p> : null}
+      </div>
+    </header>
+  );
+}
+
 export default function PlanView({ notes }: Props) {
   const [saved, setSaved] = useState<SavedPlan | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -79,7 +121,6 @@ export default function PlanView({ notes }: Props) {
   const [swapOptions, setSwapOptions] = useState<SwapOption[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [announce, setAnnounce] = useState('');
-  const [toast, setToast] = useState('');
   const [checked, setChecked] = useState<string[]>([]);
   const engineRef = useRef<Promise<[EngineModule, FoodsModule]> | null>(null);
 
@@ -92,12 +133,6 @@ export default function PlanView({ notes }: Props) {
     }
     setLoaded(true);
   }, []);
-
-  useEffect(() => {
-    if (!toast) return;
-    const timer = window.setTimeout(() => setToast(''), 2500);
-    return () => window.clearTimeout(timer);
-  }, [toast]);
 
   function loadEngine() {
     engineRef.current ??= Promise.all([
@@ -157,7 +192,7 @@ export default function PlanView({ notes }: Props) {
       const plan = engine.shuffleDay(saved.plan, saved.answers, foods.FOODS, dayIndex);
       const groceries = engine.groceryListFor(plan, saved.answers, foods.FOODS);
       persist({ ...saved, plan, groceries });
-      setAnnounce(`New meals for ${plan.days[dayIndex]?.label ?? 'the day'}.`);
+      setAnnounce(`New meals for ${FULL_DAYS[dayIndex] ?? 'the day'}.`);
     } finally {
       setBusy(false);
     }
@@ -181,36 +216,28 @@ export default function PlanView({ notes }: Props) {
     window.print();
   }
 
-  async function share() {
-    const url = site.siteUrl;
-    try {
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({ title: 'Eidolon', url });
-        return;
-      }
-      await navigator.clipboard.writeText(url);
-      setToast('Link copied');
-    } catch {
-      // user cancelled or clipboard blocked
-    }
-  }
-
   const dayTabs = useMemo(
     () => DAY_LABELS.map((label, index) => ({ id: String(index), label })),
     [],
   );
 
   if (!loaded) {
-    return <div class="pv-section" aria-busy="true" />;
+    return <div class="pv-shell" aria-busy="true" />;
   }
 
   if (!saved) {
     return (
-      <section class="pv-section section" data-surface="ice">
-        <div class="container pv-width pv-empty">
-          <h1>You don't have a plan yet</h1>
-          <p class="qc-lede">It takes about 2 minutes.</p>
-          <div class="qc-actions">
+      <section class="pv-hero pv-hero-empty pv-empty" data-surface="obsidian">
+        <div class="container">
+          <p class="eyebrow-row">
+            <span class="speed-bar" aria-hidden="true" />
+            <span class="eyebrow">Your plan</span>
+          </p>
+          <h1 class="display pv-title">
+            No plan <em class="accent-italic">yet.</em>
+          </h1>
+          <p class="pv-sub">It takes about 2 minutes, and your answers stay on your phone.</p>
+          <div class="pv-actions-row">
             <a class="qc-next" href="/plan/">
               Build my plan →
             </a>
@@ -232,113 +259,70 @@ export default function PlanView({ notes }: Props) {
   const chips = [
     GOAL_LABELS[answers.goal] ?? answers.goal,
     DIET_LABELS[answers.dietType] ?? answers.dietType,
-    stateName(answers.state === 'OUT' ? answers.homeRegion : answers.state),
+    stateName(regionCodeOf(answers)),
     MEAL_LABELS[answers.mealPattern] ?? answers.mealPattern,
   ];
 
+  const healthPresent = plan.notes.length > 0 || healthNotes.length > 0;
+
+  // Section numbers: "How I worked this out" (numbers only), "For your health"
+  // (when there is anything to show), then the main content.
+  let counter = 0;
+  const nextNumber = () => String((counter += 1)).padStart(2, '0');
+  const howNumber = targets ? nextNumber() : null;
+  const healthNumber = plan.kind !== 'guidance' && healthPresent ? nextNumber() : null;
+  const mainNumber = plan.kind === 'guidance' ? '01' : nextNumber();
+
+  const safetyCallouts = plan.safety.reasons.map((reason) => (
+    <Callout tone="warning" key={reason.code}>
+      {reason.message}
+    </Callout>
+  ));
+
   return (
-    <div class="pv-shell">
+    <div class="pv-shell" data-kind={plan.kind}>
       <p class="sr-only" aria-live="polite">
         {announce}
       </p>
 
       <div class="pv-screen">
-        <section class="section" data-surface="ice">
-          <div class="container pv-width">
+        {/* 1. Plan hero (obsidian) */}
+        <section class="pv-hero" data-surface="obsidian">
+          <div class="container">
             <p class="eyebrow-row">
               <span class="speed-bar" aria-hidden="true" />
-              <span class="eyebrow">Your plan</span>
+              <span class="eyebrow">Your plan · {formatDate(saved.savedAt)}</span>
             </p>
-            <div class="pv-head">
-              <h1>{answers.firstName ? `${answers.firstName}'s plan` : 'Your plan'}</h1>
-              <p class="pv-date">{formatDate(saved.savedAt)}</p>
-              <div class="pv-chips">
-                {chips.map((chip) => (
-                  <span class="tag" key={chip}>
-                    {chip}
-                  </span>
-                ))}
-              </div>
-              <div class="pv-links">
-                <a class="pv-link" href="/plan/?edit=1">
-                  Edit answers
-                </a>
-                {canPdf ? (
-                  <button type="button" class="pv-link" onClick={printPlan}>
-                    Download as PDF
-                  </button>
-                ) : null}
-              </div>
+            <h1 class="display pv-title">
+              {answers.firstName ? `${capitalize(answers.firstName)}'s ` : 'Your '}
+              <em class="accent-italic">Plan.</em>
+            </h1>
+            <p class="pv-sub">{heroSub(plan, answers)}</p>
+            <div class="pv-chips">
+              {chips.map((chip) => (
+                <span class="tag" key={chip}>
+                  {chip}
+                </span>
+              ))}
             </div>
-
-            {plan.safety.reasons.map((reason) => (
-              <Callout tone="warning" key={reason.code}>
-                {reason.message}
-              </Callout>
-            ))}
-
-            {plan.notes.map((note) => (
-              <Callout tone="info" key={note}>
-                {note}
-              </Callout>
-            ))}
-
-            {healthNotes.map((note) => (
-              <div class="pv-block" key={note.id}>
-                <h2 class="pv-block-title">{note.title}</h2>
-                <div class="pv-note-body" dangerouslySetInnerHTML={{ __html: note.html }} />
-                {note.reviewedBy ? <p class="pv-date">Reviewed by {note.reviewedBy}</p> : null}
-              </div>
-            ))}
+            <div class="pv-links">
+              <a class="pv-link" href="/plan/?edit=1">
+                Edit answers
+              </a>
+              {canPdf ? (
+                <button type="button" class="pv-link" onClick={printPlan}>
+                  Download as PDF
+                </button>
+              ) : null}
+            </div>
+            {safetyCallouts.length > 0 ? <div class="pv-callouts">{safetyCallouts}</div> : null}
           </div>
         </section>
 
-        {plan.kind === 'guidance' && plan.guidance ? (
-          <section class="section" data-surface="ice">
-            <div class="container pv-width">
-              <h2 class="pv-guidance-headline">{plan.guidance.headline}</h2>
-              {(
-                [
-                  ['Breakfast', plan.guidance.mealIdeas.breakfast],
-                  ['Lunch', plan.guidance.mealIdeas.lunch],
-                  ['Dinner', plan.guidance.mealIdeas.dinner],
-                  ['Snacks', plan.guidance.mealIdeas.snack],
-                ] as const
-              ).map(([label, items]) => (
-                <div class="pv-block" key={label}>
-                  <h3 class="pv-block-title">{label}</h3>
-                  <ul class="pv-list">
-                    {items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-              {plan.guidance.proteinFoods.length > 0 ? (
-                <div class="pv-block">
-                  <h3 class="pv-block-title">Protein-rich foods</h3>
-                  <ul class="pv-list">
-                    {plan.guidance.proteinFoods.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              <div class="pv-block">
-                <h3 class="pv-block-title">Tips</h3>
-                <ul class="pv-list">
-                  {plan.guidance.tips.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
-        ) : null}
-
+        {/* 2. Key numbers — same obsidian surface, one rule above */}
         {targets ? (
           <section class="pv-numbers" data-surface="obsidian">
-            <div class="container pv-width">
+            <div class="container">
               <div class="pv-stat-grid">
                 <Stat value={formatNumber(targets.kcal)} label="Calories" accent />
                 <Stat value={`${targets.protein} g`} label="Protein" accent />
@@ -353,15 +337,27 @@ export default function PlanView({ notes }: Props) {
           </section>
         ) : null}
 
-        {targets ? (
+        {/* 3. How I worked this out (ice) */}
+        {targets && howNumber ? (
           <section class="section" data-surface="ice">
-            <div class="container pv-width">
-              <h2 class="pv-block-title">How I worked this out</h2>
-              <div class="pv-details">
-                {targets.explain.map((step) => (
-                  <details key={step.title}>
-                    <summary>{step.title}</summary>
-                    <p class="pv-details-text">{step.text}</p>
+            <div class="container">
+              <PlanHeader
+                number={howNumber}
+                eyebrow="How I worked this out"
+                intro="Every number above comes from your answers. Open any step to see how."
+              >
+                The maths, <em class="accent-italic">in plain words.</em>
+              </PlanHeader>
+              <div class="pv-steps">
+                {targets.explain.map((step, index) => (
+                  <details class="pv-step step-row" key={step.title}>
+                    <summary>
+                      <span class="section-number" aria-hidden="true">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <h3 class="pv-step-title">{step.title}</h3>
+                    </summary>
+                    <p class="pv-step-text">{step.text}</p>
                   </details>
                 ))}
               </div>
@@ -369,48 +365,42 @@ export default function PlanView({ notes }: Props) {
           </section>
         ) : null}
 
-        {plan.kind === 'plateRules' && plan.plateGuide ? (
-          <section class="section" data-surface="ice">
-            <div class="container pv-width">
-              <h2 class="pv-block-title">Build your plate</h2>
-              <p class="pv-plate-rule">{plan.plateGuide.baseRule}</p>
-              <ul class="pv-list">
-                {plan.plateGuide.portions.map((item) => (
-                  <li key={item}>{item}</li>
+        {/* 4. For your health (obsidian) */}
+        {healthNumber ? (
+          <section class="section" data-surface="obsidian">
+            <div class="container">
+              <PlanHeader number={healthNumber} eyebrow="For your health">
+                What your <em class="accent-italic">answers</em> change.
+              </PlanHeader>
+              <div class="pv-callouts pv-callouts-wide">
+                {plan.notes.map((note) => (
+                  <Callout tone="info" key={note}>
+                    {note}
+                  </Callout>
                 ))}
-              </ul>
-              <div class="pv-block">
-                <h3 class="pv-block-title">At the mess</h3>
-                <ul class="pv-list">
-                  {plan.plateGuide.messTips.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div class="pv-block">
-                <h3 class="pv-block-title">When you order</h3>
-                {plan.plateGuide.orderingGuide.map((row) => (
-                  <div class="pv-order-row" key={row.place}>
-                    <span class="pv-order-place">{row.place}</span>
-                    <span>{row.tip}</span>
+                {healthNotes.map((note) => (
+                  <div class="pv-note" key={note.id}>
+                    <Callout tone="info" heading={note.title}>
+                      <div class="pv-note-body" dangerouslySetInnerHTML={{ __html: note.html }} />
+                    </Callout>
+                    {note.reviewedBy ? (
+                      <p class="pv-note-by">Reviewed by {note.reviewedBy}</p>
+                    ) : null}
                   </div>
                 ))}
-              </div>
-              <div class="pv-block">
-                <h3 class="pv-block-title">Protein back-ups</h3>
-                <ul class="pv-list">
-                  {plan.plateGuide.proteinTips.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
               </div>
             </div>
           </section>
         ) : null}
 
+        {/* 5. Your week (ice) — recipes */}
         {plan.kind === 'recipes' ? (
           <section class="section" data-surface="ice">
-            <div class="container pv-width">
+            <div class="container">
+              <PlanHeader number={mainNumber} eyebrow="Your week">
+                Seven days, <em class="accent-italic">your food.</em>
+              </PlanHeader>
+
               <Tabs
                 label="Plan sections"
                 tabs={[
@@ -430,47 +420,58 @@ export default function PlanView({ notes }: Props) {
                 aria-labelledby="tab-plan"
                 hidden={tab !== 'plan'}
               >
-                <Tabs
-                  label="Choose a day"
-                  tabs={dayTabs}
-                  active={String(day)}
-                  onChange={(id) => setDay(Number(id))}
-                />
+                <div class="pv-daytabs">
+                  <Tabs
+                    label="Choose a day"
+                    tabs={dayTabs}
+                    active={String(day)}
+                    onChange={(id) => setDay(Number(id))}
+                  />
+                </div>
+
                 {activeDay ? (
                   <>
-                    <div class="pv-day-summary">
-                      <span>{activeDay.label}</span>
-                      <span>
-                        {formatNumber(activeDay.kcal)} kcal · {activeDay.protein} g protein
-                        (approx.)
-                      </span>
+                    <div class="pv-dayhead">
+                      <h3 class="pv-dayhead-title">{FULL_DAYS[activeDay.index]}</h3>
+                      <p class="pv-dayhead-meta">
+                        {formatNumber(activeDay.kcal)} kcal · {activeDay.protein} g protein ·
+                        approx.
+                      </p>
+                      <button
+                        type="button"
+                        class="pv-btn pv-dayhead-shuffle"
+                        disabled={busy}
+                        onClick={() => shuffle(activeDay.index)}
+                      >
+                        Shuffle day
+                      </button>
                     </div>
+
                     {activeDay.meals.map((meal, mealIndex) => (
                       <article class="pv-meal" key={`${activeDay.index}-${meal.slot}-${mealIndex}`}>
-                        <div class="pv-meal-head">
-                          <div>
-                            <p class="pv-meal-time">{meal.time}</p>
-                            <h3 class="pv-meal-label">{meal.label}</h3>
-                          </div>
+                        <div class="pv-meal-side">
+                          <p class="pv-meal-time">{meal.time}</p>
+                          <h3 class="pv-meal-label">{meal.label}</h3>
                         </div>
-                        {meal.items.map((item, itemIndex) => (
-                          <div class="pv-item" key={`${item.foodId}-${itemIndex}`}>
-                            <p>
-                              <span class="pv-item-name">{item.name}</span>{' '}
-                              <span class="pv-item-gloss">{item.gloss}</span>
-                            </p>
-                            <p class="pv-item-meta">
-                              {item.measure} · {item.grams} g · {item.kcal} kcal · {item.protein} g
-                              protein
-                            </p>
-                            {item.notes.map((note) => (
-                              <p class="pv-item-note" key={note}>
-                                {note}
+                        <div class="pv-meal-items">
+                          {meal.items.map((item, itemIndex) => (
+                            <div class="pv-item" key={`${item.foodId}-${itemIndex}`}>
+                              <p class="pv-item-name">
+                                {item.name} <span class="pv-item-gloss">{item.gloss}</span>
                               </p>
-                            ))}
-                          </div>
-                        ))}
-                        <div class="pv-meal-actions">
+                              <p class="pv-item-meta">{itemMeta(item)}</p>
+                              {item.notes.map((note) => (
+                                <p class="pv-item-note" key={note}>
+                                  {note}
+                                </p>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                        <div class="pv-meal-foot">
+                          <span class="pv-meal-kcal">
+                            {formatNumber(meal.kcal)} kcal · {meal.protein} g protein
+                          </span>
                           <button
                             type="button"
                             class="pv-btn"
@@ -478,18 +479,7 @@ export default function PlanView({ notes }: Props) {
                           >
                             Swap
                           </button>
-                          <button
-                            type="button"
-                            class="pv-btn"
-                            disabled={busy}
-                            onClick={() => shuffle(activeDay.index)}
-                          >
-                            Shuffle day
-                          </button>
                         </div>
-                        <p class="pv-meal-total">
-                          {formatNumber(meal.kcal)} kcal · {meal.protein} g protein
-                        </p>
                       </article>
                     ))}
                   </>
@@ -503,27 +493,29 @@ export default function PlanView({ notes }: Props) {
                 aria-labelledby="tab-groceries"
                 hidden={tab !== 'groceries'}
               >
-                {groceries.categories.map((category) => (
-                  <div class="pv-grocery-group" key={category.id}>
-                    <h3>{category.label}</h3>
-                    {category.items.map((item) => (
-                      <label
-                        class={`pv-grocery-row${checked.includes(item.id) ? ' is-checked' : ''}`}
-                        key={item.id}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked.includes(item.id)}
-                          onChange={() => toggleGrocery(item.id)}
-                        />
-                        <span class="pv-grocery-name">{item.name}</span>
-                        <span class="pv-grocery-amount">{item.amount}</span>
-                      </label>
-                    ))}
-                  </div>
-                ))}
+                <div class="pv-grocery-grid">
+                  {groceries.categories.map((category) => (
+                    <div class="pv-grocery-group" key={category.id}>
+                      <h3 class="pv-grocery-label">{category.label}</h3>
+                      {category.items.map((item) => (
+                        <label
+                          class={`pv-grocery-row${checked.includes(item.id) ? ' is-checked' : ''}`}
+                          key={item.id}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked.includes(item.id)}
+                            onChange={() => toggleGrocery(item.id)}
+                          />
+                          <span class="pv-grocery-name">{item.name}</span>
+                          <span class="pv-grocery-amount">{item.amount}</span>
+                        </label>
+                      ))}
+                    </div>
+                  ))}
+                </div>
                 {checked.length > 0 ? (
-                  <button type="button" class="pv-btn pv-block" onClick={clearTicks}>
+                  <button type="button" class="pv-btn pv-after-grid" onClick={clearTicks}>
                     Clear ticks
                   </button>
                 ) : null}
@@ -536,21 +528,119 @@ export default function PlanView({ notes }: Props) {
                 aria-labelledby="tab-progress"
                 hidden={tab !== 'progress'}
               >
-                <p class="pv-details-text">
+                <p class="pv-body-text">
                   Weekly check-ins and a weight chart are coming next. For now, weigh yourself once
                   a week, same day, same time.
                 </p>
-                <FollowAnchor location="my-plan-progress" />
+                <FollowAnchor location="my-plan" />
               </div>
             </div>
           </section>
         ) : null}
 
-        {plan.kind === 'plateRules' || plan.kind === 'guidance' ? (
+        {/* 6. plateRules (ice) */}
+        {plan.kind === 'plateRules' && plan.plateGuide ? (
           <section class="section" data-surface="ice">
-            <div class="container pv-width">
+            <div class="container">
+              <PlanHeader number={mainNumber} eyebrow="Build your plate">
+                Half sabzi. <em class="accent-italic">A quarter protein.</em>
+              </PlanHeader>
+              <p class="pv-statement">{plan.plateGuide.baseRule}</p>
+              <div class="pv-rows">
+                <div class="pv-row">
+                  <h3 class="pv-row-title">Portions</h3>
+                  <ul class="pv-row-list">
+                    {plan.plateGuide.portions.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="pv-row">
+                  <h3 class="pv-row-title">At the mess</h3>
+                  <ul class="pv-row-list">
+                    {plan.plateGuide.messTips.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="pv-row">
+                  <h3 class="pv-row-title">When you order</h3>
+                  <div class="pv-order">
+                    {plan.plateGuide.orderingGuide.map((row) => (
+                      <div class="pv-order-row" key={row.place}>
+                        <span class="pv-order-place">{row.place}</span>
+                        <span>{row.tip}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div class="pv-row">
+                  <h3 class="pv-row-title">Protein back-ups</h3>
+                  <ul class="pv-row-list">
+                    {plan.plateGuide.proteinTips.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {/* 6. guidance (ice) */}
+        {plan.kind === 'guidance' && plan.guidance ? (
+          <section class="section" data-surface="ice">
+            <div class="container">
+              <PlanHeader number={mainNumber} eyebrow="What to eat">
+                Simple meals, <em class="accent-italic">from home.</em>
+              </PlanHeader>
+              <div class="pv-rows">
+                {(
+                  [
+                    ['Breakfast', plan.guidance.mealIdeas.breakfast],
+                    ['Lunch', plan.guidance.mealIdeas.lunch],
+                    ['Dinner', plan.guidance.mealIdeas.dinner],
+                    ['Snacks', plan.guidance.mealIdeas.snack],
+                  ] as const
+                ).map(([label, items]) => (
+                  <div class="pv-row" key={label}>
+                    <h3 class="pv-row-title">{label}</h3>
+                    <ul class="pv-row-list">
+                      {items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+                {plan.guidance.proteinFoods.length > 0 ? (
+                  <div class="pv-row">
+                    <h3 class="pv-row-title">Protein-rich foods</h3>
+                    <ul class="pv-row-list">
+                      {plan.guidance.proteinFoods.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                <div class="pv-row">
+                  <h3 class="pv-row-title">Tips</h3>
+                  <ul class="pv-row-list">
+                    {plan.guidance.tips.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {/* Progress for plateRules and guidance */}
+        {plan.kind !== 'recipes' ? (
+          <section class="section" data-surface="ice">
+            <div class="container">
               <h2 class="pv-block-title">Progress</h2>
-              <p class="pv-details-text">
+              <p class="pv-body-text">
                 Weekly check-ins and a weight chart are coming next. For now, weigh yourself once a
                 week, same day, same time.
               </p>
@@ -558,33 +648,11 @@ export default function PlanView({ notes }: Props) {
             </div>
           </section>
         ) : null}
-
-        <section class="pv-follow section" data-surface="obsidian">
-          <div class="container pv-width">
-            <p class="eyebrow-row">
-              <span class="speed-bar" aria-hidden="true" />
-              <span class="eyebrow">Stay close</span>
-            </p>
-            <p class="pv-follow-text">I post recipes and swaps from these plans every week.</p>
-            <div class="pv-follow-actions">
-              <FollowAnchor location="my-plan" primary />
-              <button type="button" class="pv-btn" onClick={share}>
-                Share this site
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" data-surface="ice">
-          <div class="container pv-width">
-            <p class="pv-disclaimer">{plan.disclaimer}</p>
-          </div>
-        </section>
       </div>
 
       {plan.kind === 'recipes' ? (
         <div class="print-only" aria-hidden="true">
-          <h1>{answers.firstName ? `${answers.firstName}'s plan` : 'Your plan'}</h1>
+          <h1>{answers.firstName ? `${capitalize(answers.firstName)}'s plan` : 'Your plan'}</h1>
           <p>{formatDate(saved.savedAt)}</p>
           {plan.days.map((printDay) => (
             <section class="pv-print-day" key={printDay.index}>
@@ -600,8 +668,7 @@ export default function PlanView({ notes }: Props) {
                   <ul>
                     {meal.items.map((item, itemIndex) => (
                       <li key={`${item.foodId}-${itemIndex}`}>
-                        {item.name} ({item.gloss}) — {item.measure} · {item.grams} g · {item.kcal}{' '}
-                        kcal · {item.protein} g protein
+                        {item.name} ({item.gloss}) — {itemMeta(item)}
                       </li>
                     ))}
                   </ul>
@@ -644,7 +711,7 @@ export default function PlanView({ notes }: Props) {
 
       {plan.kind === 'plateRules' && plan.plateGuide ? (
         <div class="print-only" aria-hidden="true">
-          <h1>{answers.firstName ? `${answers.firstName}'s plan` : 'Your plan'}</h1>
+          <h1>{answers.firstName ? `${capitalize(answers.firstName)}'s plan` : 'Your plan'}</h1>
           <section>
             <h2>Build your plate</h2>
             <p>{plan.plateGuide.baseRule}</p>
@@ -668,9 +735,9 @@ export default function PlanView({ notes }: Props) {
         onClose={() => setSwapFor(null)}
       >
         {swapOptions === null ? (
-          <p class="pv-details-text">Loading…</p>
+          <p class="pv-body-text">Loading…</p>
         ) : swapOptions.length === 0 ? (
-          <p class="pv-details-text">No close alternatives for this meal.</p>
+          <p class="pv-body-text">No close alternatives for this meal.</p>
         ) : (
           swapOptions.map((option) => (
             <button
@@ -691,22 +758,24 @@ export default function PlanView({ notes }: Props) {
           ))
         )}
       </Sheet>
-
-      {toast ? <div class="pv-toast">{toast}</div> : null}
     </div>
   );
 }
 
 interface FollowAnchorProps {
   location: string;
-  primary?: boolean;
 }
 
-function FollowAnchor({ location, primary = false }: FollowAnchorProps) {
+/**
+ * Preact mirror of the Astro FollowLink, used only inside the island (the
+ * Progress tab). The rendered href, target, rel, aria-label and Umami event
+ * attributes match the Astro component (asserted in my-plan.spec.ts).
+ */
+function FollowAnchor({ location }: FollowAnchorProps) {
   const label = `Follow @${site.instagramHandle}`;
   return (
     <a
-      class={primary ? 'pv-follow-link pv-follow-primary' : 'pv-follow-link'}
+      class="pv-follow-anchor"
       href={site.instagramUrl}
       target="_blank"
       rel="noopener"

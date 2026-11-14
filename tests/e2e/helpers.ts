@@ -145,7 +145,8 @@ async function clickOption(page: Page, label: string): Promise<void> {
 
 async function clickNext(page: Page): Promise<void> {
   const before = await currentStep(page);
-  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  // The last question's button reads "Review answers" instead of "Next".
+  await page.getByRole('button', { name: /^(Next|Review answers)$/ }).click();
   if (before) {
     await page.waitForFunction(
       (previous) => document.querySelector('[data-step]')?.getAttribute('data-step') !== previous,

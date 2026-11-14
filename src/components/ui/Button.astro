@@ -11,6 +11,11 @@ interface Props {
   class?: string;
   disabled?: boolean;
   ariaLabel?: string;
+  /**
+   * Marks a "plan" CTA so the shared inline script can switch its label and
+   * href for the saved-plan state. `header` gets the per-page header rules.
+   */
+  planCta?: 'default' | 'header';
 }
 
 const {
@@ -23,6 +28,7 @@ const {
   class: className = '',
   disabled = false,
   ariaLabel,
+  planCta,
 } = Astro.props;
 
 const Tag = href ? 'a' : 'button';
@@ -32,6 +38,7 @@ const classes = [
   size === 'sm' ? 'btn-sm' : '',
   full ? 'btn-full' : '',
   disabled ? 'btn-disabled' : '',
+  planCta ? 'plan-cta' : '',
   className,
 ]
   .filter(Boolean)
@@ -45,8 +52,9 @@ const classes = [
   disabled={href ? undefined : disabled}
   aria-disabled={disabled ? 'true' : undefined}
   aria-label={ariaLabel}
+  data-plan-cta={planCta}
 >
-  <span>
+  <span data-plan-cta-label={planCta ? '' : undefined}>
     <slot />
   </span>
   {arrow && <Icon name="arrow-right" size={18} class="btn-arrow" />}

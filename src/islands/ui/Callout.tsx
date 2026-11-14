@@ -2,6 +2,7 @@ import type { ComponentChildren } from 'preact';
 
 interface Props {
   tone?: 'warning' | 'info';
+  heading?: string;
   children: ComponentChildren;
 }
 
@@ -26,11 +27,14 @@ function AlertIcon() {
   );
 }
 
-export default function Callout({ tone = 'info', children }: Props) {
+export default function Callout({ tone = 'info', heading, children }: Props) {
   return (
     <div class={`pv-callout pv-callout-${tone}`}>
       <AlertIcon />
-      <p class="pv-callout-text">{children}</p>
+      <div class="pv-callout-main">
+        {heading ? <p class="pv-callout-heading">{heading}</p> : null}
+        <div class="pv-callout-text">{children}</div>
+      </div>
     </div>
   );
 }

@@ -91,6 +91,33 @@ const mainClasses = ['site-main', flushTop ? 'site-main-flush' : ''].filter(Bool
     <Footer />
 
     {!hideStickyCta && <StickyCta />}
+
+    <script>
+      // One small script drives every "plan" CTA using the shared rule table.
+      // It only ever changes href and the text of [data-plan-cta-label]; with no
+      // JS the link and its default label still work.
+      import { planCtaFor, type PlanCtaKind } from '../lib/cta';
+
+      try {
+        const hasPlan = !!localStorage.getItem('eidolon:plan:v1');
+        const path = location.pathname;
+
+        document.querySelectorAll<HTMLElement>('[data-plan-cta]').forEach((cta) => {
+          const kind = (cta.getAttribute('data-plan-cta') ?? 'default') as PlanCtaKind;
+          const result = planCtaFor(kind, path, hasPlan);
+          const label = cta.querySelector<HTMLElement>('[data-plan-cta-label]');
+
+          if (result.hidden) {
+            cta.style.display = 'none';
+            return;
+          }
+          if (result.label && label) label.textContent = result.label;
+          if (result.href && cta.tagName === 'A') cta.setAttribute('href', result.href);
+        });
+      } catch {
+        // default labels and links stay
+      }
+    </script>
   </body>
 </html>
 

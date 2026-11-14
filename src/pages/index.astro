@@ -93,7 +93,7 @@ const steps = [
         </p>
 
         <div class="hero-ctas hero-fade">
-          <Button href="/plan/" arrow class="plan-cta">
+          <Button href="/plan/" arrow planCta="default">
             Build my plan
           </Button>
           <FollowLink variant="secondary" location="hero" />
@@ -146,28 +146,13 @@ const steps = [
       </h2>
 
       <div class="cta-actions">
-        <Button href="/plan/" arrow>
+        <Button href="/plan/" arrow planCta="default">
           Build my plan
         </Button>
         <FollowLink variant="secondary" location="final-cta" />
       </div>
     </div>
   </section>
-
-  <script>
-    // If a plan is saved, the hero and header CTAs open it instead.
-    try {
-      if (localStorage.getItem('eidolon:plan:v1')) {
-        document.querySelectorAll<HTMLAnchorElement>('a.plan-cta').forEach((cta) => {
-          const label = cta.querySelector('span');
-          if (label) label.textContent = 'Open my plan';
-          cta.setAttribute('href', '/my-plan/');
-        });
-      }
-    } catch {
-      // ignore — the default label stays
-    }
-  </script>
 </BaseLayout>
 
 <style>
@@ -204,6 +189,7 @@ const steps = [
     width: 100vw;
     transform: translateX(-50%);
     text-align: center;
+    pointer-events: none;
     font-family: var(--font-display);
     font-weight: 900;
     font-stretch: 125%;
@@ -238,14 +224,18 @@ const steps = [
 
   .hero-copy {
     position: relative;
-    z-index: 3;
+    z-index: 6;
     grid-column: 1 / 9;
-    padding-block: 72px 48px;
+    padding-block: 72px 64px;
     transform: translateY(16px);
     pointer-events: none;
   }
 
-  .hero-copy :is(a, button) {
+  /* Astro scoping would require the anchor to carry this component's scope
+     attribute, which the Button/FollowLink components do not. :global() keeps
+     the hero CTAs clickable. */
+  .hero-copy :global(a),
+  .hero-copy :global(button) {
     pointer-events: auto;
   }
 
@@ -439,7 +429,7 @@ const steps = [
 
     .hero-copy {
       padding-top: 16px;
-      padding-bottom: 32px;
+      padding-bottom: 56px;
       transform: none;
     }
 

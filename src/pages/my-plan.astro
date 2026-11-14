@@ -4,6 +4,9 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PlanView from '../islands/PlanView';
 import RelatedReels from '../components/RelatedReels.astro';
+import Button from '../components/ui/Button.astro';
+import FollowLink from '../components/FollowLink.astro';
+import { site } from '../config/site';
 import '../styles/plan.css';
 
 const entries = await getCollection('healthNotes');
@@ -29,7 +32,74 @@ const notes = await Promise.all(
   hideStickyCta
 >
   <PlanView client:load notes={notes} />
+
+  <section class="pv-follow section" data-surface="obsidian">
+    <div class="container">
+      <span class="pv-follow-rule" aria-hidden="true"></span>
+
+      <p class="eyebrow-row">
+        <span class="speed-bar" aria-hidden="true"></span>
+        <span class="eyebrow">Stay close</span>
+      </p>
+
+      <h2 class="display pv-follow-title">
+        New recipes from these plans, <em class="accent-italic">every week.</em>
+      </h2>
+
+      <p class="pv-follow-sub">I post recipes and swaps from these plans on Instagram.</p>
+
+      <div class="pv-follow-actions">
+        <FollowLink
+          variant="primary"
+          location="my-plan"
+          label={`Follow @${site.instagramHandle}`}
+        />
+        <Button variant="secondary" class="pv-share">
+          Share this site
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="pv-disclaimer-section section" data-surface="ice">
+    <div class="container">
+      <p class="pv-disclaimer">{site.disclaimer}</p>
+    </div>
+  </section>
+
   <RelatedReels />
+
+  <div class="pv-toast" data-share-toast hidden>
+    Link copied
+  </div>
+
+  <script>
+    // Share the site only. Web Share API first, copy-link fallback.
+    try {
+      const button = document.querySelector<HTMLButtonElement>('.pv-share');
+      const toast = document.querySelector<HTMLElement>('[data-share-toast]');
+      button?.addEventListener('click', async () => {
+        const url = 'https://eidolon.cloud';
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: 'Eidolon', url });
+            return;
+          }
+          await navigator.clipboard.writeText(url);
+          if (toast) {
+            toast.hidden = false;
+            window.setTimeout(() => {
+              toast.hidden = true;
+            }, 2500);
+          }
+        } catch {
+          // user cancelled or clipboard blocked
+        }
+      });
+    } catch {
+      // ignore — the button stays inert
+    }
+  </script>
 </BaseLayout>
 
 <style is:global>
@@ -47,7 +117,10 @@ const notes = await Promise.all(
     footer,
     .sticky-cta,
     .pv-screen,
-    .pv-sheet {
+    .pv-sheet,
+    .pv-follow,
+    .pv-disclaimer-section,
+    .pv-toast {
       display: none !important;
     }
 

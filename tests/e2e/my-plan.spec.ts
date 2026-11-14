@@ -11,7 +11,7 @@ async function noViolations(page: import('@playwright/test').Page) {
 test.describe('plan page', () => {
   test('shows the empty state without a plan', async ({ page }) => {
     await page.goto('/my-plan/');
-    await expect(page.getByRole('heading', { name: "You don't have a plan yet" })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /no plan yet/i })).toBeVisible();
     await expect(
       page.locator('.pv-empty').getByRole('link', { name: /Build my plan/ }),
     ).toBeVisible();
@@ -25,14 +25,14 @@ test.describe('plan page', () => {
     });
     await page.addInitScript((key) => localStorage.setItem(key, '{bad'), PLAN_KEY);
     await page.goto('/my-plan/');
-    await expect(page.getByRole('heading', { name: "You don't have a plan yet" })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /no plan yet/i })).toBeVisible();
     expect(errors).toEqual([]);
   });
 
   test('renders the recipes plan with numbers and seven days', async ({ page }) => {
     await seedPlan(page, VEG_HARYANA);
     await page.goto('/my-plan/');
-    await expect(page.getByRole('heading', { name: 'Your plan' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /your plan/i })).toBeVisible();
     await expect(page.getByText('Lose fat', { exact: true })).toBeVisible();
     await expect(page.getByText('Vegetarian', { exact: true })).toBeVisible();
     await expect(page.locator('.pv-stat')).toHaveCount(7);
@@ -116,7 +116,8 @@ test.describe('plan page', () => {
   test('renders guidance with no numbers', async ({ page }) => {
     await seedPlan(page, TEEN);
     await page.goto('/my-plan/');
-    await expect(page.locator('.pv-guidance-headline')).toBeVisible();
+    await expect(page.locator('[data-kind="guidance"]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /simple meals/i })).toBeVisible();
     const text = await page.locator('main').innerText();
     expect(text).not.toMatch(/kcal|\d+\s?g protein|\d+\s?kg/i);
     await expect(page.getByText(/parent or doctor/i).first()).toBeVisible();
@@ -131,6 +132,29 @@ test.describe('plan page', () => {
     const follow = page.locator('a[data-umami-event="follow_click"]');
     await expect(follow.first()).toHaveAttribute('href', 'https://www.instagram.com/hiteshdhayal/');
     await expect(follow.first()).toHaveAttribute('target', '_blank');
+  });
+
+  test('the Preact follow mirror matches the Astro FollowLink', async ({ page }) => {
+    await seedPlan(page, VEG_HARYANA);
+    await page.goto('/my-plan/');
+    await page.getByRole('tab', { name: 'Progress' }).click();
+
+    const attributes = [
+      'href',
+      'target',
+      'rel',
+      'aria-label',
+      'data-umami-event',
+      'data-umami-event-location',
+    ];
+    const read = (selector: string) =>
+      page
+        .locator(selector)
+        .evaluate((el, list) => list.map((name) => el.getAttribute(name)), attributes);
+
+    const astro = await read('.pv-follow-actions a[data-umami-event="follow_click"]');
+    const preact = await read('#panel-progress a[data-umami-event="follow_click"]');
+    expect(preact).toEqual(astro);
   });
 
   test('edit answers rebuilds the plan', async ({ page }) => {
@@ -164,6 +188,11 @@ test.describe('plan page', () => {
 
 test.describe('plan page axe', () => {
   test.skip(({ viewport }) => viewport?.width === 768, 'axe runs at 375 and 1440');
+
+  test('empty state', async ({ page }) => {
+    await page.goto('/my-plan/');
+    await noViolations(page);
+  });
 
   test('recipes', async ({ page }) => {
     await seedPlan(page, VEG_HARYANA);

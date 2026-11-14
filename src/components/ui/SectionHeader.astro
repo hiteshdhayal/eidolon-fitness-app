@@ -2,14 +2,26 @@
 interface Props {
   number: string;
   eyebrow: string;
+  /** Plain title, or use `accent` for one trailing red italic phrase. */
   title: string;
+  /** The one red italic accent phrase for the headline. */
+  accent?: string;
   intro?: string;
   id?: string;
   rule?: boolean;
   class?: string;
 }
 
-const { number, eyebrow, title, intro, id, rule = true, class: className = '' } = Astro.props;
+const {
+  number,
+  eyebrow,
+  title,
+  accent,
+  intro,
+  id,
+  rule = true,
+  class: className = '',
+} = Astro.props;
 ---
 
 <header id={id} class={`mb-10 md:mb-14 ${className}`}>
@@ -20,17 +32,16 @@ const { number, eyebrow, title, intro, id, rule = true, class: className = '' } 
     </span>
   </p>
   <div class="grid gap-6 md:grid-cols-12 md:gap-6">
-    <h2 class="md:col-span-6">{title}</h2>
+    <h2 class="md:col-span-6">
+      {title}
+      {accent && (
+        <Fragment>
+          {' '}
+          <em class="accent-italic">{accent}</em>
+        </Fragment>
+      )}
+    </h2>
     {intro && <p class="measure text-muted md:col-span-5 md:col-start-8 md:pt-2">{intro}</p>}
   </div>
   {rule && <hr class="rule-strong mt-8 md:mt-10" />}
 </header>
-
-<style>
-  .section-header-number {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-stretch: 125%;
-    letter-spacing: 0;
-  }
-</style>
