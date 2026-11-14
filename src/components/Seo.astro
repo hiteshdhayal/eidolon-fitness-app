@@ -6,6 +6,7 @@
  * against the real site origin, with a trailing slash.
  */
 import { site } from '../config/site';
+import { ogImagePathFor } from '../lib/seo/ogSlug';
 
 interface Props {
   title: string;
@@ -36,7 +37,7 @@ function withTrailingSlash(p: string): string {
 
 const canonicalPath = withTrailingSlash(path);
 const canonical = new URL(canonicalPath, site.siteUrl).href;
-const ogImageUrl = new URL(ogImage ?? '/og/default.png', site.siteUrl).href;
+const ogImageUrl = new URL(ogImage ?? ogImagePathFor(canonicalPath), site.siteUrl).href;
 ---
 
 <title>{title}</title>
