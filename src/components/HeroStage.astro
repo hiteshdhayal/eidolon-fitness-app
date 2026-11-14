@@ -437,8 +437,11 @@ if (count === 0 && import.meta.env.DEV) {
 
   .segment {
     position: relative;
-    flex: 1 1 0;
-    min-width: 14px;
+    /* flex: 1 1 0 alone computed ~37px per segment at 5 slides in the
+       260px track (a real 44px touch-target miss); min-width: 44px forces
+       the real floor and lets the track grow past 260px when it must. */
+    flex: 1 1 44px;
+    min-width: 44px;
     max-width: 44px;
     height: 44px;
     padding: 0;

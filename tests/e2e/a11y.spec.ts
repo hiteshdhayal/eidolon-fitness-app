@@ -39,6 +39,8 @@ const PROD_PAGES = [
 ];
 
 test.describe('axe: production page types', () => {
+  test.use({ reducedMotion: 'reduce' });
+
   for (const path of PROD_PAGES) {
     test(`${path} has no axe violations`, async ({ page }) => {
       await page.goto(path);
@@ -62,6 +64,8 @@ const DRAFT_PAGES = [
 ];
 
 test.describe('axe: draft-only page types (SHOW_DRAFTS preview)', () => {
+  test.use({ reducedMotion: 'reduce' });
+
   for (const path of DRAFT_PAGES) {
     test(`${path} has no axe violations`, async ({ page }) => {
       await page.goto(`${draftsBaseURL}${path}`);
@@ -71,6 +75,8 @@ test.describe('axe: draft-only page types (SHOW_DRAFTS preview)', () => {
 });
 
 test.describe('axe: /plan/ interactive states', () => {
+  test.use({ reducedMotion: 'reduce' });
+
   test('intro screen', async ({ page }) => {
     await page.goto('/plan/');
     expect(await axeViolations(page)).toEqual([]);
@@ -84,13 +90,16 @@ test.describe('axe: /plan/ interactive states', () => {
 
   test('review screen', async ({ page }) => {
     await seedDraft(page, answersFor(VEG_HARYANA), 'review');
-    await page.goto('/plan/');
+    await page.goto('/plan/?step=review');
+    await page.getByRole('button', { name: /Continue where you left off/ }).click();
     await expect(page.locator('.qc-legend')).toHaveText('Check your answers');
     expect(await axeViolations(page)).toEqual([]);
   });
 });
 
 test.describe('axe: /my-plan/ states', () => {
+  test.use({ reducedMotion: 'reduce' });
+
   test('recipes plan', async ({ page }) => {
     await seedPlan(page, VEG_HARYANA);
     await page.goto('/my-plan/');
@@ -137,6 +146,8 @@ test.describe('axe: /my-plan/ states', () => {
 });
 
 test.describe('axe: home interactive states', () => {
+  test.use({ reducedMotion: 'reduce' });
+
   test('state-kitchen section with a non-default state selected', async ({ page }) => {
     // Scrolled into view like a real visitor browsing down the page, not a
     // direct #hash jump: a hard anchor-jump can land before the scroll-driven
@@ -283,6 +294,8 @@ test.describe('reduced motion', () => {
 });
 
 test.describe('contrast', () => {
+  test.use({ reducedMotion: 'reduce' });
+
   test('muted text on ice uses steel-500 or darker, never steel-400', async ({ page }) => {
     await page.goto('/');
     const steel400 = await page.evaluate(() => {
