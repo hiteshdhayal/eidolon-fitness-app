@@ -53,8 +53,15 @@ module.exports = {
       staticDistDir: './dist-audit',
       url: URLS,
       numberOfRuns: 3,
+      // No preset: Lighthouse's default is mobile emulation with simulated
+      // throttling, which is exactly the spec's "mobile preset (default
+      // simulated throttling)" — "mobile" isn't a valid --preset value.
+      // chromePath/chromeFlags are env-overridable: this sandboxed dev
+      // container runs as root with its own pinned Chromium build, neither
+      // of which a normal CI runner needs (see docs/DECISIONS.md).
+      chromePath: process.env.LHCI_CHROME_PATH || undefined,
       settings: {
-        preset: 'mobile',
+        chromeFlags: process.env.LHCI_CHROME_FLAGS || '',
       },
     },
     assert: {

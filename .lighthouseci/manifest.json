@@ -1,0 +1,15 @@
+[
+  {
+    "url": "http://localhost:38461/",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/user/chitresh-ka-assignment/.lighthouseci/localhost--2026_11_14_13_40_00.report.html",
+    "jsonPath": "/home/user/chitresh-ka-assignment/.lighthouseci/localhost--2026_11_14_13_40_00.report.json",
+    "summary": {
+      "performance": 0.98,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 1,
+      "agentic-browsing": 1
+    }
+  }
+]

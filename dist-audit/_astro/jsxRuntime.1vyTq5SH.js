@@ -1,0 +1,1 @@
+import{n as u}from"./preact.BoRmAbBq.js";var p=Symbol.for("pv"),t=0;function y(o,r,i,v,c,e){r||(r={});var f,_,n=r;if("ref"in n&&typeof o!="function")for(_ in n={},r)_=="ref"?f=r[_]:n[_]=r[_];var l={type:o,props:n,key:i,ref:f,__k:null,__:null,__b:0,__e:null,__c:null,constructor:p,__v:--t,__i:-1,__u:0};return u.vnode&&u.vnode(l),l}export{y as a};
