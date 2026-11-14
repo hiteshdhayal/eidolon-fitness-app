@@ -29,6 +29,19 @@ export function visibleSteps(answers: DraftAnswers): string[] {
   );
 }
 
+/**
+ * Override the draft's weight from a `weight` query param (Part F1, "Update my
+ * plan"). Only a valid 30–250 kg number is applied; anything else leaves the
+ * draft exactly as it was.
+ */
+export function applyWeightParam(draft: DraftAnswers, params: URLSearchParams): DraftAnswers {
+  const raw = params.get('weight');
+  if (raw === null || raw.trim() === '') return draft;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < WEIGHT_MIN_KG || value > WEIGHT_MAX_KG) return draft;
+  return { ...draft, weightKg: Math.round(value * 10) / 10 };
+}
+
 export function isFinalQuestion(id: string): boolean {
   return id === QUESTIONS[QUESTIONS.length - 1]?.id;
 }

@@ -6,10 +6,13 @@
 import { z } from 'zod';
 import { AnswersSchema, GroceryListSchema, PlanSchema } from './engine/schema';
 import type { AnswersInput, GroceryList, Plan } from './engine/types';
+import { ProgressSchema, type Entry, type Progress } from './progress/schema';
 
 export const DRAFT_KEY = 'eidolon:draft:v1';
 export const PLAN_KEY = 'eidolon:plan:v1';
 export const GROCERIES_KEY = 'eidolon:groceries:v1';
+export const PROGRESS_KEY = 'eidolon:progress:v1';
+export const KEY_PREFIX = 'eidolon:';
 
 /** The draft answers: a partial AnswersInput, validated loosely. */
 const DraftAnswersSchema = z.object(AnswersSchema.shape).partial();
@@ -134,3 +137,95 @@ export function readGroceries(seed: number): Groceries {
 export function writeGroceries(seed: number, checked: string[]): void {
   save(GROCERIES_KEY, { v: 1, seed, checked } satisfies Groceries);
 }
+
+// ---------------------------------------------------------------------------
+// Progress log (spec §10)
+// ---------------------------------------------------------------------------
+
+const round1 = (value: number) => Math.round(value * 10) / 10;
+
+/** crypto.randomUUID() where available; the only allowed Math.random fallback. */
+function newId(): string {
+  const scope = globalThis as { crypto?: { randomUUID?: () => string } };
+  if (scope.crypto && typeof scope.crypto.randomUUID === 'function') {
+    return scope.crypto.randomUUID();
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+const EMPTY_PROGRESS: Progress = { v: 1, entries: [], dismissedRules: {} };
+
+export function readProgress(): Progress {
+  return load(PROGRESS_KEY, ProgressSchema) ?? { ...EMPTY_PROGRESS, entries: [] };
+}
+
+export function writeProgress(progress: Progress): boolean {
+  const storage = store();
+  if (!storage) return false;
+  try {
+    storage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** One entry per date: saving on an existing date replaces it and keeps its id. */
+export function upsertEntry(input: {
+  date: string;
+  weightKg: number;
+  waistCm?: number;
+}): Progress {
+  const current = readProgress();
+  const existing = current.entries.find((entry) => entry.date === input.date);
+  const entry: Entry = {
+    id: existing?.id ?? newId(),
+    date: input.date,
+    weightKg: round1(input.weightKg),
+    createdAt: new Date().toISOString(),
+  };
+  if (input.waistCm !== undefined) entry.waistCm = round1(input.waistCm);
+
+  const entries = current.entries
+    .filter((item) => item.date !== input.date)
+    .concat(entry)
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+
+  const next: Progress = { ...current, entries };
+  writeProgress(next);
+  return next;
+}
+
+export function deleteEntry(id: string): Progress {
+  const current = readProgress();
+  const next: Progress = {
+    ...current,
+    entries: current.entries.filter((entry) => entry.id !== id),
+  };
+  writeProgress(next);
+  return next;
+}
+
+export function setProgressFields(fields: Partial<Pick<Progress, 'nudgeDismissedOn' | 'dismissedRules'>>): Progress {
+  const current = readProgress();
+  const next: Progress = { ...current, ...fields };
+  writeProgress(next);
+  return next;
+}
+
+/** Remove every `eidolon:*` key, by iterating the keys rather than a fixed list. */
+export function clearAll(): void {
+  const storage = store();
+  if (!storage) return;
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < storage.length; i += 1) {
+      const key = storage.key(i);
+      if (key && key.startsWith(KEY_PREFIX)) keys.push(key);
+    }
+    for (const key of keys) storage.removeItem(key);
+  } catch {
+    // ignore
+  }
+}
+
