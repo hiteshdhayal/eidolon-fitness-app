@@ -5,6 +5,7 @@ import Button from './ui/Button.astro';
 import FollowLink from './FollowLink.astro';
 import Icon from './ui/Icon.astro';
 import { isNavActive } from '../lib/nav';
+import { planCtaFor } from '../lib/cta';
 
 interface Props {
   overlay?: boolean;
@@ -16,6 +17,11 @@ const path = Astro.url.pathname;
 function isActive(href: string) {
   return isNavActive(path, href);
 }
+
+// Known at build time regardless of the client's saved-plan state — render
+// it hidden from the start on /plan/ instead of flashing it in only for the
+// inline script to hide it a moment later (a real, measured CLS source).
+const headerCtaHidden = planCtaFor('header', path, false).hidden;
 ---
 
 <header
@@ -39,9 +45,11 @@ function isActive(href: string) {
 
     <div class="header-actions">
       <FollowLink variant="secondary" size="sm" location="header" />
-      <Button href="/plan/" size="sm" arrow planCta="header">
-        Build my plan
-      </Button>
+      {!headerCtaHidden && (
+        <Button href="/plan/" size="sm" arrow planCta="header">
+          Build my plan
+        </Button>
+      )}
     </div>
 
     <button type="button" popovertarget="mobile-menu" class="menu-button" aria-label="Open menu">
@@ -77,9 +85,11 @@ function isActive(href: string) {
     </nav>
 
     <div class="container mobile-menu-actions">
-      <Button href="/plan/" arrow full planCta="header">
-        Build my plan
-      </Button>
+      {!headerCtaHidden && (
+        <Button href="/plan/" arrow full planCta="header">
+          Build my plan
+        </Button>
+      )}
       <FollowLink variant="secondary" location="mobile-menu" />
       <p class="small mobile-menu-note">{site.disclaimer}</p>
     </div>

@@ -65,8 +65,13 @@ module.exports = {
       },
     },
     assert: {
+      // Anchored to the full path, not just a trailing substring — a
+      // naive `.*${url}$` pattern for '/' matches every URL (everything
+      // ends in a slash), so every page silently also got the home page's
+      // assertions, including the categories:seo one /my-plan/ is exempt
+      // from.
       assertMatrix: URLS.map((url) => ({
-        matchingUrlPattern: `.*${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
+        matchingUrlPattern: `^https?://[^/]+${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
         assertions: assertionsFor(url),
       })),
     },

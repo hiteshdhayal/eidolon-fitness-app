@@ -14,6 +14,13 @@
   border: 0;
 }
 
+/* Reserve the real content's rough height while PlanView reads
+   localStorage, so that first render doesn't collapse to ~0px and then
+   jump open once loaded — the single biggest source of CLS on /my-plan/. */
+.pv-shell[aria-busy='true'] {
+  min-height: calc(100svh - var(--header-h));
+}
+
 /* ------------------------------------------------------------------ */
 /* Questionnaire — intro hero (obsidian)                               */
 /* ------------------------------------------------------------------ */
