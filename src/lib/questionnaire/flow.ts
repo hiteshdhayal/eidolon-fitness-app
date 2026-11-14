@@ -167,7 +167,9 @@ export function toEngineAnswers(answers: DraftAnswers): AnswersInput {
         ? answers.targetWeightKg
         : undefined,
     conditions: allowedConditions(answers.sex, answers.conditions ?? []),
-    diabetesType: (answers.conditions ?? []).includes('diabetes') ? answers.diabetesType : undefined,
+    diabetesType: (answers.conditions ?? []).includes('diabetes')
+      ? answers.diabetesType
+      : undefined,
     medications: answers.medications ?? [],
     trainingDays: answers.trainingDays as AnswersInput['trainingDays'],
     trainingType:

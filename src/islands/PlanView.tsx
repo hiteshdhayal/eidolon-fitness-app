@@ -119,9 +119,7 @@ export default function PlanView({ notes }: Props) {
     setBusy(true);
     try {
       const [engine, foods] = await loadEngine();
-      setSwapOptions(
-        engine.getSwaps(saved.plan, saved.answers, foods.FOODS, dayIndex, mealIndex),
-      );
+      setSwapOptions(engine.getSwaps(saved.plan, saved.answers, foods.FOODS, dayIndex, mealIndex));
     } finally {
       setBusy(false);
     }
@@ -422,124 +420,128 @@ export default function PlanView({ notes }: Props) {
                 ]}
                 active={tab}
                 onChange={setTab}
+                panelPrefix="panel"
               />
 
-              {tab === 'plan' ? (
-                <div class="pv-panel" id="panel-plan" role="tabpanel" aria-labelledby="tab-plan">
-                  <Tabs
-                    label="Choose a day"
-                    tabs={dayTabs}
-                    active={String(day)}
-                    onChange={(id) => setDay(Number(id))}
-                  />
-                  {activeDay ? (
-                    <>
-                      <div class="pv-day-summary">
-                        <span>{activeDay.label}</span>
-                        <span>
-                          {formatNumber(activeDay.kcal)} kcal · {activeDay.protein} g protein (approx.)
-                        </span>
-                      </div>
-                      {activeDay.meals.map((meal, mealIndex) => (
-                        <article class="pv-meal" key={`${activeDay.index}-${meal.slot}-${mealIndex}`}>
-                          <div class="pv-meal-head">
-                            <div>
-                              <p class="pv-meal-time">{meal.time}</p>
-                              <h3 class="pv-meal-label">{meal.label}</h3>
-                            </div>
-                          </div>
-                          {meal.items.map((item, itemIndex) => (
-                            <div class="pv-item" key={`${item.foodId}-${itemIndex}`}>
-                              <p>
-                                <span class="pv-item-name">{item.name}</span>{' '}
-                                <span class="pv-item-gloss">{item.gloss}</span>
-                              </p>
-                              <p class="pv-item-meta">
-                                {item.measure} · {item.grams} g · {item.kcal} kcal · {item.protein} g
-                                protein
-                              </p>
-                              {item.notes.map((note) => (
-                                <p class="pv-item-note" key={note}>
-                                  {note}
-                                </p>
-                              ))}
-                            </div>
-                          ))}
-                          <div class="pv-meal-actions">
-                            <button
-                              type="button"
-                              class="pv-btn"
-                              onClick={() => openSwap(activeDay.index, mealIndex)}
-                            >
-                              Swap
-                            </button>
-                            <button
-                              type="button"
-                              class="pv-btn"
-                              disabled={busy}
-                              onClick={() => shuffle(activeDay.index)}
-                            >
-                              Shuffle day
-                            </button>
-                          </div>
-                          <p class="pv-meal-total">
-                            {formatNumber(meal.kcal)} kcal · {meal.protein} g protein
-                          </p>
-                        </article>
-                      ))}
-                    </>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {tab === 'groceries' ? (
-                <div
-                  class="pv-panel"
-                  id="panel-groceries"
-                  role="tabpanel"
-                  aria-labelledby="tab-groceries"
-                >
-                  {groceries.categories.map((category) => (
-                    <div class="pv-grocery-group" key={category.id}>
-                      <h3>{category.label}</h3>
-                      {category.items.map((item) => (
-                        <label
-                          class={`pv-grocery-row${checked.includes(item.id) ? ' is-checked' : ''}`}
-                          key={item.id}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={checked.includes(item.id)}
-                            onChange={() => toggleGrocery(item.id)}
-                          />
-                          <span class="pv-grocery-name">{item.name}</span>
-                          <span class="pv-grocery-amount">{item.amount}</span>
-                        </label>
-                      ))}
+              <div
+                class="pv-panel"
+                id="panel-plan"
+                role="tabpanel"
+                aria-labelledby="tab-plan"
+                hidden={tab !== 'plan'}
+              >
+                <Tabs
+                  label="Choose a day"
+                  tabs={dayTabs}
+                  active={String(day)}
+                  onChange={(id) => setDay(Number(id))}
+                />
+                {activeDay ? (
+                  <>
+                    <div class="pv-day-summary">
+                      <span>{activeDay.label}</span>
+                      <span>
+                        {formatNumber(activeDay.kcal)} kcal · {activeDay.protein} g protein
+                        (approx.)
+                      </span>
                     </div>
-                  ))}
-                  {checked.length > 0 ? (
-                    <button type="button" class="pv-btn pv-block" onClick={clearTicks}>
-                      Clear ticks
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
+                    {activeDay.meals.map((meal, mealIndex) => (
+                      <article class="pv-meal" key={`${activeDay.index}-${meal.slot}-${mealIndex}`}>
+                        <div class="pv-meal-head">
+                          <div>
+                            <p class="pv-meal-time">{meal.time}</p>
+                            <h3 class="pv-meal-label">{meal.label}</h3>
+                          </div>
+                        </div>
+                        {meal.items.map((item, itemIndex) => (
+                          <div class="pv-item" key={`${item.foodId}-${itemIndex}`}>
+                            <p>
+                              <span class="pv-item-name">{item.name}</span>{' '}
+                              <span class="pv-item-gloss">{item.gloss}</span>
+                            </p>
+                            <p class="pv-item-meta">
+                              {item.measure} · {item.grams} g · {item.kcal} kcal · {item.protein} g
+                              protein
+                            </p>
+                            {item.notes.map((note) => (
+                              <p class="pv-item-note" key={note}>
+                                {note}
+                              </p>
+                            ))}
+                          </div>
+                        ))}
+                        <div class="pv-meal-actions">
+                          <button
+                            type="button"
+                            class="pv-btn"
+                            onClick={() => openSwap(activeDay.index, mealIndex)}
+                          >
+                            Swap
+                          </button>
+                          <button
+                            type="button"
+                            class="pv-btn"
+                            disabled={busy}
+                            onClick={() => shuffle(activeDay.index)}
+                          >
+                            Shuffle day
+                          </button>
+                        </div>
+                        <p class="pv-meal-total">
+                          {formatNumber(meal.kcal)} kcal · {meal.protein} g protein
+                        </p>
+                      </article>
+                    ))}
+                  </>
+                ) : null}
+              </div>
 
-              {tab === 'progress' ? (
-                <div
-                  class="pv-panel"
-                  id="panel-progress"
-                  role="tabpanel"
-                  aria-labelledby="tab-progress"
-                >
-                  <p class="pv-details-text">
-                    Weekly check-ins and a weight chart are coming next. For now, weigh yourself
-                    once a week, same day, same time.
-                  </p>
-                  <FollowAnchor location="my-plan-progress" />
-                </div>
-              ) : null}
+              <div
+                class="pv-panel"
+                id="panel-groceries"
+                role="tabpanel"
+                aria-labelledby="tab-groceries"
+                hidden={tab !== 'groceries'}
+              >
+                {groceries.categories.map((category) => (
+                  <div class="pv-grocery-group" key={category.id}>
+                    <h3>{category.label}</h3>
+                    {category.items.map((item) => (
+                      <label
+                        class={`pv-grocery-row${checked.includes(item.id) ? ' is-checked' : ''}`}
+                        key={item.id}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked.includes(item.id)}
+                          onChange={() => toggleGrocery(item.id)}
+                        />
+                        <span class="pv-grocery-name">{item.name}</span>
+                        <span class="pv-grocery-amount">{item.amount}</span>
+                      </label>
+                    ))}
+                  </div>
+                ))}
+                {checked.length > 0 ? (
+                  <button type="button" class="pv-btn pv-block" onClick={clearTicks}>
+                    Clear ticks
+                  </button>
+                ) : null}
+              </div>
+
+              <div
+                class="pv-panel"
+                id="panel-progress"
+                role="tabpanel"
+                aria-labelledby="tab-progress"
+                hidden={tab !== 'progress'}
+              >
+                <p class="pv-details-text">
+                  Weekly check-ins and a weight chart are coming next. For now, weigh yourself once
+                  a week, same day, same time.
+                </p>
+                <FollowAnchor location="my-plan-progress" />
+              </div>
             </div>
           </section>
         ) : null}
@@ -563,9 +565,7 @@ export default function PlanView({ notes }: Props) {
               <span class="speed-bar" aria-hidden="true" />
               <span class="eyebrow">Stay close</span>
             </p>
-            <p class="pv-follow-text">
-              I post recipes and swaps from these plans every week.
-            </p>
+            <p class="pv-follow-text">I post recipes and swaps from these plans every week.</p>
             <div class="pv-follow-actions">
               <FollowAnchor location="my-plan" primary />
               <button type="button" class="pv-btn" onClick={share}>
@@ -600,8 +600,8 @@ export default function PlanView({ notes }: Props) {
                   <ul>
                     {meal.items.map((item, itemIndex) => (
                       <li key={`${item.foodId}-${itemIndex}`}>
-                        {item.name} ({item.gloss}) — {item.measure} · {item.grams} g · {item.kcal} kcal ·{' '}
-                        {item.protein} g protein
+                        {item.name} ({item.gloss}) — {item.measure} · {item.grams} g · {item.kcal}{' '}
+                        kcal · {item.protein} g protein
                       </li>
                     ))}
                   </ul>
@@ -609,41 +609,43 @@ export default function PlanView({ notes }: Props) {
               ))}
             </section>
           ))}
-          {targets ? (
-            <section class="pv-print-day">
-              <h2>Daily targets</h2>
-              <p>
-                {formatNumber(targets.kcal)} kcal · {targets.protein} g protein · {targets.carbs} g
-                carbs · {targets.fat} g fat · {targets.fiber} g fibre
-              </p>
+          <div class="pv-print-tail">
+            {targets ? (
+              <section>
+                <h2>Daily targets</h2>
+                <p>
+                  {formatNumber(targets.kcal)} kcal · {targets.protein} g protein · {targets.carbs}{' '}
+                  g carbs · {targets.fat} g fat · {targets.fiber} g fibre
+                </p>
+              </section>
+            ) : null}
+            <section>
+              <h2>Groceries</h2>
+              {groceries.categories.map((category) => (
+                <div key={category.id}>
+                  <h3>{category.label}</h3>
+                  <ul>
+                    {category.items.map((item) => (
+                      <li key={item.id}>
+                        {item.name} {item.amount}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </section>
-          ) : null}
-          <section class="pv-print-day">
-            <h2>Groceries</h2>
-            {groceries.categories.map((category) => (
-              <div key={category.id}>
-                <h3>{category.label}</h3>
-                <ul>
-                  {category.items.map((item) => (
-                    <li key={item.id}>
-                      {item.name} {item.amount}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </section>
-          <section class="pv-print-day">
-            <h2>Disclaimer</h2>
-            <p>{plan.disclaimer}</p>
-          </section>
+            <section>
+              <h2>Disclaimer</h2>
+              <p>{plan.disclaimer}</p>
+            </section>
+          </div>
         </div>
       ) : null}
 
       {plan.kind === 'plateRules' && plan.plateGuide ? (
         <div class="print-only" aria-hidden="true">
           <h1>{answers.firstName ? `${answers.firstName}'s plan` : 'Your plan'}</h1>
-          <section class="pv-print-day">
+          <section>
             <h2>Build your plate</h2>
             <p>{plan.plateGuide.baseRule}</p>
             <ul>
@@ -652,7 +654,7 @@ export default function PlanView({ notes }: Props) {
               ))}
             </ul>
           </section>
-          <section class="pv-print-day">
+          <section>
             <h2>Disclaimer</h2>
             <p>{plan.disclaimer}</p>
           </section>

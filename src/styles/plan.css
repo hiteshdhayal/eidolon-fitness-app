@@ -522,10 +522,29 @@
 
   .qc-next {
     width: 100%;
+    text-align: center;
   }
 
   .qc-secondary {
     width: 100%;
+  }
+
+  .pv-screen > .section {
+    padding-block: 48px;
+  }
+
+  .pv-follow-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .pv-follow-actions > * {
+    width: 100%;
+  }
+
+  .pv-meal-actions .pv-btn {
+    flex: 1 1 0;
   }
 
   .qc-listbox {
@@ -631,14 +650,14 @@
 }
 
 .pv-numbers {
-  margin-top: 40px;
+  margin-top: 0;
   padding-block: clamp(40px, 6vw, 72px);
 }
 
 .pv-stat-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 16px;
+  gap: 28px 24px;
 }
 
 .pv-stat {
@@ -650,11 +669,12 @@
 .pv-stat-value {
   font-family: var(--font-display);
   font-weight: 900;
-  font-stretch: 115%;
-  font-size: clamp(2.25rem, 1.4rem + 3.4vw, 3.75rem);
+  font-stretch: 110%;
+  font-size: clamp(2.25rem, 1.2rem + 2.6vw, 3rem);
   line-height: 0.9;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .pv-stat-value.is-accent {
@@ -730,7 +750,7 @@
 .pv-tablist {
   display: flex;
   gap: 4px;
-  margin-top: 40px;
+  margin-top: 24px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -739,7 +759,7 @@
   padding-inline: 16px;
   border: 0;
   border-bottom: 3px solid transparent;
-  background: none;
+  background-color: var(--bg);
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -769,7 +789,7 @@
   padding-inline: 14px;
   border: 0;
   border-bottom: 3px solid transparent;
-  background: none;
+  background-color: var(--bg);
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -1055,7 +1075,7 @@
 }
 
 .pv-follow {
-  margin-top: 48px;
+  margin-top: 0;
   padding-block: clamp(40px, 6vw, 64px);
 }
 
@@ -1157,12 +1177,14 @@
 }
 
 @media (min-width: 768px) {
-  .pv-stat-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
   .pv-sheet {
     margin: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pv-stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

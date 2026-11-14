@@ -98,3 +98,8 @@ One line per decision. Simplest option consistent with the spec wins.
 - `/my-plan` renders the health notes at build time (`getCollection("healthNotes")` + `AstroContainer.renderToString`) and passes `{ id, title, reviewedBy, html }` to the island. `reviewedBy` stays hidden while empty.
 - Print output uses a print-only copy of the plan (all 7 days, then targets, groceries and disclaimer) so the A4 order and page breaks do not depend on the interactive tab state.
 - The swap/shuffle engine and food database are lazy-imported on the first Swap or Shuffle; the plan view renders from the saved plan alone.
+- `scripts/check-island-size.mjs` runs after the link check in `pnpm build`; it follows each island's static import graph and fails if its eager JavaScript passes 80 KB gzipped. The engine and food chunks are checked to be lazy-only and reported separately.
+- `src/content.config.ts` imports `z` from `astro/zod` (the `astro:content` export is deprecated in Astro 6).
+- The mobile Next button is sticky to the viewport bottom; screenshots force it static so full-page captures show it after the options.
+- Print output groups daily targets, groceries and the disclaimer into one `.pv-print-tail` page after the seven day pages.
+- Questionnaire question screens carry a visually hidden `<h1>Build your plan</h1>` so every step has a level-one heading while the legend stays the visual heading.

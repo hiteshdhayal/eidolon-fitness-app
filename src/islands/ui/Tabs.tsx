@@ -10,9 +10,11 @@ interface Props {
   tabs: readonly TabDef[];
   active: string;
   onChange: (id: string) => void;
+  /** Only set when panels with these ids are present in the DOM. */
+  panelPrefix?: string;
 }
 
-export default function Tabs({ label, tabs, active, onChange }: Props) {
+export default function Tabs({ label, tabs, active, onChange, panelPrefix }: Props) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   function move(from: number, delta: number) {
@@ -37,7 +39,7 @@ export default function Tabs({ label, tabs, active, onChange }: Props) {
             role="tab"
             id={`tab-${tab.id}`}
             aria-selected={selected}
-            aria-controls={`panel-${tab.id}`}
+            aria-controls={panelPrefix ? `${panelPrefix}-${tab.id}` : undefined}
             tabIndex={selected ? 0 : -1}
             class={`pv-tab${selected ? ' is-active' : ''}`}
             onClick={() => onChange(tab.id)}

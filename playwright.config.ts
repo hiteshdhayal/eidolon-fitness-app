@@ -1,5 +1,8 @@
 import { defineConfig } from '@playwright/test';
 
+const port = Number(process.env.PW_PORT ?? 4321);
+const baseURL = `http://127.0.0.1:${port}`;
+
 export default defineConfig({
   testDir: './tests',
   testIgnore: ['**/unit/**'],
@@ -8,12 +11,12 @@ export default defineConfig({
   timeout: 60_000,
   reporter: [['list']],
   use: {
-    baseURL: 'http://127.0.0.1:4321',
+    baseURL,
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'pnpm preview --port 4321 --host 127.0.0.1',
-    url: 'http://127.0.0.1:4321',
+    command: `pnpm preview --port ${port} --host 127.0.0.1`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

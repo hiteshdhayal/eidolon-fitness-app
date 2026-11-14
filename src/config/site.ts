@@ -80,9 +80,4 @@ export function stub(path: string): { title: string; copy: string } {
 }
 
 /** Routes that must stay out of the sitemap (stubs, styleguide, 404). */
-export const sitemapExcludedRoutes = [
-  ...stubRoutes,
-  '/my-plan/',
-  '/styleguide/',
-  '/404/',
-];
+export const sitemapExcludedRoutes = [...stubRoutes, '/my-plan/', '/styleguide/', '/404/'];

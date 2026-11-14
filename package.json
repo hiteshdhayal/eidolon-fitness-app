@@ -7,7 +7,7 @@
     "predev": "node scripts/process-hero.mjs",
     "dev": "astro dev",
     "prebuild": "node scripts/process-hero.mjs",
-    "build": "astro build && node scripts/check-placeholders.mjs && node scripts/check-links.mjs",
+    "build": "astro build && node scripts/check-placeholders.mjs && node scripts/check-links.mjs && node scripts/check-island-size.mjs",
     "preview": "astro preview",
     "typecheck": "astro check",
     "check": "astro check",

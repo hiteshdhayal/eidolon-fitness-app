@@ -14,11 +14,7 @@ import {
   validate,
   visibleSteps,
 } from '../lib/questionnaire/flow';
-import {
-  questionById,
-  type DraftAnswers,
-  type QuestionDef,
-} from '../lib/questionnaire/questions';
+import { questionById, type DraftAnswers, type QuestionDef } from '../lib/questionnaire/questions';
 import { regionOf, type StateCode } from '../lib/engine/regions';
 import type { Answers } from '../lib/engine/types';
 import OptionCard from './ui/OptionCard';
@@ -63,7 +59,15 @@ interface NumberFieldProps {
   onValue: (value: number | undefined) => void;
 }
 
-function NumberField({ id, value, placeholder, step, describedBy, invalid, onValue }: NumberFieldProps) {
+function NumberField({
+  id,
+  value,
+  placeholder,
+  step,
+  describedBy,
+  invalid,
+  onValue,
+}: NumberFieldProps) {
   return (
     <div class="qc-field-row">
       <input
@@ -115,7 +119,12 @@ function HeightField({ initialCm, initialUnit, invalid, describedBy, onChange }:
       setFeet(parts.feet);
       setInches(parts.inches);
       setUnit('ftin');
-      onChange(feet !== undefined || inches !== undefined ? heightCmFromFtIn(parts.feet, parts.inches) : cm, 'ftin');
+      onChange(
+        feet !== undefined || inches !== undefined
+          ? heightCmFromFtIn(parts.feet, parts.inches)
+          : cm,
+        'ftin',
+      );
     }
   }
 
@@ -222,7 +231,7 @@ function HeightField({ initialCm, initialUnit, invalid, describedBy, onChange }:
 }
 
 export default function Questionnaire() {
-  const [answers, setAnswers] = useState<DraftAnswers>({});
+  const [answers, setAnswers] = useState<DraftAnswers>({ supplements: 'foodOnly' });
   const [stepId, setStepId] = useState<string>(INTRO);
   const [resumeStep, setResumeStep] = useState<string | null>(null);
   const [returnToReview, setReturnToReview] = useState(false);
@@ -236,8 +245,7 @@ export default function Questionnaire() {
   const nextRef = useRef<() => void>(() => {});
 
   const steps = useMemo(() => visibleSteps(answers), [answers]);
-  const currentQuestion =
-    stepId !== INTRO && stepId !== REVIEW ? questionById(stepId) : undefined;
+  const currentQuestion = stepId !== INTRO && stepId !== REVIEW ? questionById(stepId) : undefined;
   const questionIndex = Math.max(0, steps.indexOf(stepId));
   const counterIndex = stepId === REVIEW ? steps.length : questionIndex + 1;
 
@@ -260,8 +268,10 @@ export default function Questionnaire() {
         requested && (visible.includes(requested) || requested === REVIEW)
           ? requested
           : draft.stepId;
-      setAnswers(draft.answers);
-      setResumeStep(visible.includes(target) || target === REVIEW ? target : (visible[0] ?? REVIEW));
+      setAnswers({ supplements: 'foodOnly', ...draft.answers });
+      setResumeStep(
+        visible.includes(target) || target === REVIEW ? target : (visible[0] ?? REVIEW),
+      );
     }
     setReady(true);
   }, []);
@@ -273,8 +283,7 @@ export default function Questionnaire() {
   }, [ready, steps, stepId]);
 
   useEffect(() => {
-    if (!ready) return;
-    if (stepId === INTRO && Object.keys(answers).length === 0) return;
+    if (!ready || stepId === INTRO) return;
     writeDraft({ v: 1, answers, stepId, updatedAt: new Date().toISOString() });
   }, [answers, stepId, ready]);
 
@@ -331,13 +340,21 @@ export default function Questionnaire() {
 
   function back() {
     if (stepId === INTRO) return;
+    try {
+      if (window.history.state && typeof window.history.state.step === 'string') {
+        window.history.back();
+        return;
+      }
+    } catch {
+      // fall through to a direct move
+    }
     const index = stepId === REVIEW ? steps.length : steps.indexOf(stepId);
     if (index <= 0) go(INTRO);
     else go(steps[index - 1] ?? INTRO);
   }
 
   function setValue(id: string, value: unknown) {
-    setAnswers((prev) => ({ ...prev, [id]: value } as DraftAnswers));
+    setAnswers((prev) => ({ ...prev, [id]: value }) as DraftAnswers);
   }
 
   function selectSingle(question: QuestionDef, value: unknown, viaPointer: boolean) {
@@ -354,7 +371,7 @@ export default function Questionnaire() {
 
   function startFresh() {
     track('plan_start');
-    setAnswers({});
+    setAnswers({ supplements: 'foodOnly' });
     setResumeStep(null);
     go(visibleSteps({})[0] ?? REVIEW);
   }
@@ -463,15 +480,21 @@ export default function Questionnaire() {
     const describedBy = message ? `${question.id}-error` : undefined;
 
     if (question.kind === 'number') {
+      const key =
+        question.id === 'weight'
+          ? 'weightKg'
+          : question.id === 'targetWeight'
+            ? 'targetWeightKg'
+            : question.id;
       return (
         <NumberField
           id={`${question.id}-input`}
-          value={value as number | undefined}
+          value={answers[key as keyof DraftAnswers] as number | undefined}
           placeholder={question.placeholder ?? ''}
           step={question.id === 'age' ? 1 : 0.1}
           describedBy={describedBy}
           invalid={!!message}
-          onValue={(next) => setValue(question.id, next)}
+          onValue={(next) => setValue(key, next)}
         />
       );
     }
@@ -569,12 +592,8 @@ export default function Questionnaire() {
 
   return (
     <div class="qc-shell" data-step={stepId}>
-      <TopBar
-        index={counterIndex}
-        total={steps.length}
-        canBack={stepId !== INTRO}
-        onBack={back}
-      />
+      <h1 class="sr-only">Build your plan</h1>
+      <TopBar index={counterIndex} total={steps.length} canBack={stepId !== INTRO} onBack={back} />
 
       <p class="sr-only" aria-live="polite">
         {currentQuestion
@@ -639,9 +658,29 @@ export default function Questionnaire() {
           </div>
         </div>
       ) : currentQuestion ? (
-        <div class="qc-step-anim" key={currentQuestion.id}>
+        <div
+          class="qc-step-anim"
+          key={currentQuestion.id}
+          onKeyDown={(event) => {
+            // Enter advances from a focused radio; the Next button handles the rest.
+            if (
+              event.key === 'Enter' &&
+              event.target instanceof HTMLInputElement &&
+              event.target.type === 'radio' &&
+              complete
+            ) {
+              event.preventDefault();
+              next();
+            }
+          }}
+        >
           <fieldset class="qc-step">
-            <legend class="qc-legend" tabIndex={-1} id={`${currentQuestion.id}-legend`} ref={legendRef}>
+            <legend
+              class="qc-legend"
+              tabIndex={-1}
+              id={`${currentQuestion.id}-legend`}
+              ref={legendRef}
+            >
               {currentQuestion.legend}
             </legend>
 
@@ -667,7 +706,11 @@ export default function Questionnaire() {
             <button type="button" class="qc-next" disabled={!complete} onClick={next}>
               Next
             </button>
-            {currentQuestion.skippable && !complete ? (
+            {currentQuestion.skippable &&
+            ((answers[currentQuestion.id as keyof DraftAnswers] as string | number | undefined) ===
+              undefined ||
+              (answers[currentQuestion.id as keyof DraftAnswers] as string | number | undefined) ===
+                '') ? (
               <button type="button" class="qc-skip" onClick={skipStep}>
                 Skip
               </button>

@@ -50,6 +50,18 @@ The food database is plain TypeScript, one file per region in `src/data/foods/` 
 
 `docs/food-review.csv` is only a review sheet for you and a dietitian. **Editing the CSV changes nothing** — the region `.ts` files are the source of truth, and the CSV is regenerated from them. Leave `verified: false` and `source: "computed from ingredients"` until a value has been checked against IFCT 2017.
 
+## How the plan builder works
+
+`/plan` asks about 18 questions (goal, body, health, activity and food). The plan is computed **in your browser** by the engine in `src/lib/engine/` using the food database in `src/data/foods/`. Nothing is sent to a server.
+
+Your answers and plan are kept on your device in three localStorage keys:
+
+- `eidolon:draft:v1` — the half-finished questionnaire
+- `eidolon:plan:v1` — the saved plan, answers and grocery list
+- `eidolon:groceries:v1` — which grocery items you've ticked
+
+`/my-plan` reads the saved plan and offers swap, shuffle, groceries and a printable copy. To clear everything, open your browser's site settings for `eidolon.cloud` and delete site data (Chrome: Settings → Privacy and security → Third-party cookies → See all site data and permissions; Safari: Settings → Privacy → Manage Website Data). Deleting site data removes the plan; there is no server copy.
+
 ## Site config
 
 Everything personal lives in `src/config/site.ts`: brand, creator, Instagram, domain, and empty placeholders for credentials and contact email. Empty values hide their UI — the footer contact link falls back to an Instagram DM.
