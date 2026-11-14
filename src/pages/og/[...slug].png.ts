@@ -21,7 +21,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const GET: APIRoute = async ({ props }) => {
   const { eyebrow, title } = props as { eyebrow: string; title: string };
   const png = await renderOgImage({ eyebrow, title });
-  return new Response(png, {
+  return new Response(new Uint8Array(png), {
     headers: { 'Content-Type': 'image/png' },
   });
 };
