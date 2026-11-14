@@ -26,14 +26,6 @@ export function pageTitle(page: string): string {
 
 /** Routes that are still placeholders. Excluded from the sitemap. */
 export const stubPages: Record<string, { title: string; copy: string }> = {
-  '/plan/': {
-    title: 'Diet plan',
-    copy: "The 2-minute plan builder is being built right now. Follow for the launch — it's the first thing I'll post.",
-  },
-  '/my-plan/': {
-    title: 'Your plan',
-    copy: 'Your saved plan and progress tracker will live here.',
-  },
   '/learn/': {
     title: 'Learn',
     copy: 'Exercise library: how to do each movement properly, mistakes to avoid, easier and harder versions.',
@@ -88,4 +80,9 @@ export function stub(path: string): { title: string; copy: string } {
 }
 
 /** Routes that must stay out of the sitemap (stubs, styleguide, 404). */
-export const sitemapExcludedRoutes = [...stubRoutes, '/styleguide/', '/404/'];
+export const sitemapExcludedRoutes = [
+  ...stubRoutes,
+  '/my-plan/',
+  '/styleguide/',
+  '/404/',
+];

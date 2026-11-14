@@ -93,7 +93,7 @@ const steps = [
         </p>
 
         <div class="hero-ctas hero-fade">
-          <Button href="/plan/" arrow>
+          <Button href="/plan/" arrow class="plan-cta">
             Build my plan
           </Button>
           <FollowLink variant="secondary" location="hero" />
@@ -153,6 +153,21 @@ const steps = [
       </div>
     </div>
   </section>
+
+  <script>
+    // If a plan is saved, the hero and header CTAs open it instead.
+    try {
+      if (localStorage.getItem('eidolon:plan:v1')) {
+        document.querySelectorAll<HTMLAnchorElement>('a.plan-cta').forEach((cta) => {
+          const label = cta.querySelector('span');
+          if (label) label.textContent = 'Open my plan';
+          cta.setAttribute('href', '/my-plan/');
+        });
+      }
+    } catch {
+      // ignore — the default label stays
+    }
+  </script>
 </BaseLayout>
 
 <style>

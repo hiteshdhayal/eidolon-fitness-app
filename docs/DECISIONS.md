@@ -81,3 +81,15 @@ One line per decision. Simplest option consistent with the spec wins.
 - `zod` was already a dependency at `^4.6.7`, so `pnpm add zod` was not needed; the engine's zod 3 API runs on zod 4. `tsx` was added as a dev dependency.
 - TypeScript strictness was extended with `noUnusedLocals` and `noUnusedParameters`; no compiler option was loosened.
 - `tests/unit/**` is included in Vitest and ignored by Playwright (`testIgnore: ["**/unit/**"]`).
+
+## Phase 3
+
+- zod `^4.6.7` kept; the engine and the new questionnaire code use the v3-compatible API and every test passes on zod 4.
+- Preact islands were already installed in Phase 1 (`@astrojs/preact`, `preact`); Phase 3 adds none.
+- Storage keys are `eidolon:draft:v1` (`{ v, answers, stepId, updatedAt }`), `eidolon:plan:v1` (`{ v, answers, plan, groceries, savedAt }`) and `eidolon:groceries:v1` (`{ v, seed, checked }`). Every read/write is wrapped in try/catch; invalid or corrupt data reads as null.
+- Grocery ticks carry the plan seed, so a new plan starts with no ticks.
+- Single-choice questions auto-advance only after a pointer selection; keyboard selection never auto-advances (Enter/Next moves on).
+- Each step is a `history.pushState` entry (`?step=<id>`), so the browser back button walks the questionnaire; `popstate` restore is handled.
+- `/plan/` is indexable and in the sitemap; `/my-plan/` is `noindex` and excluded from the sitemap.
+- `src/content/health-notes/*.md` is in `.prettierignore` so the inline frontmatter the engine test reads stays intact.
+- The home page's `a.plan-cta` labels switch to "Open my plan" when `eidolon:plan:v1` exists; with no plan or no JS they stay "Build my plan".

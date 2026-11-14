@@ -8,6 +8,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "verbatimModuleSyntax": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "types": ["vitest/globals"],
     "baseUrl": ".",
     "paths": {

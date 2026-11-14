@@ -1,0 +1,2 @@
+# Keep the health-note frontmatter inline: a Vitest test reads it as authored.
+src/content/health-notes/*.md

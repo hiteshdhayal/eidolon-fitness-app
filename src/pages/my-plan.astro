@@ -1,8 +1,17 @@
 ---
-import ComingSoon from '../layouts/ComingSoon.astro';
-import { stub } from '../config/site';
-
-const page = stub('/my-plan/');
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/plan.css';
 ---
 
-<ComingSoon slug="my-plan" title={page.title} copy={page.copy} />
+<BaseLayout
+  title="Your plan · Eidolon"
+  description="Your saved Eidolon diet plan."
+  noindex
+  hideStickyCta
+>
+  <section class="pv-section section" data-surface="ice">
+    <div class="container pv-width">
+      <h1>Your plan</h1>
+    </div>
+  </section>
+</BaseLayout>
