@@ -1,0 +1,17 @@
+# Launch checklist
+
+Everything below needs a human decision or real content before the site goes live. Nothing on this list blocks `pnpm build` — the build guards already enforce honesty (no fake facts, no `{{placeholders}}`, no unreviewed "verified" claims), so the site is safe to deploy as-is with these items still open; they're what make it *finished*, not what makes it *correct*.
+
+- [ ] Review and edit the About copy (`/about/` sections 1–2 — "Who I am" and "Why I built this", rendered from `src/pages/about.astro` + `src/components/home/AboutMeSection.astro`), and fill `site.aboutLong` and `site.credentials` in `src/config/site.ts` if you want the longer bio or a credentials line to show.
+- [ ] Add photos: hero slides in `src/assets/hero/slides/` (Phase 1.6 is built and already renders whatever's there — see the phase status note below) and an About portrait (`hero.png`/`hero.jpg` in `src/assets/hero/`, or the first hero slide is reused automatically).
+- [ ] Replace the seed reel URLs with real Instagram links, add real thumbnails, review the written summaries, and set `draft: false` in `src/content/reels/*.md`.
+- [ ] Fill `src/data/products.ts` with real brands, affiliate URLs and `placeholder: false`, then set `draft: false` on `src/content/articles/top-5-supplement-brands-india.mdx` to publish the supplement article.
+- [ ] Review the 36 exercises (`src/content/exercises/*.yaml`), the 4 workouts (`src/content/workouts/*.yaml`) and the 3 guides (`src/content/articles/*.mdx` with `kind: guide`), and set `draft: false` on each as they're ready. (All 43 are currently `draft: true`, so `/learn/` and `/workouts/` show their empty states in production.)
+- [ ] Dietitian review of `docs/food-review.csv`; mark verified foods in the region files under `src/data/foods/`. Until this happens, every build guard and every page correctly says the food values are estimates under review — don't mark anything "verified" or "dietitian-approved" before this is done, `scripts/check-copy.mjs` will fail the build if you do.
+- [ ] Doctor or dietitian review of the 12 health notes in `src/content/health-notes/*.md`; fill in `reviewedBy` on each as they're signed off.
+- [ ] Have a lawyer read the four legal pages (`src/pages/disclaimer.astro`, `privacy.astro`, `affiliate-disclosure.astro`, `terms.astro`); update `LEGAL_LAST_UPDATED` in `src/config/legal.ts` to the date they're approved.
+- [ ] Set `site.contactEmail` in `src/config/site.ts` if you want a direct email instead of "Contact via Instagram DM" in the footer and legal pages.
+- [ ] **Phase 7:** set up Umami and put its website id in `site.umamiWebsiteId` (`src/config/site.ts`). Until this is set, no analytics script loads at all — this is intentional, not a bug.
+- [ ] **Phase 7:** configure Nginx access-log retention to 14 days, as `/privacy/` already promises ("Server logs" section).
+- [ ] **Phase 7:** set a CSP that allows `www.instagram.com` (script and frame) only on reel and article pages, and `stats.eidolon.cloud` everywhere once Umami is live.
+- [ ] Run `pnpm perf` on the final content (once drafts above are published) and confirm every page scores 95+ across all four Lighthouse categories. The LCP/CLS numbers measured during Phase 6 development ran a little high in this sandboxed build container (see `docs/DECISIONS.md` and the Phase 6 report) — re-run on the real deploy target or a less CPU-constrained machine before trusting the absolute numbers.

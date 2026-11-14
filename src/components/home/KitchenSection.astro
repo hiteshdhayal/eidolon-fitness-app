@@ -1,0 +1,346 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import Button from '../ui/Button.astro';
+import { KITCHEN_SAMPLES } from '../../lib/home/sampleDays';
+import { STATES } from '../../lib/engine/regions';
+
+interface Props {
+  number: string;
+  surface: 'obsidian' | 'ice';
+}
+
+const { number, surface } = Astro.props;
+
+const FEATURED: ReadonlyArray<string> = ['HR', 'PB', 'TN', 'KL', 'WB', 'GJ', 'MH', 'AS'];
+const DEFAULT_STATE = 'HR';
+
+const featuredStates = FEATURED.map((code) => STATES.find((s) => s.code === code)!);
+const allStatesSorted = [...STATES].sort((a, b) => a.name.localeCompare(b.name));
+const defaultSample = KITCHEN_SAMPLES[DEFAULT_STATE as keyof typeof KITCHEN_SAMPLES];
+const dataJson = JSON.stringify(KITCHEN_SAMPLES);
+---
+
+<section class="section kitchen" data-surface={surface} id="kitchen">
+  <div class="container section-reveal">
+    <SectionHeader
+      number={number}
+      eyebrow="YOUR STATE'S KITCHEN"
+      title="YOUR STATE'S"
+      accent="KITCHEN."
+      intro="Pick a state. This is a day on the plan — built from food people there already cook."
+    />
+
+    <div class="kitchen-picker">
+      <div class="chip-row" role="group" aria-label="Pick a state">
+        {featuredStates.map((state) => (
+          <button
+            type="button"
+            class="chip"
+            data-state-chip
+            data-state={state.code}
+            aria-pressed={state.code === DEFAULT_STATE ? 'true' : 'false'}
+          >
+            {state.name}
+          </button>
+        ))}
+      </div>
+
+      <div class="other-states">
+        <label class="eyebrow" for="kitchen-state-select">
+          Other states
+        </label>
+        <select id="kitchen-state-select" data-state-select>
+          {allStatesSorted.map((state) => (
+            <option value={state.code} selected={state.code === DEFAULT_STATE}>
+              {state.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    <p id="kitchen-live" class="visually-hidden" role="status" aria-live="polite"></p>
+
+    <div class="kitchen-columns" data-kitchen-columns>
+      <div class="kitchen-col">
+        <h3 class="eyebrow kitchen-col-label">Veg day</h3>
+        <ol class="kitchen-meals" data-kitchen-meals="veg">
+          {defaultSample.veg.meals.map((meal) => (
+            <li class="kitchen-meal">
+              <span class="eyebrow kitchen-meal-label">{meal.label}</span>
+              <ul class="kitchen-items">
+                {meal.items.map((item) => (
+                  <li>
+                    {item.name} · {item.measure}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
+        <p class="kitchen-kcal" data-kitchen-kcal="veg">
+          About {defaultSample.veg.kcal} kcal
+        </p>
+      </div>
+
+      <div class="kitchen-col">
+        <h3 class="eyebrow kitchen-col-label">Non-veg day</h3>
+        <ol class="kitchen-meals" data-kitchen-meals="nonveg">
+          {defaultSample.nonveg.meals.map((meal) => (
+            <li class="kitchen-meal">
+              <span class="eyebrow kitchen-meal-label">{meal.label}</span>
+              <ul class="kitchen-items">
+                {meal.items.map((item) => (
+                  <li>
+                    {item.name} · {item.measure}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
+        <p class="kitchen-kcal" data-kitchen-kcal="nonveg">
+          About {defaultSample.nonveg.kcal} kcal
+        </p>
+      </div>
+    </div>
+
+    <p class="kitchen-note small text-muted">
+      A sample day for a 30-year-old woman eating healthier. Your plan is built on your own answers.
+    </p>
+
+    <div class="kitchen-cta">
+      <Button href="/plan/" arrow planCta="default">
+        Build my plan
+      </Button>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id="kitchen-data" set:html={dataJson} />
+<script>
+  interface KitchenItem {
+    name: string;
+    measure: string;
+  }
+  interface KitchenMeal {
+    label: string;
+    items: KitchenItem[];
+  }
+  interface KitchenDay {
+    kcal: number;
+    meals: KitchenMeal[];
+  }
+  type KitchenData = Record<string, { veg: KitchenDay; nonveg: KitchenDay }>;
+
+  const dataEl = document.getElementById('kitchen-data');
+  const section = document.getElementById('kitchen');
+  if (dataEl?.textContent && section) {
+    const data: KitchenData = JSON.parse(dataEl.textContent);
+    const chips = section.querySelectorAll<HTMLButtonElement>('[data-state-chip]');
+    const select = section.querySelector<HTMLSelectElement>('[data-state-select]');
+    const live = section.querySelector<HTMLElement>('#kitchen-live');
+
+    function renderColumn(diet: 'veg' | 'nonveg', day: KitchenDay) {
+      const list = section!.querySelector<HTMLElement>(`[data-kitchen-meals="${diet}"]`);
+      const kcalEl = section!.querySelector<HTMLElement>(`[data-kitchen-kcal="${diet}"]`);
+      if (list) {
+        list.innerHTML = day.meals
+          .map(
+            (meal) =>
+              `<li class="kitchen-meal"><span class="eyebrow kitchen-meal-label">${meal.label}</span><ul class="kitchen-items">${meal.items
+                .map((item) => `<li>${item.name} · ${item.measure}</li>`)
+                .join('')}</ul></li>`,
+          )
+          .join('');
+      }
+      if (kcalEl) kcalEl.textContent = `About ${day.kcal} kcal`;
+    }
+
+    function showState(code: string, label: string) {
+      const sample = data[code];
+      if (!sample) return;
+      renderColumn('veg', sample.veg);
+      renderColumn('nonveg', sample.nonveg);
+      chips.forEach((chip) =>
+        chip.setAttribute('aria-pressed', String(chip.dataset.state === code)),
+      );
+      if (select) select.value = code;
+      if (live) live.textContent = `Showing ${label}`;
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const code = chip.dataset.state;
+        if (code) showState(code, chip.textContent?.trim() ?? code);
+      });
+    });
+
+    select?.addEventListener('change', () => {
+      const option = select.selectedOptions[0];
+      if (option) showState(option.value, option.textContent?.trim() ?? option.value);
+    });
+  }
+</script>
+
+<style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .kitchen-picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding-inline: 16px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color 160ms ease-out,
+      color 160ms ease-out,
+      border-color 160ms ease-out;
+  }
+
+  .chip:hover {
+    border-color: var(--text);
+  }
+
+  .chip[aria-pressed='true'] {
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--bg);
+  }
+
+  .chip:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .other-states {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .other-states select {
+    min-height: 44px;
+    max-width: 100%;
+    padding-inline: 12px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    /*
+     * Without an explicit width, a native <select> sizes itself to its
+     * widest <option> (e.g. "Andaman and Nicobar Islands"), which forced
+     * the whole mobile layout viewport wider than 375px — the header's
+     * "Open menu" button ended up rendered off-screen as a result. Both
+     * the select and its ancestors need min-width: 0 for this to actually
+     * shrink inside a flex row.
+     */
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .other-states select:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .kitchen-columns {
+    display: grid;
+    gap: 32px;
+    border-top: 1px solid var(--border-strong);
+    padding-top: 32px;
+  }
+
+  .kitchen-col-label {
+    margin-bottom: 16px;
+    color: var(--text-muted);
+  }
+
+  .kitchen-meals {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .kitchen-meal {
+    padding-block: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .kitchen-meal:last-child {
+    border-bottom: 0;
+  }
+
+  .kitchen-meal-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+  }
+
+  .kitchen-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .kitchen-items li {
+    padding-block: 2px;
+  }
+
+  .kitchen-kcal {
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .kitchen-note {
+    max-width: 52ch;
+    margin-top: 32px;
+  }
+
+  .kitchen-cta {
+    margin-top: 24px;
+  }
+
+  @media (min-width: 768px) {
+    .kitchen-columns {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 48px;
+    }
+  }
+</style>

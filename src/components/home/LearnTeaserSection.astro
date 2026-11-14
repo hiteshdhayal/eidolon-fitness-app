@@ -1,0 +1,70 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  number: string;
+  surface: 'obsidian' | 'ice';
+  /** Published guides (articles with kind "guide") — the only /learn/ content with a live page today. */
+  guides: CollectionEntry<'articles'>[];
+}
+
+const { number, surface, guides } = Astro.props;
+const featured = guides.slice(0, 4);
+---
+
+{featured.length > 0 && (
+  <section class="section learn-teaser" data-surface={surface} id="learn">
+    <div class="container section-reveal">
+      <SectionHeader number={number} eyebrow="LEARN" title="LEARN" accent="SOMETHING." />
+
+      <ol class="ruled-list">
+        {featured.map((guide) => (
+          <li class="ruled-row learn-row">
+            <a class="learn-link" href={`/learn/guides/${guide.id}/`}>
+              {guide.data.title}
+            </a>
+            <p class="small text-muted">{guide.data.description}</p>
+          </li>
+        ))}
+      </ol>
+
+      <a class="all-link" href="/learn/">
+        All of Learn →
+      </a>
+    </div>
+  </section>
+)}
+
+<style>
+  .learn-row {
+    gap: 4px;
+  }
+
+  .learn-link {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .learn-link:hover {
+    color: var(--accent-text);
+  }
+
+  .all-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 24px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+</style>

@@ -1,8 +1,96 @@
 ---
-import ComingSoon from '../../layouts/ComingSoon.astro';
-import { stub } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import Accordion from '../../components/ui/Accordion.astro';
+import BmiTool from '../../islands/tools/BmiTool';
+import { breadcrumbListJsonLd, faqPageJsonLd } from '../../lib/seo/jsonld';
+import { pageTitle } from '../../config/site';
+import '../../styles/content.css';
+import '../../styles/tools.css';
 
-const page = stub('/tools/bmi/');
+const FAQ = [
+  {
+    question: 'What cut-offs does this use?',
+    answer:
+      'The WHO Asia-Pacific cut-offs used across India: under 18.5 underweight, 18.5–22.9 healthy, 23–24.9 overweight, 25 and above obese. These are lower than the cut-offs used in Europe or the US, because Indians tend to carry more body fat at the same BMI.',
+  },
+  {
+    question: 'Is BMI the full picture?',
+    answer:
+      "No. BMI doesn't separate muscle from fat, and doesn't account for where you carry weight. It's a quick, useful starting point, not a diagnosis.",
+  },
+  {
+    question: 'Does this work for kids or teens?',
+    answer:
+      "No. These bands are for adults. Children and teenagers are assessed on growth charts for their age, not adult BMI — ask a doctor.",
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    faqPageJsonLd(FAQ),
+    breadcrumbListJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Tools', path: '/tools/' },
+      { name: 'BMI calculator', path: '/tools/bmi/' },
+    ]),
+  ],
+};
 ---
 
-<ComingSoon slug="tools-bmi" title={page.title} copy={page.copy} />
+<BaseLayout
+  title={pageTitle('BMI calculator with Asian cutoffs')}
+  description="Free BMI calculator using the WHO Asia-Pacific cut-offs used across India, not the higher Western ones."
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <PageHero
+    eyebrow="Tool"
+    titleBefore="BMI,"
+    accent="with Asian cut-offs."
+    sub="Indians tend to carry more body fat at the same BMI as Europeans, so India uses lower cut-offs. This calculator uses those."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="01" eyebrow="Calculator" title="Check your" accent="BMI." rule={false} />
+      <BmiTool client:load />
+    </div>
+  </section>
+
+  <section class="section" data-surface="obsidian">
+    <div class="container">
+      <SectionHeader number="02" eyebrow="The method" title="How this" accent="works." rule={false} />
+      <div class="tool-method">
+        <p>
+          BMI is your weight in kilograms divided by your height in metres, squared. It's a quick
+          screening number, not a diagnosis — it can't tell muscle from fat.
+        </p>
+        <p>
+          This calculator uses the WHO Asia-Pacific cut-offs: under 18.5 is underweight, 18.5–22.9
+          is a healthy range, 23–24.9 is overweight, and 25 or above is obese. These are the
+          cut-offs used by doctors across India, lower than the ones used in Europe or the US.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="03" eyebrow="Questions" title="Fair" accent="questions." rule={false} />
+      <Accordion items={FAQ} />
+    </div>
+  </section>
+
+  <FinalCta
+    titleBefore="Your plan is"
+    accent="2 minutes"
+    titleAfter="away."
+    location="tools-bmi-cta"
+  />
+</BaseLayout>

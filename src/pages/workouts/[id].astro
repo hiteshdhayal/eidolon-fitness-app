@@ -1,0 +1,170 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import Callout from '../../components/ui/Callout.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { publishedOnly, showDraftTag } from '../../lib/content/published';
+import { breadcrumbListJsonLd } from '../../lib/seo/jsonld';
+import { ogImagePathFor } from '../../lib/seo/ogSlug';
+import { levelLabel, whereLabel } from '../../lib/content/exerciseLabels';
+import { pageTitle } from '../../config/site';
+import '../../styles/content.css';
+
+export async function getStaticPaths() {
+  const workouts = publishedOnly(await getCollection('workouts'));
+  return workouts.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { title, summary, level, daysPerWeek, where, days, steps, progression, draft } = entry.data;
+
+const resolvedDays = await Promise.all(
+  days.map(async (day) => ({
+    name: day.name,
+    exercises: await Promise.all(
+      day.exercises.map(async (ex) => ({
+        exercise: await getEntry(ex.exercise),
+        sets: ex.sets,
+        reps: ex.reps,
+        rest: ex.rest,
+        note: ex.note,
+      })),
+    ),
+  })),
+);
+
+const jsonLd = breadcrumbListJsonLd([
+  { name: 'Home', path: '/' },
+  { name: 'Workouts', path: '/workouts/' },
+  { name: title, path: `/workouts/${entry.id}/` },
+]);
+---
+
+<BaseLayout
+  title={pageTitle(title)}
+  description={summary}
+  noindex={showDraftTag(draft)}
+  ogImage={ogImagePathFor(`/workouts/${entry.id}`)}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <PageHero
+    eyebrow="Workout"
+    titleBefore={title}
+    draft={showDraftTag(draft)}
+    sub={summary}
+    tags={[
+      { label: levelLabel(level) },
+      { label: `${daysPerWeek}×/week` },
+      { label: whereLabel(where) },
+    ]}
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      {resolvedDays.map((day, i) => (
+        <div class="workout-day">
+          <SectionHeader
+            number={String(i + 1).padStart(2, '0')}
+            eyebrow="Day"
+            title={day.name}
+            rule={false}
+          />
+          <div class="workout-table" role="table">
+            <div class="workout-row workout-row-head" role="row">
+              <span role="columnheader">Exercise</span>
+              <span role="columnheader">Sets</span>
+              <span role="columnheader">Reps</span>
+              <span role="columnheader">Rest</span>
+            </div>
+            {day.exercises.map((ex) => (
+              <div class="workout-row" role="row">
+                <span role="cell" class="workout-exercise">
+                  {ex.exercise ? (
+                    <a href={`/learn/${ex.exercise.id}/`}>{ex.exercise.data.name}</a>
+                  ) : (
+                    ex.exercise
+                  )}
+                  {ex.note && <span class="workout-note"> — {ex.note}</span>}
+                </span>
+                <span role="cell">{ex.sets}</span>
+                <span role="cell">{ex.reps}</span>
+                <span role="cell">{ex.rest}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {steps && steps.length > 0 && (
+        <div class="workout-day">
+          <SectionHeader number={String(resolvedDays.length + 1).padStart(2, '0')} eyebrow="Steps" title="Weekly" accent="step target." rule={false} />
+          <ul class="ruled-list">
+            {steps.map((step) => (
+              <li class="ruled-row">
+                <p class="row-meta">Week {step.week}</p>
+                <div class="row-body">
+                  <p class="row-title">{step.dailySteps.toLocaleString('en-IN')} steps/day</p>
+                  {step.note && <p class="row-dek">{step.note}</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <Callout variant="info" title="Progression">
+        <p>{progression}</p>
+      </Callout>
+    </div>
+  </section>
+
+  <FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location="workout-cta" />
+</BaseLayout>
+
+<style>
+  .workout-day {
+    margin-bottom: 48px;
+  }
+
+  .workout-table {
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .workout-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 64px 96px 72px;
+    gap: 12px;
+    align-items: baseline;
+    padding-block: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .workout-row-head {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .workout-exercise a {
+    font-weight: 600;
+  }
+
+  .workout-note {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 599px) {
+    .workout-row {
+      grid-template-columns: minmax(0, 1fr) 40px 64px 56px;
+      font-size: 0.875rem;
+    }
+  }
+</style>

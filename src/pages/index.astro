@@ -6,11 +6,80 @@ import HeroStage from '../components/HeroStage.astro';
 import KineticBand from '../components/KineticBand.astro';
 import FinalCta from '../components/content/FinalCta.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
-import { defaultTitle } from '../config/site';
+import KitchenSection from '../components/home/KitchenSection.astro';
+import AboutMeSection from '../components/home/AboutMeSection.astro';
+import FaqSection from '../components/home/FaqSection.astro';
+import ReelsTeaserSection from '../components/home/ReelsTeaserSection.astro';
+import LearnTeaserSection from '../components/home/LearnTeaserSection.astro';
+import ArticlesTeaserSection from '../components/home/ArticlesTeaserSection.astro';
+import { getCollection } from 'astro:content';
+import { publishedOnly } from '../lib/content/published';
+import { HOME_FAQ } from '../lib/home/faq';
+import { defaultTitle, site } from '../config/site';
 import { getHeroSlides, heroSizes } from '../lib/hero-slides';
+import '../styles/content.css';
 
 const { slides: heroSlides } = getHeroSlides();
 const heroPreload = heroSlides[0];
+
+// Sections 5–7 (reels, learn, articles) only render when they have published
+// content. Numbers and obsidian/ice surfaces are assigned dynamically so a
+// hidden section leaves no gap in the numbering and no two visible sections
+// ever share a surface (spec Phase 6 Part A).
+const reels = publishedOnly(await getCollection('reels')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+const articleEntries = publishedOnly(await getCollection('articles'));
+const guides = articleEntries.filter((entry) => entry.data.kind === 'guide');
+const articles = articleEntries
+  .filter((entry) => entry.data.kind === 'article')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const homeSections = [
+  { key: 'kitchen', visible: true },
+  { key: 'reels', visible: reels.length > 0 },
+  { key: 'learn', visible: guides.length > 0 },
+  { key: 'articles', visible: articles.length > 0 },
+  { key: 'about', visible: true },
+  { key: 'faq', visible: true },
+] as const;
+
+type Surface = 'obsidian' | 'ice';
+const number: Partial<Record<(typeof homeSections)[number]['key'], string>> = {};
+const surface: Partial<Record<(typeof homeSections)[number]['key'], Surface>> = {};
+let n = 2; // "01 — How it works" already used above
+let nextSurface: Surface = 'obsidian'; // the section right after How it works (ice)
+for (const section of homeSections) {
+  if (!section.visible) continue;
+  number[section.key] = String(n).padStart(2, '0');
+  surface[section.key] = nextSurface;
+  nextSurface = nextSurface === 'obsidian' ? 'ice' : 'obsidian';
+  n += 1;
+}
+
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.creatorName,
+  url: site.siteUrl,
+  sameAs: [site.instagramUrl],
+  ...(site.credentials ? { jobTitle: site.credentials } : {}),
+};
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.brandName,
+  url: site.siteUrl,
+};
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: HOME_FAQ.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
 
 const steps = [
   {
@@ -49,6 +118,9 @@ const steps = [
         fetchpriority="high"
       />
     )}
+    <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
   <section class="hero" data-surface="obsidian">
@@ -132,6 +204,28 @@ const steps = [
       </ol>
     </div>
   </section>
+
+  <KitchenSection number={number.kitchen!} surface={surface.kitchen!} />
+
+  {reels.length > 0 && (
+    <ReelsTeaserSection number={number.reels!} surface={surface.reels!} reels={reels} />
+  )}
+
+  {guides.length > 0 && (
+    <LearnTeaserSection number={number.learn!} surface={surface.learn!} guides={guides} />
+  )}
+
+  {articles.length > 0 && (
+    <ArticlesTeaserSection
+      number={number.articles!}
+      surface={surface.articles!}
+      articles={articles}
+    />
+  )}
+
+  <AboutMeSection number={number.about!} surface={surface.about!} />
+
+  <FaqSection number={number.faq!} surface={surface.faq!} />
 
   <FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location="final-cta" />
 </BaseLayout>

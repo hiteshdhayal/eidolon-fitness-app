@@ -142,6 +142,9 @@ function DataSection({ number, today, onReplaced, onAnnounce }: DataSectionProps
         >
           Your data <em class="accent-italic">stays here.</em>
         </PlanHeader>
+        <p class="pv-privacy-link">
+          <a href="/privacy/">Read the full privacy page →</a>
+        </p>
         <DataControls today={today} onReplaced={onReplaced} onAnnounce={onAnnounce} />
       </div>
     </section>
@@ -308,7 +311,11 @@ export default function PlanView({ notes }: Props) {
   );
 
   if (!loaded) {
-    return <div class="pv-shell" aria-busy="true" />;
+    return (
+      <div class="pv-shell" aria-busy="true">
+        <h1 class="sr-only">Your plan</h1>
+      </div>
+    );
   }
 
   if (!saved) {

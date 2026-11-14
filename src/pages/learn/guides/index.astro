@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHero from '../../../components/content/PageHero.astro';
+import FinalCta from '../../../components/content/FinalCta.astro';
+import FollowLink from '../../../components/FollowLink.astro';
+import SectionHeader from '../../../components/ui/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+import { publishedOnly } from '../../../lib/content/published';
+import { pageTitle } from '../../../config/site';
+import '../../../styles/content.css';
+
+const guides = publishedOnly(await getCollection('articles'))
+  .filter((entry) => entry.data.kind === 'guide')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout
+  title={pageTitle('Guides')}
+  description="Short, practical guides: step counts, nutrition labels, protein without shakes."
+>
+  <PageHero
+    eyebrow="Guides"
+    titleBefore="Get the"
+    accent="basics right."
+    sub="Short, practical guides that go with the reels and the plan."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="01" eyebrow="All guides" title="Start" accent="here." rule={false} />
+
+      {guides.length > 0 ? (
+        <ul class="ruled-list">
+          {guides.map((guide) => (
+            <li class="ruled-row">
+              <div class="row-body">
+                <p class="row-title">
+                  <a href={`/learn/guides/${guide.id}/`}>{guide.data.title}</a>
+                </p>
+                <p class="row-dek">{guide.data.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="empty-state">
+          <p>Guides are being written up. Follow for updates.</p>
+          <div class="empty-actions">
+            <FollowLink variant="primary" location="guides-empty" />
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location="guides-cta" />
+</BaseLayout>

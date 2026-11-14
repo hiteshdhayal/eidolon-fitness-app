@@ -1,7 +1,8 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
+import { distDir } from './dist-dir.mjs';
 
-const DIST = process.env.SHOW_DRAFTS === '1' ? 'dist-drafts' : 'dist';
+const DIST = distDir();
 
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });

@@ -29,6 +29,11 @@ import { pageTitle } from '../config/site';
         </Button>
         <FollowLink variant="text" location="404" />
       </div>
+
+      <nav class="notfound-links" aria-label="More places to go">
+        <a href="/tools/">Tools</a>
+        <a href="/learn/">Learn</a>
+      </nav>
     </div>
   </section>
 </BaseLayout>
@@ -71,6 +76,32 @@ import { pageTitle } from '../config/site';
     align-items: center;
     gap: 16px;
     margin-top: 36px;
+  }
+
+  .notfound-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 28px;
+  }
+
+  .notfound-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .notfound-links a:hover {
+    color: var(--text);
+    text-decoration-color: var(--accent);
   }
 
   @media (max-width: 767px) {

@@ -1,0 +1,203 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import Callout from '../../components/ui/Callout.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import { getCollection, getEntry, render } from 'astro:content';
+import { publishedOnly, showDraftTag } from '../../lib/content/published';
+import { breadcrumbListJsonLd } from '../../lib/seo/jsonld';
+import { ogImagePathFor } from '../../lib/seo/ogSlug';
+import { muscleLabel, equipmentLabel, levelLabel } from '../../lib/content/exerciseLabels';
+import { pageTitle } from '../../config/site';
+import '../../styles/content.css';
+
+export async function getStaticPaths() {
+  const exercises = publishedOnly(await getCollection('exercises'));
+  return exercises.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const {
+  name,
+  otherNames,
+  muscles,
+  equipment,
+  level,
+  summary,
+  steps,
+  cues,
+  commonMistakes,
+  easierVersion,
+  harderVersion,
+  relatedReel,
+  draft,
+} = entry.data;
+
+const easier = easierVersion ? await getEntry(easierVersion) : undefined;
+const harder = harderVersion ? await getEntry(harderVersion) : undefined;
+const reel = relatedReel ? await getEntry(relatedReel) : undefined;
+
+const jsonLd = breadcrumbListJsonLd([
+  { name: 'Home', path: '/' },
+  { name: 'Learn', path: '/learn/' },
+  { name, path: `/learn/${entry.id}/` },
+]);
+---
+
+<BaseLayout
+  title={pageTitle(name)}
+  description={summary}
+  noindex={showDraftTag(draft)}
+  ogImage={ogImagePathFor(`/learn/${entry.id}`)}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <PageHero
+    eyebrow={`Exercise · ${levelLabel(level)}`}
+    titleBefore={name}
+    draft={showDraftTag(draft)}
+    sub={summary}
+    tags={[
+      ...muscles.map((m) => ({ label: muscleLabel(m) })),
+      { label: equipmentLabel(equipment) },
+    ]}
+  />
+
+  {otherNames.length > 0 && (
+    <section class="section" data-surface="ice" style="padding-block: 0 24px;">
+      <div class="container">
+        <p class="small text-muted">Also called: {otherNames.join(', ')}</p>
+      </div>
+    </section>
+  )}
+
+  <section class="section" data-surface="ice">
+    <div class="container exercise-grid">
+      <div>
+        <SectionHeader number="01" eyebrow="How to" title="Do it" accent="right." rule={false} />
+        <ol class="ruled-list">
+          {steps.map((step, i) => (
+            <li class="ruled-row">
+              <p class="row-meta">Step {i + 1}</p>
+              <p class="row-title exercise-step">{step}</p>
+            </li>
+          ))}
+        </ol>
+
+        {entry.body && entry.body.trim() && (
+          <div class="article-body exercise-notes">
+            <Content />
+          </div>
+        )}
+      </div>
+
+      <div class="exercise-side">
+        <div class="exercise-box">
+          <p class="exercise-box-label">Cues</p>
+          <ul class="exercise-cue-list">
+            {cues.map((cue) => <li>{cue}</li>)}
+          </ul>
+        </div>
+
+        <Callout variant="warning" title="Common mistakes">
+          <ul class="exercise-cue-list">
+            {commonMistakes.map((mistake) => <li>{mistake}</li>)}
+          </ul>
+        </Callout>
+      </div>
+    </div>
+  </section>
+
+  {(easier || harder || reel) && (
+    <section class="section" data-surface="obsidian">
+      <div class="container">
+        <SectionHeader number="02" eyebrow="Related" title="Make it" accent="yours." rule={false} />
+        <ul class="ruled-list">
+          {easier && (
+            <li class="ruled-row">
+              <p class="row-meta">Easier version</p>
+              <p class="row-title">
+                <a href={`/learn/${easier.id}/`}>{easier.data.name}</a>
+              </p>
+            </li>
+          )}
+          {harder && (
+            <li class="ruled-row">
+              <p class="row-meta">Harder version</p>
+              <p class="row-title">
+                <a href={`/learn/${harder.id}/`}>{harder.data.name}</a>
+              </p>
+            </li>
+          )}
+          {reel && (
+            <li class="ruled-row">
+              <p class="row-meta">Reel</p>
+              <p class="row-title">
+                <a href={`/reels/${reel.id}/`}>{reel.data.title}</a>
+              </p>
+            </li>
+          )}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location="exercise-cta" />
+</BaseLayout>
+
+<style>
+  .exercise-grid {
+    display: grid;
+    gap: 40px;
+  }
+
+  .exercise-step {
+    max-width: 60ch;
+  }
+
+  .exercise-notes {
+    margin-top: 32px;
+  }
+
+  .exercise-side {
+    display: grid;
+    gap: 24px;
+    align-content: start;
+  }
+
+  .exercise-box {
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .exercise-box-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .exercise-cue-list {
+    margin: 12px 0 0;
+    padding: 0 0 0 20px;
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .exercise-cue-list li + li {
+    margin-top: 6px;
+  }
+
+  @media (min-width: 768px) {
+    .exercise-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+      align-items: start;
+    }
+  }
+</style>

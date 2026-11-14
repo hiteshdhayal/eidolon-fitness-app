@@ -510,6 +510,14 @@
   min-width: 520px;
   border-collapse: collapse;
   font-size: 0.9375rem;
+  /*
+   * Wider than its scrollable .compare-wrap at narrow viewports: without an
+   * explicit background, the columns past the initial scroll position can
+   * get measured against whatever's behind the scroll layer (html's own
+   * dark base color) instead of the page's real surface, a false
+   * color-contrast failure axe caught on a 375px viewport.
+   */
+  background: var(--bg);
 }
 
 .compare-table caption {

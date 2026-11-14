@@ -82,6 +82,19 @@
   }
 }
 
+/*
+ * A Tailwind @theme alias like `--color-muted: var(--text-muted)` only ever
+ * gets computed once, where `--color-muted` itself is declared (here, at
+ * :root) — its nested var() resolves against *that* declaring element's
+ * cascade, then the result inherits down as a fixed value. Redeclaring
+ * --text-muted deeper in the tree (e.g. on an obsidian section) does
+ * nothing for --color-muted unless --color-muted is *also* redeclared at
+ * that same scope, which is why every --color-* alias is repeated in both
+ * blocks below instead of defined once in @theme. Found by axe flagging
+ * real steel-500-on-obsidian contrast failures from the Tailwind
+ * `text-muted` utility (component styles using `color: var(--text-muted)`
+ * directly were never affected).
+ */
 :root,
 [data-surface='ice'] {
   --bg: var(--ice-100);
@@ -94,6 +107,15 @@
   --accent-hover: var(--red-600);
   --accent-text: var(--red-600);
   --focus: var(--red-600);
+
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
 }
 
 [data-surface='obsidian'] {
@@ -106,6 +128,15 @@
   --accent: var(--red-500);
   --accent-hover: var(--red-600);
   --accent-text: var(--red-400);
+
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
   --focus: var(--red-400);
 }
 

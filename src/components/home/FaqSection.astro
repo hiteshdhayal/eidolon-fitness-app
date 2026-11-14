@@ -1,0 +1,19 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import Accordion from '../ui/Accordion.astro';
+import { HOME_FAQ } from '../../lib/home/faq';
+
+interface Props {
+  number: string;
+  surface: 'obsidian' | 'ice';
+}
+
+const { number, surface } = Astro.props;
+---
+
+<section class="section faq" data-surface={surface} id="faq">
+  <div class="container section-reveal">
+    <SectionHeader number={number} eyebrow="QUESTIONS" title="FAIR" accent="QUESTIONS." />
+    <Accordion items={HOME_FAQ} />
+  </div>
+</section>

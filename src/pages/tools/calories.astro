@@ -1,8 +1,98 @@
 ---
-import ComingSoon from '../../layouts/ComingSoon.astro';
-import { stub } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import Accordion from '../../components/ui/Accordion.astro';
+import CalorieTool from '../../islands/tools/CalorieTool';
+import { breadcrumbListJsonLd, faqPageJsonLd } from '../../lib/seo/jsonld';
+import { pageTitle } from '../../config/site';
+import '../../styles/content.css';
+import '../../styles/tools.css';
 
-const page = stub('/tools/calories/');
+const FAQ = [
+  {
+    question: 'What formula does this use?',
+    answer:
+      'The Mifflin-St Jeor equation for resting burn, then an activity factor from your steps or training days for your maintenance calories (TDEE) — the same formula the full plan uses.',
+  },
+  {
+    question: 'Why no exact number for losing or gaining weight?',
+    answer:
+      'A safe deficit or surplus depends on your health conditions, medicines and age, which this quick tool does not ask about. The full plan checks all of that before giving you an exact number.',
+  },
+  {
+    question: 'Why no numbers for under-18s?',
+    answer:
+      "Growing bodies need a doctor or dietitian's judgement, not a formula. The full plan gives under-18s general guidance instead of calorie numbers, and this tool does the same.",
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    faqPageJsonLd(FAQ),
+    breadcrumbListJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Tools', path: '/tools/' },
+      { name: 'Calorie calculator', path: '/tools/calories/' },
+    ]),
+  ],
+};
 ---
 
-<ComingSoon slug="tools-calories" title={page.title} copy={page.copy} />
+<BaseLayout
+  title={pageTitle('Calorie calculator for Indians')}
+  description="Free calorie calculator: your resting burn and maintenance calories, from the Mifflin-St Jeor formula."
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <PageHero
+    eyebrow="Tool"
+    titleBefore="How much"
+    accent="you actually need."
+    sub="Your resting burn and maintenance calories, worked out from your height, weight, age and how active you are."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="01" eyebrow="Calculator" title="Check your" accent="calories." rule={false} />
+      <CalorieTool client:load />
+    </div>
+  </section>
+
+  <section class="section" data-surface="obsidian">
+    <div class="container">
+      <SectionHeader number="02" eyebrow="The method" title="How this" accent="works." rule={false} />
+      <div class="tool-method">
+        <p>
+          I start with the Mifflin-St Jeor formula for your resting burn (BMR) — the calories your
+          body uses just existing. Then I multiply it by an activity factor built from your daily
+          steps and any training days, to get your maintenance calories (TDEE): roughly what keeps
+          your weight steady.
+        </p>
+        <p>
+          From there, losing fat means eating a bit below maintenance and gaining means eating a
+          bit above it. How much below or above depends on your health, your medicines and your
+          age — the full plan works that out safely and gives you an exact number.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="03" eyebrow="Questions" title="Fair" accent="questions." rule={false} />
+      <Accordion items={FAQ} />
+    </div>
+  </section>
+
+  <FinalCta
+    titleBefore="Your plan is"
+    accent="2 minutes"
+    titleAfter="away."
+    location="tools-calories-cta"
+  />
+</BaseLayout>

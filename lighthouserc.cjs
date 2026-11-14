@@ -1,0 +1,83 @@
+/**
+ * Lighthouse CI config (spec Phase 6 Part E). Run via `pnpm perf`, which
+ * builds a dedicated LH_AUDIT=1 SHOW_DRAFTS=1 build into dist-audit/ first
+ * (never deployed — drafts render without the DRAFT tag/noindex so every
+ * page type can be scored) and then runs lhci against it.
+ */
+const URLS = [
+  '/',
+  '/plan/',
+  '/my-plan/',
+  '/reels/',
+  '/reels/pcod-diet-basics/',
+  '/reels/topic/pcos/',
+  '/articles/',
+  '/articles/top-5-supplement-brands-india/',
+  '/articles/picks/',
+  '/learn/',
+  '/learn/push-up/',
+  '/workouts/beginner-home-full-body/',
+  '/learn/guides/how-to-find-your-step-count/',
+  '/tools/',
+  '/tools/bmi/',
+  '/tools/calories/',
+  '/tools/protein/',
+  '/links/',
+  '/about/',
+  '/privacy/',
+  '/404.html',
+];
+
+// /my-plan/ (empty state, noindex by design) and /404.html are exempt from
+// the SEO category only — every other assertion still applies to them.
+const SEO_EXEMPT = new Set(['/my-plan/', '/404.html']);
+
+function assertionsFor(url) {
+  const base = {
+    'categories:performance': ['error', { minScore: 0.95 }],
+    'categories:accessibility': ['error', { minScore: 0.95 }],
+    'categories:best-practices': ['error', { minScore: 0.95 }],
+    'largest-contentful-paint': ['error', { maxNumericValue: 2000 }],
+    'cumulative-layout-shift': ['error', { maxNumericValue: 0.05 }],
+    'total-blocking-time': ['error', { maxNumericValue: 200 }],
+  };
+  if (!SEO_EXEMPT.has(url)) {
+    base['categories:seo'] = ['error', { minScore: 0.95 }];
+  }
+  return base;
+}
+
+module.exports = {
+  ci: {
+    collect: {
+      staticDistDir: './dist-audit',
+      url: URLS,
+      numberOfRuns: 3,
+      // No preset: Lighthouse's default is mobile emulation with simulated
+      // throttling, which is exactly the spec's "mobile preset (default
+      // simulated throttling)" — "mobile" isn't a valid --preset value.
+      // chromePath/chromeFlags are env-overridable: this sandboxed dev
+      // container runs as root with its own pinned Chromium build, neither
+      // of which a normal CI runner needs (see docs/DECISIONS.md).
+      chromePath: process.env.LHCI_CHROME_PATH || undefined,
+      settings: {
+        chromeFlags: process.env.LHCI_CHROME_FLAGS || '',
+      },
+    },
+    assert: {
+      // Anchored to the full path, not just a trailing substring — a
+      // naive `.*${url}$` pattern for '/' matches every URL (everything
+      // ends in a slash), so every page silently also got the home page's
+      // assertions, including the categories:seo one /my-plan/ is exempt
+      // from.
+      assertMatrix: URLS.map((url) => ({
+        matchingUrlPattern: `^https?://[^/]+${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
+        assertions: assertionsFor(url),
+      })),
+    },
+    upload: {
+      target: 'filesystem',
+      outputDir: './.lighthouseci',
+    },
+  },
+};

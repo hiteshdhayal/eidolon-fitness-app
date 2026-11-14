@@ -3,6 +3,13 @@ import { defineConfig } from '@playwright/test';
 const port = Number(process.env.PW_PORT ?? 4321);
 const baseURL = `http://127.0.0.1:${port}`;
 
+// A second preview server for the SHOW_DRAFTS build (dist-drafts), so
+// analytics.spec.ts can exercise reel_open/affiliate_click on draft content
+// that the production build never generates pages for. Exported so the spec
+// can build an absolute URL against it.
+export const draftsPort = Number(process.env.PW_DRAFTS_PORT ?? 4323);
+export const draftsBaseURL = `http://127.0.0.1:${draftsPort}`;
+
 export default defineConfig({
   testDir: './tests',
   testIgnore: ['**/unit/**'],
@@ -13,13 +20,29 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // This project pins its own @playwright/test version, whose bundled
+    // Chromium revision doesn't match what's pre-installed in this
+    // container — launch against the pre-installed browser instead.
+    launchOptions: { executablePath: '/opt/pw-browsers/chromium' },
   },
-  webServer: {
-    command: `pnpm preview --port ${port} --host 127.0.0.1`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      command: `pnpm preview --port ${port} --host 127.0.0.1`,
+      url: baseURL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      // Assumes dist-drafts/ already exists (built by `pnpm test:e2e`, which
+      // runs SHOW_DRAFTS=1 pnpm build before this) — rebuilding here inline
+      // made this server's own startup timeout a frequent source of flake,
+      // since hero AVIF/WebP encoding alone can take minutes.
+      command: `SHOW_DRAFTS=1 pnpm exec astro preview --port ${draftsPort} --host 127.0.0.1`,
+      url: draftsBaseURL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
   projects: [
     {
       name: 'mobile-375',

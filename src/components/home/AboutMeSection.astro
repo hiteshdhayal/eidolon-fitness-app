@@ -1,0 +1,105 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro';
+import PortraitSlot from '../content/PortraitSlot.astro';
+import FollowLink from '../FollowLink.astro';
+import { site } from '../../config/site';
+
+interface Props {
+  number: string;
+  surface: 'obsidian' | 'ice';
+}
+
+const { number, surface } = Astro.props;
+---
+
+<section class="section about-me" data-surface={surface} id="about-me">
+  <div class="container section-reveal">
+    <SectionHeader number={number} eyebrow="ABOUT ME" title="WHO'S" accent="BEHIND THIS." />
+
+    <div class="about-grid">
+      <PortraitSlot class="about-portrait" />
+
+      <div class="about-copy">
+        <p>I'm Hitesh Dhayal. I make short fitness and food videos on Instagram.</p>
+        <p>
+          I built Eidolon because most diet plans online are written for someone else's kitchen —
+          oats, quinoa and shakes. Yours should be built on rajma, idli, macher jhol or thepla.
+        </p>
+        {site.credentials && <p class="about-credentials">{site.credentials}</p>}
+
+        <div class="about-actions">
+          <a class="about-more-link" href="/about/">
+            More about me →
+          </a>
+          <FollowLink variant="secondary" location="home-about" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-grid {
+    display: grid;
+    gap: 32px;
+  }
+
+  .about-portrait {
+    max-width: 320px;
+  }
+
+  .about-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 52ch;
+  }
+
+  .about-copy p {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .about-credentials {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+
+  .about-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    margin-top: 12px;
+  }
+
+  .about-more-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .about-more-link:hover {
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--accent);
+  }
+
+  @media (min-width: 768px) {
+    .about-grid {
+      grid-template-columns: minmax(0, 280px) 1fr;
+      align-items: start;
+      gap: 48px;
+    }
+  }
+</style>

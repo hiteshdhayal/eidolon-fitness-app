@@ -1,6 +1,4 @@
 ---
-import Icon from './Icon.astro';
-
 interface Item {
   question: string;
   answer: string;
@@ -19,7 +17,10 @@ const { items, class: className = '' } = Astro.props;
     <details class="accordion-item">
       <summary>
         <span class="font-medium">{item.question}</span>
-        <Icon name="chevron-down" size={20} class="accordion-icon" />
+        <span class="accordion-mark" aria-hidden="true">
+          <span class="mark-plus">+</span>
+          <span class="mark-minus">–</span>
+        </span>
       </summary>
       <p class="measure small accordion-answer">{item.answer}</p>
     </details>
@@ -40,7 +41,8 @@ const { items, class: className = '' } = Astro.props;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    padding-block: 20px;
+    min-height: 52px;
+    padding-block: 14px;
     cursor: pointer;
     list-style: none;
   }
@@ -49,19 +51,29 @@ const { items, class: className = '' } = Astro.props;
     display: none;
   }
 
-  summary:hover .accordion-icon {
+  summary:hover .accordion-mark {
     color: var(--accent-text);
   }
 
-  .accordion-icon {
+  .accordion-mark {
     flex-shrink: 0;
-    transition:
-      transform 200ms ease-out,
-      color 160ms ease-out;
+    width: 20px;
+    font-family: var(--font-mono);
+    font-size: 1.125rem;
+    line-height: 1;
+    text-align: center;
   }
 
-  .accordion-item[open] .accordion-icon {
-    transform: rotate(180deg);
+  .mark-minus {
+    display: none;
+  }
+
+  .accordion-item[open] .mark-plus {
+    display: none;
+  }
+
+  .accordion-item[open] .mark-minus {
+    display: inline;
   }
 
   .accordion-answer {

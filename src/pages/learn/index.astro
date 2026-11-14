@@ -1,0 +1,252 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import FollowLink from '../../components/FollowLink.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+import { publishedOnly } from '../../lib/content/published';
+import { pageTitle } from '../../config/site';
+import {
+  MUSCLE_LABELS,
+  EQUIPMENT_LABELS,
+  LEVEL_LABELS,
+  muscleLabel,
+  equipmentLabel,
+  levelLabel,
+} from '../../lib/content/exerciseLabels';
+import '../../styles/content.css';
+
+const exercises = publishedOnly(await getCollection('exercises')).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+const guides = publishedOnly(await getCollection('articles')).filter(
+  (entry) => entry.data.kind === 'guide',
+);
+
+const musclesInUse = Object.keys(MUSCLE_LABELS).filter((m) =>
+  exercises.some((e) => e.data.muscles.includes(m as never)),
+);
+const equipmentInUse = Object.keys(EQUIPMENT_LABELS).filter((eq) =>
+  exercises.some((e) => e.data.equipment === eq),
+);
+const levelsInUse = Object.keys(LEVEL_LABELS).filter((l) =>
+  exercises.some((e) => e.data.level === l),
+);
+---
+
+<BaseLayout title={pageTitle('Learn')} description="How to do each movement properly: steps, cues, mistakes to avoid, easier and harder versions.">
+  <PageHero
+    eyebrow="Learn"
+    titleBefore="Learn"
+    accent="something."
+    sub="How to do each movement properly — steps, cues, mistakes to avoid, and easier or harder versions."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="01" eyebrow="Exercise library" title="Pick a" accent="move." rule={false} />
+
+      {exercises.length > 0 ? (
+        <div class="library">
+          {(musclesInUse.length > 1 || equipmentInUse.length > 1 || levelsInUse.length > 1) && (
+            <div class="learn-filters" data-learn-filters>
+              {musclesInUse.length > 1 && (
+                <label class="learn-filter-field">
+                  <span class="eyebrow">Muscle</span>
+                  <select data-filter="muscle">
+                    <option value="">All</option>
+                    {musclesInUse.map((m) => (
+                      <option value={m}>{muscleLabel(m)}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {equipmentInUse.length > 1 && (
+                <label class="learn-filter-field">
+                  <span class="eyebrow">Equipment</span>
+                  <select data-filter="equipment">
+                    <option value="">All</option>
+                    {equipmentInUse.map((eq) => (
+                      <option value={eq}>{equipmentLabel(eq)}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {levelsInUse.length > 1 && (
+                <label class="learn-filter-field">
+                  <span class="eyebrow">Level</span>
+                  <select data-filter="level">
+                    <option value="">All</option>
+                    {levelsInUse.map((l) => (
+                      <option value={l}>{levelLabel(l)}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </div>
+          )}
+
+          <p id="learn-live" class="visually-hidden" role="status" aria-live="polite"></p>
+
+          <ul class="ruled-list" data-learn-list>
+            {exercises.map((exercise) => (
+              <li
+                class="ruled-row"
+                data-learn-row
+                data-muscles={exercise.data.muscles.join(' ')}
+                data-equipment={exercise.data.equipment}
+                data-level={exercise.data.level}
+              >
+                <p class="row-meta">{levelLabel(exercise.data.level)} · {equipmentLabel(exercise.data.equipment)}</p>
+                <div class="row-body">
+                  <p class="row-title">
+                    <a href={`/learn/${exercise.id}/`}>{exercise.data.name}</a>
+                  </p>
+                  <p class="row-dek">{exercise.data.muscles.map((m) => muscleLabel(m)).join(', ')}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p id="learn-empty" class="small text-muted learn-empty-msg" hidden>
+            No exercises match these filters.
+          </p>
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>The exercise library is being written up. Follow for updates.</p>
+          <div class="empty-actions">
+            <FollowLink variant="primary" location="learn-empty" />
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="section" data-surface="obsidian">
+    <div class="container">
+      <SectionHeader number="02" eyebrow="Guides" title="Read the" accent="basics." rule={false} />
+      {guides.length > 0 ? (
+        <ul class="ruled-list">
+          {guides.map((guide) => (
+            <li class="ruled-row">
+              <div class="row-body">
+                <p class="row-title">
+                  <a href={`/learn/guides/${guide.id}/`}>{guide.data.title}</a>
+                </p>
+                <p class="row-dek">{guide.data.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="empty-state">
+          <p>Guides are being written up. Follow for updates.</p>
+          <div class="empty-actions">
+            <FollowLink variant="primary" location="learn-guides-empty" />
+          </div>
+        </div>
+      )}
+
+      <a class="all-link" href="/workouts/">Ready-made workouts →</a>
+    </div>
+  </section>
+
+  <FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location="learn-cta" />
+</BaseLayout>
+
+<script>
+  const filtersEl = document.querySelector<HTMLElement>('[data-learn-filters]');
+  const rows = document.querySelectorAll<HTMLElement>('[data-learn-row]');
+  const empty = document.getElementById('learn-empty');
+  const live = document.getElementById('learn-live');
+
+  if (filtersEl && rows.length > 0) {
+    const selects = filtersEl.querySelectorAll<HTMLSelectElement>('select[data-filter]');
+
+    function apply() {
+      let visible = 0;
+      const values = new Map<string, string>();
+      selects.forEach((select) => {
+        const key = select.dataset.filter!;
+        if (select.value) values.set(key, select.value);
+      });
+
+      rows.forEach((row) => {
+        let match = true;
+        const muscle = values.get('muscle');
+        if (muscle && !row.dataset.muscles?.split(' ').includes(muscle)) match = false;
+        const equipment = values.get('equipment');
+        if (equipment && row.dataset.equipment !== equipment) match = false;
+        const level = values.get('level');
+        if (level && row.dataset.level !== level) match = false;
+        row.hidden = !match;
+        if (match) visible += 1;
+      });
+
+      if (empty) empty.hidden = visible > 0;
+      if (live) live.textContent = `${visible} exercise${visible === 1 ? '' : 's'} shown`;
+    }
+
+    selects.forEach((select) => select.addEventListener('change', apply));
+  }
+</script>
+
+<style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .learn-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .learn-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .learn-filter-field select {
+    min-height: 44px;
+    min-width: 160px;
+    padding-inline: 12px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .learn-filter-field select:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .learn-empty-msg {
+    padding-block: 24px;
+  }
+
+  .all-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 24px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+</style>

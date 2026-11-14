@@ -16,10 +16,11 @@ pnpm lint           # ESLint
 pnpm test           # Vitest (engine and utilities)
 pnpm build          # processes hero, builds, runs placeholder + link guards
 pnpm preview        # serve dist/ locally
-pnpm test:e2e       # build, then Playwright + axe at 375 / 768 / 1440
+pnpm test:e2e       # build dist + dist-drafts, then Playwright + axe at 375 / 768 / 1440
 pnpm screenshots    # phase screenshots to docs/screenshots
 pnpm food:review    # regenerate docs/food-review.csv from the food database
 pnpm verify         # typecheck, lint, tests, build
+pnpm perf           # Lighthouse CI — see "Checking speed" below
 ```
 
 ## Hero slides
@@ -71,9 +72,23 @@ The "Your data" section at the bottom of `/my-plan` exports everything to a JSON
 
 ## Site config
 
-Everything personal lives in `src/config/site.ts`: brand, creator, Instagram, domain, and empty placeholders for credentials and contact email. Empty values hide their UI — the footer contact link falls back to an Instagram DM.
+Everything personal lives in `src/config/site.ts`: brand, creator, Instagram, domain, and empty placeholders for credentials, contact email and a longer "why I built this" bio (`aboutLong`). Empty values hide their UI — the footer contact link falls back to an Instagram DM, and `/about/`'s extra paragraph stays hidden until `aboutLong` is filled in.
 
-Stub routes live in the same file. They are `noindex` and excluded from the sitemap until their real pages ship.
+Stub routes live in the same file. They are `noindex` and excluded from the sitemap until their real pages ship. As of Phase 6 there are none — every route in the site map has a real page.
+
+Analytics is self-hosted Umami, cookieless, and off by default. Also in `src/config/site.ts`: set `umamiWebsiteId` to the website id from your Umami instance (`umamiSrc` already points at `https://stats.eidolon.cloud/script.js`) and the tracking script starts loading site-wide — with it left empty, no analytics script loads and no request leaves the browser at all.
+
+## Checking speed (`pnpm perf`)
+
+```bash
+pnpm perf
+```
+
+This builds a dedicated audit copy of the site (`LH_AUDIT=1 SHOW_DRAFTS=1`, output to `dist-audit/` — never deployed) in which draft content renders without the DRAFT tag or `noindex`, so every page type can be scored, then runs Lighthouse CI (`lighthouserc.cjs`) against it: mobile, simulated throttling, 3 runs per URL, asserting performance/accessibility/best-practices/SEO ≥ 0.95, LCP ≤ 2000ms, CLS ≤ 0.05 and TBT ≤ 200ms on one URL per page type. `/my-plan/` and `/404.html` are exempt from the SEO assertion only (both `noindex` by design).
+
+It's slow (real Chrome, 3 runs × ~20 URLs) and isn't part of `pnpm build` — run it before launch and whenever you touch layout, fonts or images. Reports land in `.lighthouseci/` (gitignored).
+
+If Chrome won't launch in your environment (a sandboxed container running as root, for instance), set `LHCI_CHROME_PATH` to the Chromium binary and `LHCI_CHROME_FLAGS=--no-sandbox`; neither is needed on a normal machine or CI runner.
 
 ## Structure
 

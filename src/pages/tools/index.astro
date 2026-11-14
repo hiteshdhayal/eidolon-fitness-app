@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import { pageTitle } from '../../config/site';
+import '../../styles/content.css';
+
+const tools = [
+  {
+    href: '/tools/bmi/',
+    title: 'BMI calculator',
+    dek: 'Where you stand, using the Asian cut-offs used across India.',
+  },
+  {
+    href: '/tools/calories/',
+    title: 'Calorie calculator',
+    dek: 'Your resting burn and maintenance calories.',
+  },
+  {
+    href: '/tools/protein/',
+    title: 'Protein calculator',
+    dek: 'Your daily protein target, from food.',
+  },
+];
+---
+
+<BaseLayout
+  title={pageTitle('Free calculators')}
+  description="Free BMI, calorie and protein calculators built on the same formulas as the full plan."
+>
+  <PageHero
+    eyebrow="Tools"
+    titleBefore="Quick"
+    accent="numbers."
+    sub="The same formulas behind the full plan, as stand-alone calculators."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="01" eyebrow="Calculators" title="Pick a" accent="number." rule={false} />
+      <ul class="ruled-list">
+        {tools.map((tool) => (
+          <li class="ruled-row">
+            <div class="row-body">
+              <p class="row-title">
+                <a href={tool.href}>{tool.title}</a>
+              </p>
+              <p class="row-dek">{tool.dek}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location="tools-cta" />
+</BaseLayout>

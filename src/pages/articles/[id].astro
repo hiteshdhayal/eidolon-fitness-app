@@ -7,7 +7,7 @@ import MdxReelEmbed from '../../components/mdx/MdxReelEmbed.astro';
 import MdxCallout from '../../components/mdx/MdxCallout.astro';
 import KeyTakeaways from '../../components/mdx/KeyTakeaways.astro';
 import { getCollection, getEntry, render } from 'astro:content';
-import { publishedOnly } from '../../lib/content/published';
+import { publishedOnly, showDraftTag } from '../../lib/content/published';
 import { relatedForArticle } from '../../lib/content/related';
 import { usesAmazonProduct } from '../../lib/content/affiliate';
 import { pageTitle } from '../../config/site';
@@ -40,7 +40,7 @@ const components = {
 <BaseLayout
   title={pageTitle(entry.data.title)}
   description={entry.data.description}
-  noindex={entry.data.draft}
+  noindex={showDraftTag(entry.data.draft)}
 >
   <ArticleLayout
     entry={entry}

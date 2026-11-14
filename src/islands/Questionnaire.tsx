@@ -596,7 +596,11 @@ export default function Questionnaire() {
       (answers[currentQuestion.id as keyof DraftAnswers] as string | number | undefined) === '');
 
   if (!ready) {
-    return <section class="qc-section" aria-busy="true" />;
+    return (
+      <section class="qc-section" aria-busy="true">
+        <h1 class="sr-only">Build your plan</h1>
+      </section>
+    );
   }
 
   if (stepId === INTRO) {
@@ -614,7 +618,9 @@ export default function Questionnaire() {
           <p class="qc-lede">
             Takes about 2 minutes. Your answers stay on your phone — nothing is sent to a server.
           </p>
-          <p class="qc-disclaimer">This is general guidance, not medical advice.</p>
+          <p class="qc-disclaimer">
+            This is general guidance, not medical advice. <a href="/disclaimer/">Read more →</a>
+          </p>
           <div class="qc-actions">
             {resumeStep ? (
               <>
