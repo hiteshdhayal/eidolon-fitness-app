@@ -38,13 +38,16 @@ interface TrackedEvent {
  */
 async function stubUmami(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    (window as unknown as { __umamiEvents: TrackedEvent[] }).__umamiEvents = [];
+    // addInitScript re-runs on every navigation within the flow (home ->
+    // plan -> my-plan), so events are kept in sessionStorage rather than a
+    // plain variable, or each navigation would wipe out what fired before it.
+    const STORAGE_KEY = '__umamiEvents';
+    if (!sessionStorage.getItem(STORAGE_KEY)) sessionStorage.setItem(STORAGE_KEY, '[]');
     (window as unknown as { umami: unknown }).umami = {
       track: (name: string, data?: Record<string, unknown>) => {
-        (window as unknown as { __umamiEvents: TrackedEvent[] }).__umamiEvents.push({
-          name,
-          data,
-        });
+        const events = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '[]');
+        events.push({ name, data });
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(events));
       },
     };
 
@@ -71,9 +74,7 @@ async function stubUmami(page: Page): Promise<void> {
 }
 
 async function events(page: Page): Promise<TrackedEvent[]> {
-  return page.evaluate(
-    () => (window as unknown as { __umamiEvents: TrackedEvent[] }).__umamiEvents,
-  );
+  return page.evaluate(() => JSON.parse(sessionStorage.getItem('__umamiEvents') ?? '[]'));
 }
 
 function assertNoPersonalData(all: TrackedEvent[]) {
