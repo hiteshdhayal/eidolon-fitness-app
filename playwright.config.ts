@@ -20,6 +20,10 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // This project pins its own @playwright/test version, whose bundled
+    // Chromium revision doesn't match what's pre-installed in this
+    // container — launch against the pre-installed browser instead.
+    launchOptions: { executablePath: '/opt/pw-browsers/chromium' },
   },
   webServer: [
     {
