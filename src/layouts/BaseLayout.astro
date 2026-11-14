@@ -1,6 +1,6 @@
 ---
-import { existsSync } from 'node:fs';
 import { site } from '../config/site';
+import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyCta from '../components/StickyCta.astro';
@@ -13,6 +13,10 @@ interface Props {
   hideStickyCta?: boolean;
   overlayHeader?: boolean;
   flushTop?: boolean;
+  ogImage?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
 }
 
 const {
@@ -22,11 +26,12 @@ const {
   hideStickyCta = false,
   overlayHeader = false,
   flushTop = false,
+  ogImage,
+  type,
+  publishedTime,
+  modifiedTime,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, site.siteUrl).href;
-const hasOgImage = existsSync('public/og-default.png');
-const ogImage = new URL('/og-default.png', site.siteUrl).href;
 const mainClasses = ['site-main', flushTop ? 'site-main-flush' : ''].filter(Boolean).join(' ');
 ---
 
@@ -37,23 +42,16 @@ const mainClasses = ['site-main', flushTop ? 'site-main-flush' : ''].filter(Bool
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
-
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={site.brandName} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:locale" content="en_IN" />
-    {hasOgImage && <meta property="og:image" content={ogImage} />}
-
-    <meta name="twitter:card" content={hasOgImage ? 'summary_large_image' : 'summary'} />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    {hasOgImage && <meta name="twitter:image" content={ogImage} />}
+    <Seo
+      title={title}
+      description={description}
+      path={Astro.url.pathname}
+      noindex={noindex}
+      ogImage={ogImage}
+      type={type}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+    />
 
     <meta name="theme-color" content="#0B0C0E" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -76,6 +74,17 @@ const mainClasses = ['site-main', flushTop ? 'site-main-flush' : ''].filter(Bool
       crossorigin
       fetchpriority="low"
     />
+
+    {site.umamiWebsiteId && (
+      <script
+        defer
+        src={site.umamiSrc}
+        data-website-id={site.umamiWebsiteId}
+        data-domains="eidolon.cloud"
+        data-exclude-search="true"
+        data-exclude-hash="true"
+      />
+    )}
   </head>
   <body data-surface="ice">
     <a href="#main" class="skip-link">

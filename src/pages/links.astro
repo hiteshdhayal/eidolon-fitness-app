@@ -1,8 +1,180 @@
 ---
-import ComingSoon from '../layouts/ComingSoon.astro';
-import { stub } from '../config/site';
+/**
+ * Link-in-bio page (spec §15): no header/nav, under 30 KB total. Deliberately
+ * bypasses BaseLayout (no Header/Footer/StickyCta/design-system CSS/fonts) to
+ * hit the budget — see docs/DECISIONS.md for the system-font trade-off.
+ */
+import Seo from '../components/Seo.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { publishedOnly } from '../lib/content/published';
+import { site } from '../config/site';
+import { LINKS_ORDER, type LinkButtonKey } from '../config/links';
 
-const page = stub('/links/');
+const reels = publishedOnly(await getCollection('reels')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+const picks = publishedOnly(await getCollection('articles')).filter(
+  (entry) => entry.data.hasAffiliateLinks,
+);
+
+let latest: { href: string; label: string } | undefined;
+if (reels[0]) {
+  const article = reels[0].data.relatedArticle ? await getEntry(reels[0].data.relatedArticle) : undefined;
+  latest = article
+    ? { href: `/articles/${article.id}/`, label: 'Latest article' }
+    : { href: `/reels/${reels[0].id}/`, label: 'Latest reel' };
+}
+
+const BUTTONS: Record<LinkButtonKey, { href: string; label: string } | undefined> = {
+  plan: { href: '/plan/', label: 'Build my free diet plan →' },
+  latest,
+  picks: picks.length > 0 ? { href: '/articles/picks/', label: 'My picks' } : undefined,
+  learn: { href: '/learn/', label: 'Exercise library' },
+  instagram: { href: site.instagramUrl, label: `Follow @${site.instagramHandle}` },
+};
+
+const buttons = LINKS_ORDER.map((key) => ({ key, ...BUTTONS[key] })).filter(
+  (b): b is { key: LinkButtonKey; href: string; label: string } => Boolean(b.href),
+);
 ---
 
-<ComingSoon slug="links" title={page.title} copy={page.copy} />
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Seo
+      title="Eidolon — all my links"
+      description="Everything in one place: the free diet plan, my picks, exercises and Instagram."
+      path="/links/"
+      ogImage="/og/links.png"
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {site.umamiWebsiteId && (
+      <script
+        defer
+        src={site.umamiSrc}
+        data-website-id={site.umamiWebsiteId}
+        data-domains="eidolon.cloud"
+        data-exclude-search="true"
+        data-exclude-hash="true"
+      />
+    )}
+    <style>
+      :root {
+        --obsidian-900: #0b0c0e;
+        --ice-50: #f1f4f7;
+        --steel-400: #8b939d;
+        --red-500: #e10600;
+        --red-600: #c10a04;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        padding: 48px 20px 64px;
+        background: var(--obsidian-900);
+        color: var(--ice-50);
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+      .wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        font-size: 1.125rem;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+      .wordmark-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--red-500);
+      }
+      .bio {
+        max-width: 32ch;
+        margin: 0;
+        text-align: center;
+        font-size: 0.9375rem;
+        line-height: 1.5;
+        color: var(--steel-400);
+      }
+      .links {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        max-width: 420px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .links a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 56px;
+        padding-inline: 20px;
+        border: 1px solid var(--ice-50);
+        color: var(--ice-50);
+        font-weight: 700;
+        font-size: 0.9375rem;
+        text-align: center;
+        text-decoration: none;
+      }
+      .links a:focus-visible {
+        outline: 2px solid var(--red-500);
+        outline-offset: 3px;
+      }
+      .links a.is-primary {
+        background: var(--red-500);
+        border-color: var(--red-500);
+      }
+      .links a.is-primary:hover {
+        background: var(--red-600);
+        border-color: var(--red-600);
+      }
+      .links a:not(.is-primary):hover {
+        background: rgba(241, 244, 247, 0.08);
+      }
+      .footnote {
+        margin: 0;
+        font-size: 0.75rem;
+        color: var(--steel-400);
+      }
+      .footnote a {
+        color: var(--steel-400);
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="wordmark"><span class="wordmark-dot" aria-hidden="true"></span> EIDOLON</p>
+    <p class="bio">{site.bio}</p>
+
+    <ul class="links">
+      {buttons.map((button, i) => (
+        <li>
+          <a
+            href={button.href}
+            class={i === 0 ? 'is-primary' : ''}
+            target={button.key === 'instagram' ? '_blank' : undefined}
+            rel={button.key === 'instagram' ? 'noopener' : undefined}
+            data-umami-event={button.key === 'instagram' ? 'follow_click' : undefined}
+            data-umami-event-location={button.key === 'instagram' ? 'links' : undefined}
+          >
+            {button.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p class="footnote"><a href="/">eidolon.cloud</a></p>
+  </body>
+</html>

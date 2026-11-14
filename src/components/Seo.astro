@@ -1,0 +1,60 @@
+---
+/**
+ * One SEO component used by every layout (spec Phase 6 Part C1). Emits
+ * title, meta description, canonical, OG, Twitter and (optionally) article
+ * timestamps and robots noindex. Canonical/OG URLs are always absolute,
+ * against the real site origin, with a trailing slash.
+ */
+import { site } from '../config/site';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  noindex?: boolean;
+  ogImage?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
+}
+
+const {
+  title,
+  description,
+  path,
+  noindex = false,
+  ogImage,
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+} = Astro.props;
+
+function withTrailingSlash(p: string): string {
+  if (p === '') return '/';
+  return p.endsWith('/') ? p : `${p}/`;
+}
+
+const canonicalPath = withTrailingSlash(path);
+const canonical = new URL(canonicalPath, site.siteUrl).href;
+const ogImageUrl = new URL(ogImage ?? '/og/default.png', site.siteUrl).href;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={site.brandName} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:locale" content="en_IN" />
+{type === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{type === 'article' && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />

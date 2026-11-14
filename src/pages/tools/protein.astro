@@ -1,8 +1,97 @@
 ---
-import ComingSoon from '../../layouts/ComingSoon.astro';
-import { stub } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import Accordion from '../../components/ui/Accordion.astro';
+import ProteinTool from '../../islands/tools/ProteinTool';
+import { breadcrumbListJsonLd, faqPageJsonLd } from '../../lib/seo/jsonld';
+import { pageTitle } from '../../config/site';
+import '../../styles/content.css';
+import '../../styles/tools.css';
 
-const page = stub('/tools/protein/');
+const FAQ = [
+  {
+    question: 'Do I need protein powder to hit this?',
+    answer:
+      "No. Dal, curd, paneer, chana, sprouts, rajma, eggs or meat get most people there from food alone. A powder is only ever an optional top-up, never a requirement.",
+  },
+  {
+    question: 'Why does training change the number?',
+    answer:
+      'More training days means more muscle repair work, so the target per kg of body weight goes up — up to a point. Losing fat also nudges the number up slightly, to protect muscle while you eat less.',
+  },
+  {
+    question: 'Why does age matter?',
+    answer:
+      "People 50 and over absorb and use protein a little less efficiently, so I don't let the target drop below about 1 g per kg, even at a low training load.",
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    faqPageJsonLd(FAQ),
+    breadcrumbListJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Tools', path: '/tools/' },
+      { name: 'Protein calculator', path: '/tools/protein/' },
+    ]),
+  ],
+};
 ---
 
-<ComingSoon slug="tools-protein" title={page.title} copy={page.copy} />
+<BaseLayout
+  title={pageTitle('Daily protein calculator, from food')}
+  description="Free protein calculator: your daily target in grams, reachable from dal, curd, paneer, chana, eggs or meat."
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <PageHero
+    eyebrow="Tool"
+    titleBefore="Your protein,"
+    accent="from food."
+    sub="Your daily protein target in grams, based on your weight, training and goal. No powder required."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="01" eyebrow="Calculator" title="Check your" accent="target." rule={false} />
+      <ProteinTool client:load />
+    </div>
+  </section>
+
+  <section class="section" data-surface="obsidian">
+    <div class="container">
+      <SectionHeader number="02" eyebrow="The method" title="How this" accent="works." rule={false} />
+      <div class="tool-method">
+        <p>
+          I set a target in grams per kilogram of body weight, based on how many days a week you
+          train and your goal: more for building muscle or more training days, a little more
+          again when you're cutting calories to protect muscle, and a floor for anyone 50 or over.
+        </p>
+        <p>
+          Then I multiply that by your body weight. Every plan I build gets this from food first —
+          dal, curd, paneer, chana, sprouts, rajma, eggs or meat — and only mentions a supplement
+          if food alone genuinely can't close the gap.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="03" eyebrow="Questions" title="Fair" accent="questions." rule={false} />
+      <Accordion items={FAQ} />
+    </div>
+  </section>
+
+  <FinalCta
+    titleBefore="Your plan is"
+    accent="2 minutes"
+    titleAfter="away."
+    location="tools-protein-cta"
+  />
+</BaseLayout>

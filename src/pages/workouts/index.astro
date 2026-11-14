@@ -1,8 +1,78 @@
 ---
-import ComingSoon from '../../layouts/ComingSoon.astro';
-import { stub } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import FollowLink from '../../components/FollowLink.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+import { publishedOnly } from '../../lib/content/published';
+import { pageTitle } from '../../config/site';
+import { levelLabel, whereLabel } from '../../lib/content/exerciseLabels';
+import '../../styles/content.css';
 
-const page = stub('/workouts/');
+const workouts = publishedOnly(await getCollection('workouts'));
 ---
 
-<ComingSoon slug="workouts" title={page.title} copy={page.copy} />
+<BaseLayout
+  title={pageTitle('Workouts')}
+  description="Ready-made home and gym workouts, with sets, reps, rest and a simple progression rule."
+>
+  <PageHero
+    eyebrow="Workouts"
+    titleBefore="Ready-made"
+    accent="workouts."
+    sub="Pick a template that fits your week — home or gym — with sets, reps, rest and a simple progression rule."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader number="01" eyebrow="Templates" title="Pick a" accent="plan." rule={false} />
+
+      {workouts.length > 0 ? (
+        <ul class="ruled-list">
+          {workouts.map((workout) => (
+            <li class="ruled-row">
+              <p class="row-meta">
+                {levelLabel(workout.data.level)} · {workout.data.daysPerWeek}×/week · {whereLabel(workout.data.where)}
+              </p>
+              <div class="row-body">
+                <p class="row-title">
+                  <a href={`/workouts/${workout.id}/`}>{workout.data.title}</a>
+                </p>
+                <p class="row-dek">{workout.data.summary}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="empty-state">
+          <p>The workout templates are being written up. Follow for updates.</p>
+          <div class="empty-actions">
+            <FollowLink variant="primary" location="workouts-empty" />
+          </div>
+        </div>
+      )}
+
+      <a class="all-link" href="/learn/">Exercise library →</a>
+    </div>
+  </section>
+
+  <FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location="workouts-cta" />
+</BaseLayout>
+
+<style>
+  .all-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 24px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+</style>

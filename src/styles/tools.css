@@ -1,0 +1,86 @@
+/* Calculator tool styling (spec Phase 6 §14 / Part A1 pattern reuse). */
+
+.tool-card {
+  display: grid;
+  gap: 32px;
+  padding: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.tool-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.tool-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tool-input {
+  min-height: 56px;
+  padding-inline: 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+}
+
+.tool-input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tool-result {
+  padding-top: 24px;
+  border-top: 1px solid var(--border-strong);
+}
+
+.tool-result-value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-stretch: 110%;
+  font-size: clamp(2rem, 1rem + 3vw, 3rem);
+  line-height: 1;
+}
+
+.tool-result-unit {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tool-result-band {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.tool-note {
+  max-width: 60ch;
+}
+
+.tool-method {
+  max-width: 68ch;
+}
+
+.tool-method p + p {
+  margin-top: 12px;
+}
+
+@media (max-width: 599px) {
+  .tool-card {
+    padding: 24px;
+  }
+}
