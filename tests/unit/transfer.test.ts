@@ -122,7 +122,11 @@ describe('export / import', () => {
     const bundle = buildExport();
     const broken = {
       ...bundle,
-      progress: { v: 1, entries: [{ id: 'x', date: 'yesterday', weightKg: 5 }], dismissedRules: {} },
+      progress: {
+        v: 1,
+        entries: [{ id: 'x', date: 'yesterday', weightKg: 5 }],
+        dismissedRules: {},
+      },
     };
     expect(parseExport(JSON.stringify(broken))).toBeNull();
   });

@@ -133,7 +133,7 @@ interface DataSectionProps {
 
 function DataSection({ number, today, onReplaced, onAnnounce }: DataSectionProps) {
   return (
-    <section class="section" data-surface="obsidian">
+    <section class="section pv-data-section" data-surface="obsidian">
       <div class="container">
         <PlanHeader
           number={number}

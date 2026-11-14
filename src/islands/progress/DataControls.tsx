@@ -143,8 +143,8 @@ export default function DataControls({ today, onReplaced, onAnnounce }: Props) {
       >
         <div class="pv-dialog-body">
           <p class="pv-body-text">
-            This removes your plan, answers, check-ins and grocery ticks from this phone. It can't be
-            undone. Export your data first if you want a copy.
+            This removes your plan, answers, check-ins and grocery ticks from this phone. It can't
+            be undone. Export your data first if you want a copy.
           </p>
           <div class="pv-dialog-actions">
             <button type="button" class="qc-next" onClick={confirmDelete}>

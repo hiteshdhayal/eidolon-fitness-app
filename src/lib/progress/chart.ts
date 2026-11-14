@@ -71,16 +71,16 @@ export function yDomain(values: number[], targetKg?: number): ChartDomain {
   return { min: low, max: high, ticks };
 }
 
-export function xScale(
-  date: string,
-  domain: { from: string; to: string },
-  width: number,
-): number {
+export function xScale(date: string, domain: { from: string; to: string }, width: number): number {
   const span = Math.max(1, daysBetween(domain.from, domain.to));
   return (daysBetween(domain.from, date) / span) * width;
 }
 
-export function yScale(value: number, domain: { min: number; max: number }, height: number): number {
+export function yScale(
+  value: number,
+  domain: { min: number; max: number },
+  height: number,
+): number {
   const span = Math.max(1e-6, domain.max - domain.min);
   return height - ((value - domain.min) / span) * height;
 }

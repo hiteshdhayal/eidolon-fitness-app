@@ -6,7 +6,13 @@ import {
   formatShort,
   todayLocal,
 } from '../../src/lib/progress/dates';
-import { formatSigned, smoothed, smoothedSeries, summary, valueNear } from '../../src/lib/progress/stats';
+import {
+  formatSigned,
+  smoothed,
+  smoothedSeries,
+  summary,
+  valueNear,
+} from '../../src/lib/progress/stats';
 import { evaluateRules, isNudgeDue, type RuleInput } from '../../src/lib/progress/rules';
 import type { Entry } from '../../src/lib/progress/schema';
 import {
@@ -257,7 +263,13 @@ describe('rules', () => {
 
   it('plateau does not fire for gain or healthier goals', () => {
     expect(
-      evaluateRules({ ...base, planWeightKg: 80, effectiveGoal: 'gain', entries: plateauEntries, today: d }),
+      evaluateRules({
+        ...base,
+        planWeightKg: 80,
+        effectiveGoal: 'gain',
+        entries: plateauEntries,
+        today: d,
+      }),
     ).toBeNull();
     expect(
       evaluateRules({
@@ -288,11 +300,20 @@ describe('rules', () => {
   it('hides a dismissed rule for 14 days, then shows it again', () => {
     const dismissed = { fastLoss: '2026-11-25' };
     expect(
-      evaluateRules({ ...base, entries: fastLossEntries, today: '2026-11-30', dismissedRules: dismissed }),
+      evaluateRules({
+        ...base,
+        entries: fastLossEntries,
+        today: '2026-11-30',
+        dismissedRules: dismissed,
+      }),
     ).toBeNull();
     expect(
-      evaluateRules({ ...base, entries: fastLossEntries, today: '2026-12-09', dismissedRules: dismissed })
-        ?.id,
+      evaluateRules({
+        ...base,
+        entries: fastLossEntries,
+        today: '2026-12-09',
+        dismissedRules: dismissed,
+      })?.id,
     ).toBe('fastLoss');
   });
 
@@ -311,21 +332,21 @@ describe('nudge', () => {
   });
 
   it('is not due while the plan is younger than a week', () => {
-    expect(isNudgeDue({ savedAt: '2026-11-10T09:00:00+05:30', entries: [], today: '2026-11-14' })).toBe(
+    expect(
+      isNudgeDue({ savedAt: '2026-11-10T09:00:00+05:30', entries: [], today: '2026-11-14' }),
+    ).toBe(false);
+  });
+
+  it('is not due when a check-in was logged within the last week', () => {
+    expect(isNudgeDue({ savedAt, entries: [entry('2026-11-11', 80)], today: '2026-11-14' })).toBe(
       false,
     );
   });
 
-  it('is not due when a check-in was logged within the last week', () => {
-    expect(
-      isNudgeDue({ savedAt, entries: [entry('2026-11-11', 80)], today: '2026-11-14' }),
-    ).toBe(false);
-  });
-
   it('is due when the last check-in is more than a week old', () => {
-    expect(
-      isNudgeDue({ savedAt, entries: [entry('2026-11-04', 80)], today: '2026-11-14' }),
-    ).toBe(true);
+    expect(isNudgeDue({ savedAt, entries: [entry('2026-11-04', 80)], today: '2026-11-14' })).toBe(
+      true,
+    );
   });
 
   it('is not due within a week of being dismissed, then is due again', () => {
@@ -373,7 +394,11 @@ describe('progress storage', () => {
   });
 
   it('writeProgress persists the log', () => {
-    writeProgress({ v: 1, entries: [entry('2026-11-10', 82)], dismissedRules: { plateau: '2026-11-14' } });
+    writeProgress({
+      v: 1,
+      entries: [entry('2026-11-10', 82)],
+      dismissedRules: { plateau: '2026-11-14' },
+    });
     expect(readProgress().dismissedRules.plateau).toBe('2026-11-14');
   });
 

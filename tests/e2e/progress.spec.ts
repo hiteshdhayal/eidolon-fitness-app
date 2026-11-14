@@ -170,10 +170,7 @@ test('range toggle changes how many points are drawn', async ({ page }) => {
 
   const toggle = page.locator('.pv-chart-range');
   await toggle.getByRole('button', { name: 'ALL' }).click();
-  await expect(toggle.getByRole('button', { name: 'ALL' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+  await expect(toggle.getByRole('button', { name: 'ALL' })).toHaveAttribute('aria-pressed', 'true');
   const pointsAll = await points.count();
 
   await toggle.getByRole('button', { name: '4W' }).click();
@@ -258,7 +255,11 @@ test('plateau card only for a lose goal', async ({ page }) => {
 });
 
 test('plateau does not show for a healthier goal', async ({ page }) => {
-  await seedSavedPlan(page, { ...PERSONA, goal: 'Eat healthier and get fitter' }, `${dateAgo(1)}T09:00:00+05:30`);
+  await seedSavedPlan(
+    page,
+    { ...PERSONA, goal: 'Eat healthier and get fitter' },
+    `${dateAgo(1)}T09:00:00+05:30`,
+  );
   await seedEntries(page, [
     { daysAgo: 22, weightKg: 80 },
     { daysAgo: 14, weightKg: 80.1 },
@@ -288,7 +289,10 @@ test('Log weight in the nudge opens the Progress tab and focuses the input', asy
   await page.goto('/my-plan/');
   await page.getByRole('button', { name: 'Log weight' }).click();
 
-  await expect(page.getByRole('tab', { name: 'Progress' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: 'Progress' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
   await expect(page.locator('#pv-weight')).toBeFocused();
 });
 
@@ -371,7 +375,9 @@ test('delete everything can be cancelled or confirmed', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Delete everything' }).click();
   await expect(page.getByRole('heading', { name: /no plan yet/i })).toBeVisible();
 
-  const keys = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith('eidolon:')));
+  const keys = await page.evaluate(() =>
+    Object.keys(localStorage).filter((k) => k.startsWith('eidolon:')),
+  );
   expect(keys).toEqual([]);
   const unrelated = await page.evaluate(() => localStorage.getItem('unrelated-key'));
   expect(unrelated).toBe('keep me');
@@ -498,9 +504,7 @@ test('saving a check-in sends progress_log with no data', async ({ page }) => {
   await openProgress(page);
   await saveCheckIn(page, '82');
 
-  const calls = await page.evaluate(
-    () => (window as unknown as { __calls: unknown[][] }).__calls,
-  );
+  const calls = await page.evaluate(() => (window as unknown as { __calls: unknown[][] }).__calls);
   expect(calls.map((call) => call[0])).toEqual(['progress_log']);
   expect(calls[0]?.[1] ?? null).toBeNull();
 

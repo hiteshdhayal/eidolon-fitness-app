@@ -116,3 +116,23 @@ One line per decision. Simplest option consistent with the spec wins.
 - "Ajmain" in the grocery list was a misread: every `buys` string spells it `ajwain` (central/east/north/west), and the grocery categoriser capitalises the ingredient it is given. No data change; `docs/food-review.csv` is unchanged.
 - Duplicate grams in the meal meta line are removed in the UI with `itemMeta()` (unit-tested), not in the data: when the measure already contains a gram or ml figure it is shown as `{measure} · {kcal} kcal · {protein} g protein`, otherwise `{measure} · {grams} g · …`.
 - The `markdown.gfm` / `markdown.smartypants` deprecation warning comes from Astro internals, not `astro.config.mjs` (which sets no `markdown` options), so it is left in place and noted here.
+
+## Phase 4
+
+- Progress is one versioned key, `eidolon:progress:v1`, shaped `{ v, entries, nudgeDismissedOn?, dismissedRules }`. Entries are sorted by `date` on write, weights and waist are stored to one decimal, and there is one entry per `YYYY-MM-DD` (saving an existing date replaces it and keeps the old `id`).
+- The chart and rules use a 7-day trailing moving average (`smoothed`); a point may be up to 3 days away from its target date (`valueNear`'s tolerance), because weekly check-ins never land on exactly 7/14/21 days.
+- Rule thresholds are exactly: fast loss = more than 1% of body weight lost per week for two weeks in a row (`(a−b) > 0.01a` and `(b−c) > 0.01b`); big change = |latest − plan weight| ≥ 3 kg; plateau = lose goal, |smoothed(now) − smoothed(21 days ago)| ≤ 0.3 kg with at least 3 entries in that window.
+- At most one suggestion card shows at a time, chosen by priority fastLoss > bigChange > plateau; a dismissed rule is skipped and the next qualifying rule can show.
+- "Hide this for now" stores `dismissedRules[id] = today`; the rule stays hidden for 14 days (`daysBetween < 14`), then reappears.
+- The nudge is due when the plan is at least 7 days old, the last check-in is more than 7 days old (or there are none), and `nudgeDismissedOn` is missing or more than 7 days old. "Log weight" opens the Progress tab, focuses the Weight input and also dismisses the nudge.
+- Guidance plans (teen, pregnant, kidney) have no Progress tab, no tracker and no nudge — weight tracking is not appropriate there. The old placeholder Progress section was removed with it.
+- Import always replaces: it writes the plan, progress and groceries from the file and removes the plan/groceries keys when the file has `plan: null` or `groceries: null`. It never merges.
+- The export file holds `{ app, exportVersion, exportedAt, plan, progress, groceries }`; the questionnaire draft is deliberately excluded. `parseExport` applies `migrate()` to the versioned sub-objects because the bundle itself has no `v`.
+- `clearAll()` removes every localStorage key that starts with `eidolon:` by iterating the keys (not a hard-coded list), so unrelated keys survive.
+- The Progress tab is a lazy island: PlanView imports `./progress/ProgressTab` the first time the tab is opened (or on mount for plateRules). PlanView's eager graph stays at 45.3 KB gzip; the lazy chunk is 4.2 KB gzip.
+- Saving a check-in fires `track("progress_log")` with no data at all — no weight, waist or date ever reaches analytics.
+- "Update my plan" links to `/plan/?edit=1&weight={latest}`; `applyWeightParam` overrides the draft weight only for a valid 30–250 kg value. Rebuilding never touches `eidolon:progress:v1`, so the log survives.
+- The data controls also render on the empty `/my-plan` state, so a progress-only export can be imported before a plan exists.
+- The summary is a `<dl>` styled like the key-numbers stat blocks (Archivo 800, mono labels) rather than the `Stat` component, whose root is a div and would be invalid inside a definition list.
+- The Preact FollowLink mirror and its Phase 3.1 matching test were removed: the rebuilt Progress tab no longer renders a follow link, so nothing needs the mirror.
+- `.pv-sheet` re-declares the ice surface tokens, because the delete dialog lives inside the obsidian data section and would otherwise inherit ice-text-on-ice.

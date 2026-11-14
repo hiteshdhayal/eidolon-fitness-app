@@ -181,11 +181,7 @@ export function writeProgress(progress: Progress): boolean {
 }
 
 /** One entry per date: saving on an existing date replaces it and keeps its id. */
-export function upsertEntry(input: {
-  date: string;
-  weightKg: number;
-  waistCm?: number;
-}): Progress {
+export function upsertEntry(input: { date: string; weightKg: number; waistCm?: number }): Progress {
   const current = readProgress();
   const existing = current.entries.find((entry) => entry.date === input.date);
   const entry: Entry = {
@@ -216,7 +212,9 @@ export function deleteEntry(id: string): Progress {
   return next;
 }
 
-export function setProgressFields(fields: Partial<Pick<Progress, 'nudgeDismissedOn' | 'dismissedRules'>>): Progress {
+export function setProgressFields(
+  fields: Partial<Pick<Progress, 'nudgeDismissedOn' | 'dismissedRules'>>,
+): Progress {
   const current = readProgress();
   const next: Progress = { ...current, ...fields };
   writeProgress(next);
@@ -238,4 +236,3 @@ export function clearAll(): void {
     // ignore
   }
 }
-

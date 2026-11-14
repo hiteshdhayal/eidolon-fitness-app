@@ -308,12 +308,7 @@ export default function ProgressTab({
           ) : null}
 
           <div class="pv-chart-block">
-            <WeightChart
-              entries={entries}
-              today={today}
-              summary={summary}
-              targetKg={targetKg}
-            />
+            <WeightChart entries={entries} today={today} summary={summary} targetKg={targetKg} />
           </div>
 
           <div class="pv-history">

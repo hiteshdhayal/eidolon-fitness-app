@@ -54,13 +54,20 @@ The food database is plain TypeScript, one file per region in `src/data/foods/` 
 
 `/plan` asks about 18 questions (goal, body, health, activity and food). The plan is computed **in your browser** by the engine in `src/lib/engine/` using the food database in `src/data/foods/`. Nothing is sent to a server.
 
-Your answers and plan are kept on your device in three localStorage keys:
+Your answers and plan are kept on your device in four localStorage keys:
 
 - `eidolon:draft:v1` — the half-finished questionnaire
 - `eidolon:plan:v1` — the saved plan, answers and grocery list
 - `eidolon:groceries:v1` — which grocery items you've ticked
+- `eidolon:progress:v1` — your weight check-ins and which gentle suggestion you closed
 
 `/my-plan` reads the saved plan and offers swap, shuffle, groceries and a printable copy. To clear everything, open your browser's site settings for `eidolon.cloud` and delete site data (Chrome: Settings → Privacy and security → Third-party cookies → See all site data and permissions; Safari: Settings → Privacy → Manage Website Data). Deleting site data removes the plan; there is no server copy.
+
+## Progress and your data
+
+The Progress tab on `/my-plan` logs a weekly check-in: weight, an optional waist measurement, and a date. It shows a hand-drawn SVG trend line, a plain summary (change since start, average per week, number of check-ins) and, at most one at a time, a gentle suggestion — slow down a fast loss, update the plan after a 3 kg change, or try something different after three flat weeks. Nothing is judged and there are no streaks. Check-ins live only in `eidolon:progress:v1` on this device; guidance plans (under 18, pregnant, kidney disease) have no tracker.
+
+The "Your data" section at the bottom of `/my-plan` exports everything to a JSON file (`eidolon-data-YYYY-MM-DD.json`) and imports it back. Export includes your plan, check-ins and grocery ticks but never the half-finished questionnaire draft. Import always replaces what is on the phone — it never merges. "Delete everything" removes every `eidolon:` key, which is the same as clearing the browser's site data.
 
 ## Site config
 

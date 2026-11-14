@@ -1752,6 +1752,31 @@
     font-size: 0.75rem;
     color: var(--text-muted);
   }
+
+  .pv-table {
+    font-size: 0.8125rem;
+  }
+
+  .pv-table th,
+  .pv-table td {
+    padding-block: 10px;
+  }
+
+  .pv-table-actions {
+    white-space: normal;
+  }
+
+  .pv-table-actions .pv-link + .pv-link {
+    margin-left: 8px;
+  }
+
+  .pv-summary {
+    gap: 12px;
+  }
+
+  .pv-summary-value {
+    font-size: 1.25rem;
+  }
 }
 
 @media (min-width: 768px) {
