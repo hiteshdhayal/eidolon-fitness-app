@@ -1,6 +1,8 @@
 node_modules/
 dist/
 dist-drafts/
+dist-audit/
+.lighthouseci/
 .astro/
 .commandcode/
 .env
