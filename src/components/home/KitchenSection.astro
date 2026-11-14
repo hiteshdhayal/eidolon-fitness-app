@@ -246,16 +246,31 @@ const dataJson = JSON.stringify(KITCHEN_SAMPLES);
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .other-states select {
     min-height: 44px;
+    max-width: 100%;
     padding-inline: 12px;
     border: 1px solid var(--border-strong);
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-mono);
     font-size: 0.8125rem;
+    /*
+     * Without an explicit width, a native <select> sizes itself to its
+     * widest <option> (e.g. "Andaman and Nicobar Islands"), which forced
+     * the whole mobile layout viewport wider than 375px — the header's
+     * "Open menu" button ended up rendered off-screen as a result. Both
+     * the select and its ancestors need min-width: 0 for this to actually
+     * shrink inside a flex row.
+     */
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .other-states select:focus-visible {

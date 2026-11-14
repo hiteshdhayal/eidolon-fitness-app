@@ -1,7 +1,9 @@
 ---
+import { getCollection } from 'astro:content';
 import { site } from '../config/site';
 import Wordmark from './ui/Wordmark.astro';
 import FollowLink from './FollowLink.astro';
+import { publishedOnly } from '../lib/content/published';
 
 const year = new Date().getFullYear();
 
@@ -9,31 +11,50 @@ const contactLink = site.contactEmail
   ? { href: `mailto:${site.contactEmail}`, label: 'Contact' }
   : { href: site.instagramUrl, label: 'Contact (Instagram DM)' };
 
-const columns = [
+// "My picks" only exists once there's something to show there.
+const hasPicks = publishedOnly(await getCollection('articles')).some(
+  (entry) => entry.data.hasAffiliateLinks,
+);
+
+interface FooterLink {
+  label: string;
+  href?: string;
+  /** Rendered as a FollowLink instead of a plain <a>. */
+  follow?: boolean;
+}
+
+const columns: { heading: string; links: FooterLink[] }[] = [
   {
-    heading: 'Explore',
+    heading: 'Plan',
     links: [
       { label: 'Diet plan', href: '/plan/' },
-      { label: 'Learn', href: '/learn/' },
-      { label: 'Workouts', href: '/workouts/' },
-      { label: 'Reels', href: '/reels/' },
-      { label: 'Articles', href: '/articles/' },
+      { label: 'My plan', href: '/my-plan/' },
+      { label: 'Tools', href: '/tools/' },
     ],
   },
   {
-    heading: 'Tools',
+    heading: 'Learn',
     links: [
-      { label: 'BMI calculator', href: '/tools/bmi/' },
-      { label: 'Calorie calculator', href: '/tools/calories/' },
-      { label: 'Protein calculator', href: '/tools/protein/' },
-      { label: 'Links', href: '/links/' },
+      { label: 'Exercises', href: '/learn/' },
+      { label: 'Workouts', href: '/workouts/' },
+      { label: 'Guides', href: '/learn/guides/' },
+    ],
+  },
+  {
+    heading: 'Content',
+    links: [
+      { label: 'Reels', href: '/reels/' },
+      { label: 'Articles', href: '/articles/' },
+      ...(hasPicks ? [{ label: 'My picks', href: '/articles/picks/' }] : []),
     ],
   },
   {
     heading: 'Site',
     links: [
       { label: 'About', href: '/about/' },
+      { label: 'Instagram', follow: true },
       { label: contactLink.label, href: contactLink.href },
+      { label: 'Links', href: '/links/' },
     ],
   },
   {
@@ -68,16 +89,19 @@ const columns = [
             <ul class="footer-list">
               {column.links.map((link) => (
                 <li>
-                  <a href={link.href} class="footer-link">
-                    {link.label}
-                  </a>
+                  {link.follow ? (
+                    <FollowLink
+                      variant="text"
+                      location="footer-instagram"
+                      label={link.label}
+                    />
+                  ) : (
+                    <a href={link.href} class="footer-link">
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
-              {column.heading === 'Site' && (
-                <li>
-                  <FollowLink variant="text" location="footer-instagram" label="Instagram" />
-                </li>
-              )}
             </ul>
           </nav>
         ))}
@@ -231,7 +255,7 @@ const columns = [
     }
 
     .footer-columns {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 24px;
     }
   }

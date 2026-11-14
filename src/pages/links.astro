@@ -64,6 +64,7 @@ const buttons = LINKS_ORDER.map((key) => ({ key, ...BUTTONS[key] })).filter(
       :root {
         --obsidian-900: #0b0c0e;
         --ice-50: #f1f4f7;
+        --ice-0: #f8fafb;
         --steel-400: #8b939d;
         --red-500: #e10600;
         --red-600: #c10a04;
@@ -82,6 +83,13 @@ const buttons = LINKS_ORDER.map((key) => ({ key, ...BUTTONS[key] })).filter(
         background: var(--obsidian-900);
         color: var(--ice-50);
         font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        width: 100%;
       }
       .wordmark {
         display: inline-flex;
@@ -136,6 +144,9 @@ const buttons = LINKS_ORDER.map((key) => ({ key, ...BUTTONS[key] })).filter(
       .links a.is-primary {
         background: var(--red-500);
         border-color: var(--red-500);
+        /* ice-0, not ice-50: ~5:1 on red-500 vs ~4.49:1 (spec §3.2's table
+           calls out ice-0/white specifically for button labels on red). */
+        color: var(--ice-0);
       }
       .links a.is-primary:hover {
         background: var(--red-600);
@@ -157,24 +168,26 @@ const buttons = LINKS_ORDER.map((key) => ({ key, ...BUTTONS[key] })).filter(
   </head>
   <body>
     <h1 class="wordmark"><span class="wordmark-dot" aria-hidden="true"></span> EIDOLON</h1>
-    <p class="bio">{site.bio}</p>
+    <main>
+      <p class="bio">{site.bio}</p>
 
-    <ul class="links">
-      {buttons.map((button, i) => (
-        <li>
-          <a
-            href={button.href}
-            class={i === 0 ? 'is-primary' : ''}
-            target={button.key === 'instagram' ? '_blank' : undefined}
-            rel={button.key === 'instagram' ? 'noopener' : undefined}
-            data-umami-event={button.key === 'instagram' ? 'follow_click' : undefined}
-            data-umami-event-location={button.key === 'instagram' ? 'links' : undefined}
-          >
-            {button.label}
-          </a>
-        </li>
-      ))}
-    </ul>
+      <ul class="links">
+        {buttons.map((button, i) => (
+          <li>
+            <a
+              href={button.href}
+              class={i === 0 ? 'is-primary' : ''}
+              target={button.key === 'instagram' ? '_blank' : undefined}
+              rel={button.key === 'instagram' ? 'noopener' : undefined}
+              data-umami-event={button.key === 'instagram' ? 'follow_click' : undefined}
+              data-umami-event-location={button.key === 'instagram' ? 'links' : undefined}
+            >
+              {button.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </main>
 
     <p class="footnote"><a href="/">eidolon.cloud</a></p>
   </body>

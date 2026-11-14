@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { draftsBaseURL } from '../../playwright.config';
-import { seedPlan, seedDraft, VEG_HARYANA, HOSTEL, TEEN } from './helpers';
+import { seedPlan, seedDraft, answersFor, VEG_HARYANA, HOSTEL, TEEN } from './helpers';
 
 /**
  * Accessibility pass (spec Phase 6 Part F.2): axe across every page type and
@@ -83,31 +83,7 @@ test.describe('axe: /plan/ interactive states', () => {
   });
 
   test('review screen', async ({ page }) => {
-    await seedDraft(
-      page,
-      {
-        goal: 'lose',
-        sex: 'female',
-        age: 28,
-        heightCm: 165,
-        weightKg: 65,
-        conditions: [],
-        medications: [],
-        trainingDays: 'none',
-        trainingType: [],
-        steps: '3-6k',
-        state: 'HR',
-        cuisineMix: 'mostlyMine',
-        dietType: 'veg',
-        meats: [],
-        restrictions: [],
-        foodSource: 'family',
-        mealPattern: '3',
-        budget: 'moderate',
-        supplements: 'foodOnly',
-      },
-      'review',
-    );
+    await seedDraft(page, answersFor(VEG_HARYANA), 'review');
     await page.goto('/plan/');
     await expect(page.locator('.qc-legend')).toHaveText('Check your answers');
     expect(await axeViolations(page)).toEqual([]);
@@ -280,17 +256,18 @@ test.describe('reduced motion', () => {
     test(`no running animation/transition on ${path}`, async ({ page }) => {
       if (path === '/my-plan/') await seedPlan(page, VEG_HARYANA);
       await page.goto(path);
+      // A non-zero computed animation/transition-duration doesn't mean
+      // anything is actually playing (Chromium reports a near-zero
+      // baseline, e.g. "1e-05s", on essentially every element regardless).
+      // getAnimations() reports real, currently-running Web Animations.
       const running = await page.evaluate(() => {
-        const found: string[] = [];
-        for (const el of document.querySelectorAll('*')) {
-          const style = getComputedStyle(el);
-          const animDuration = parseFloat(style.animationDuration || '0');
-          const transDuration = parseFloat(style.transitionDuration || '0');
-          if (animDuration > 0 || transDuration > 0) {
-            found.push(`${el.tagName}.${el.className} anim=${style.animationDuration} trans=${style.transitionDuration}`);
-          }
-        }
-        return found;
+        const getAnimations = document.getAnimations as (opts?: {
+          subtree: boolean;
+        }) => Animation[];
+        return getAnimations
+          .call(document, { subtree: true })
+          .filter((a) => a.playState === 'running')
+          .map((a) => a.id || (a as unknown as { animationName?: string }).animationName || 'unnamed');
       });
       expect(running).toEqual([]);
     });
@@ -311,7 +288,14 @@ test.describe('contrast', () => {
     const steel400 = await page.evaluate(() => {
       const target = 'rgb(139, 147, 157)'; // --steel-400
       const offenders: string[] = [];
-      for (const el of document.querySelectorAll('[data-surface="ice"] .text-muted, [data-surface="ice"] .small')) {
+      for (const el of document.querySelectorAll('.text-muted, .small')) {
+        // The nearest [data-surface] ancestor is what actually governs this
+        // element's colors — a plain descendant selector like
+        // `[data-surface="ice"] .text-muted` would also match elements
+        // under a *closer* obsidian override nested inside an outer ice
+        // one (or vice versa), which isn't what "on ice" means here.
+        const surface = el.closest('[data-surface]')?.getAttribute('data-surface');
+        if (surface !== 'ice') continue;
         const color = getComputedStyle(el).color;
         if (color === target) offenders.push(el.outerHTML.slice(0, 60));
       }
