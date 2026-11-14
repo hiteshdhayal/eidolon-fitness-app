@@ -1,4 +1,4 @@
-# Eidolon
+# Eidolon Fitness App
 
 Personal site for Hitesh Dhayal (@hiteshdhayal): a free 7-day Indian diet plan, exercise knowledge, and companion articles for Instagram reels.
 
