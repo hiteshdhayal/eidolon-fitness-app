@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleLayout from '../../../components/content/ArticleLayout.astro';
+import ProductCard from '../../../components/mdx/ProductCard.astro';
+import ComparisonTable from '../../../components/mdx/ComparisonTable.astro';
+import MdxReelEmbed from '../../../components/mdx/MdxReelEmbed.astro';
+import MdxCallout from '../../../components/mdx/MdxCallout.astro';
+import KeyTakeaways from '../../../components/mdx/KeyTakeaways.astro';
+import ProteinTable from '../../../components/mdx/ProteinTable.astro';
+import { getCollection, render } from 'astro:content';
+import { publishedOnly } from '../../../lib/content/published';
+import { relatedForArticle } from '../../../lib/content/related';
+import { usesAmazonProduct } from '../../../lib/content/affiliate';
+import { pageTitle } from '../../../config/site';
+
+export async function getStaticPaths() {
+  const guides = publishedOnly(await getCollection('articles')).filter(
+    (entry) => entry.data.kind === 'guide',
+  );
+  return guides.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+
+const allArticles = publishedOnly(await getCollection('articles'));
+const related = relatedForArticle(entry, allArticles);
+const body = entry.body ?? '';
+const hasAmazon = usesAmazonProduct(body);
+
+const components = {
+  ProductCard,
+  ComparisonTable,
+  ReelEmbed: MdxReelEmbed,
+  Callout: MdxCallout,
+  KeyTakeaways,
+  ProteinTable,
+};
+---
+
+<BaseLayout
+  title={pageTitle(entry.data.title)}
+  description={entry.data.description}
+  noindex={entry.data.draft}
+>
+  <ArticleLayout
+    entry={entry}
+    kind="guide"
+    headings={headings}
+    relatedArticles={related}
+    hasAmazon={hasAmazon}
+    body={body}
+  >
+    <Content components={components} />
+  </ArticleLayout>
+</BaseLayout>

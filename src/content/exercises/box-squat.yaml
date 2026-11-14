@@ -1,0 +1,11 @@
+name: "Box squat"
+otherNames: ["Chair squat"]
+muscles: ["quads", "glutes"]
+equipment: "none"
+level: "beginner"
+summary: "A squat to a chair or box, to learn the depth and the pattern safely."
+steps: ["Stand in front of a sturdy chair or a low box, facing away from it.", "Push your hips back and lower yourself until you sit lightly on the box.", "Keep your chest up and your knees over your toes.", "Stand up without using your hands."]
+cues: ["Touch the box, do not collapse onto it", "Keep weight through the whole foot"]
+commonMistakes: ["Dropping onto the box", "Leaning the chest too far forward"]
+harderVersion: "bodyweight-squat"
+draft: true

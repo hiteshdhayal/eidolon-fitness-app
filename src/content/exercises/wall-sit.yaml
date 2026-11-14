@@ -1,0 +1,10 @@
+name: "Wall sit"
+otherNames: ["Wall squat"]
+muscles: ["quads"]
+equipment: "none"
+level: "beginner"
+summary: "A still hold against a wall that builds leg endurance."
+steps: ["Stand with your back against a wall, feet a step away.", "Slide down until your knees are bent to about 90 degrees.", "Keep your back flat on the wall and hold.", "Slide back up when the hold is done."]
+cues: ["Knees over the ankles, not past the toes", "Breathe steadily through the hold"]
+commonMistakes: ["Holding your breath", "Letting the knees drift inward"]
+draft: true

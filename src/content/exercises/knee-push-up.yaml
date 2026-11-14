@@ -1,0 +1,12 @@
+name: "Knee push-up"
+otherNames: ["Knee push-up"]
+muscles: ["chest", "triceps"]
+equipment: "none"
+level: "beginner"
+summary: "A push-up from the knees, the step before the full version."
+steps: ["Start on your hands and knees with your hands under your shoulders.", "Keep a straight line from your knees to your head.", "Lower your chest to just above the floor.", "Push back up."]
+cues: ["Hips stay in line with the shoulders", "Full range, chest close to the floor"]
+commonMistakes: ["Piking the hips up", "Flaring the elbows out wide"]
+easierVersion: "incline-push-up"
+harderVersion: "push-up"
+draft: true

@@ -1,0 +1,26 @@
+title: "Walking plan"
+summary: "An eight-week plan that adds 500 steps a day each week, from 4,000 to 7,500."
+level: "beginner"
+daysPerWeek: 7
+where: "anywhere"
+steps:
+  - week: 1
+    dailySteps: 4000
+    note: "A normal day. Keep it easy."
+  - week: 2
+    dailySteps: 4500
+  - week: 3
+    dailySteps: 5000
+  - week: 4
+    dailySteps: 5500
+  - week: 5
+    dailySteps: 6000
+  - week: 6
+    dailySteps: 6500
+  - week: 7
+    dailySteps: 7000
+  - week: 8
+    dailySteps: 7500
+    note: "Hold this level, or keep adding slowly."
+progression: "Add about 500 steps a day each week. If a week feels hard, repeat it."
+draft: true

@@ -1,0 +1,12 @@
+name: "Single-leg glute bridge"
+otherNames: ["Single-leg bridge"]
+muscles: ["glutes", "hamstrings"]
+equipment: "none"
+level: "intermediate"
+summary: "A glute bridge on one leg, for more challenge and better balance."
+steps: ["Lie on your back with one knee bent and the other leg straight.", "Lift your hips using only the bent leg.", "Keep the hips level, not twisted.", "Lower slowly and swap sides."]
+cues: ["Keep the raised leg in line with the body", "Squeeze the glute at the top"]
+commonMistakes: ["Letting the hips drop on one side", "Pushing through the raised leg"]
+easierVersion: "glute-bridge"
+harderVersion: "hip-thrust"
+draft: true

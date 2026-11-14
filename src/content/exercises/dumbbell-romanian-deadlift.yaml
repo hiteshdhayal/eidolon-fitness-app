@@ -1,0 +1,12 @@
+name: "Dumbbell Romanian deadlift"
+otherNames: ["DB RDL"]
+muscles: ["hamstrings", "glutes"]
+equipment: "dumbbells"
+level: "beginner"
+summary: "A hip hinge with dumbbells that loads the hamstrings."
+steps: ["Hold a dumbbell in each hand in front of your thighs.", "With soft knees, push your hips back and lower the weights down your legs.", "Stop when you feel a stretch in the hamstrings or your back starts to round.", "Push your hips forward to stand up."]
+cues: ["Weights stay close to the legs", "Chest up, back flat"]
+commonMistakes: ["Turning it into a squat", "Rounding the lower back at the bottom"]
+easierVersion: "hip-hinge-drill"
+harderVersion: "barbell-romanian-deadlift"
+draft: true

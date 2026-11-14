@@ -1,0 +1,11 @@
+name: "Conventional deadlift"
+otherNames: ["Deadlift"]
+muscles: ["hamstrings", "glutes", "back"]
+equipment: "barbell"
+level: "intermediate"
+summary: "Lifting the bar from the floor with a flat back and strong hips."
+steps: ["Stand with the bar over the middle of your feet, feet hip-width apart.", "Grip the bar outside your knees and set your back flat.", "Push the floor away and stand up, keeping the bar close to your legs.", "Lower the bar with control by pushing your hips back."]
+cues: ["Chest up before you pull", "Pull the slack out of the bar first"]
+commonMistakes: ["Jerking the bar off the floor", "Rounding the back under load"]
+easierVersion: "barbell-romanian-deadlift"
+draft: true

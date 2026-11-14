@@ -1,0 +1,12 @@
+name: "Incline push-up"
+otherNames: ["Incline push-up"]
+muscles: ["chest", "triceps"]
+equipment: "none"
+level: "beginner"
+summary: "A push-up with the hands on a table or bench, easier than the floor."
+steps: ["Place both hands on a table, bench or step.", "Step your feet back so your body is straight.", "Lower your chest towards the edge.", "Push back up."]
+cues: ["Lower the surface as you get stronger", "Keep the core braced"]
+commonMistakes: ["Sagging hips", "Half reps at the top"]
+easierVersion: "wall-push-up"
+harderVersion: "knee-push-up"
+draft: true

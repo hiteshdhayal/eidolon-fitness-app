@@ -1,0 +1,11 @@
+name: "Walking lunge"
+otherNames: ["Walking lunge"]
+muscles: ["quads", "glutes"]
+equipment: "dumbbells"
+level: "intermediate"
+summary: "Lunges that travel forward, with dumbbells once the pattern is smooth."
+steps: ["Hold a dumbbell in each hand by your sides.", "Step forward into a lunge and lower under control.", "Push through the front foot and bring the back foot forward into the next lunge.", "Keep alternating for the set."]
+cues: ["Step far enough forward to stay upright", "Keep the weights steady"]
+commonMistakes: ["Rushing and losing balance", "Letting the back knee slam down"]
+easierVersion: "reverse-lunge"
+draft: true

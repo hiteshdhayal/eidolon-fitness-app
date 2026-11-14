@@ -1,0 +1,11 @@
+name: "Wall push-up"
+otherNames: ["Wall push-up"]
+muscles: ["chest", "triceps"]
+equipment: "none"
+level: "beginner"
+summary: "A push-up against a wall, the easiest place to start."
+steps: ["Stand an arm’s length from a wall and place both palms on it at chest height.", "Bend your elbows and bring your chest towards the wall.", "Push back to the start.", "Keep your body in a straight line throughout."]
+cues: ["Elbows at about 45 degrees from the body", "Move as one piece"]
+commonMistakes: ["Bending at the hips", "Shrugging the shoulders"]
+harderVersion: "incline-push-up"
+draft: true

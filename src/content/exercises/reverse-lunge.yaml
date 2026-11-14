@@ -1,0 +1,12 @@
+name: "Reverse lunge"
+otherNames: ["Backward lunge"]
+muscles: ["quads", "glutes"]
+equipment: "none"
+level: "beginner"
+summary: "Stepping backwards into a lunge, which is easier on the knees."
+steps: ["Stand tall with your feet under your hips.", "Step one foot back and lower until both knees are bent.", "Keep your front shin close to vertical.", "Push through the front foot to return to standing."]
+cues: ["Step back, not down", "Keep the torso upright"]
+commonMistakes: ["Front knee caving inward", "Taking too small a step"]
+easierVersion: "split-squat"
+harderVersion: "walking-lunge"
+draft: true

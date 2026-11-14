@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHero from '../../../components/content/PageHero.astro';
+import FinalCta from '../../../components/content/FinalCta.astro';
+import ReelThumb from '../../../components/content/ReelThumb.astro';
+import SectionHeader from '../../../components/ui/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+import { publishedOnly } from '../../../lib/content/published';
+import { TOPICS, topicLabel, type Topic } from '../../../config/topics';
+import { pageTitle } from '../../../config/site';
+import '../../../styles/content.css';
+
+export async function getStaticPaths() {
+  const reels = publishedOnly(await getCollection('reels'));
+  const topics = (Object.keys(TOPICS) as Topic[]).filter((topic) =>
+    reels.some((reel) => reel.data.topics.includes(topic)),
+  );
+  return topics.map((topic) => ({ params: { topic }, props: { topic } }));
+}
+
+const { topic } = Astro.props as { topic: Topic };
+
+const allReels = publishedOnly(await getCollection('reels'));
+const allTopics = (Object.keys(TOPICS) as Topic[]).filter((item) =>
+  allReels.some((reel) => reel.data.topics.includes(item)),
+);
+const reels = allReels
+  .filter((reel) => reel.data.topics.includes(topic))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const label = topicLabel(topic);
+---
+
+<BaseLayout
+  title={pageTitle(`${label} reels`)}
+  description={`Every reel about ${label.toLowerCase()}, with the key points written out.`}
+>
+  <PageHero
+    eyebrow="Reels"
+    titleBefore={label}
+    accent="reels."
+    sub="Every reel on this topic, with the key points written out."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader
+        number="01"
+        eyebrow={label}
+        title="Watch first,"
+        accent="then read."
+        rule={false}
+      />
+
+      <div class="library">
+        <nav class="filter-row" aria-label="Filter reels by topic">
+          <a href="/reels/">All</a>
+          {allTopics.map((item) => (
+            <a
+              href={`/reels/topic/${item}/`}
+              class={item === topic ? 'is-active' : ''}
+              aria-current={item === topic ? 'page' : undefined}
+            >
+              {topicLabel(item)}
+            </a>
+          ))}
+        </nav>
+
+        <div class="thumb-grid">
+          {reels.map((reel) => (
+            <ReelThumb
+              href={`/reels/${reel.id}/`}
+              title={reel.data.title}
+              date={reel.data.date}
+              thumbnail={reel.data.thumbnail}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FinalCta
+    titleBefore="Your plan is"
+    accent="2 minutes"
+    titleAfter="away."
+    location="reels-topic-cta"
+  />
+</BaseLayout>

@@ -8,12 +8,13 @@ import { resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 const LIMIT_KB = 80;
+const DIR = process.env.SHOW_DRAFTS === '1' ? 'dist-drafts' : 'dist';
 const pages = [
-  { name: 'Questionnaire (/plan)', html: 'dist/plan/index.html' },
-  { name: 'PlanView (/my-plan)', html: 'dist/my-plan/index.html' },
+  { name: 'Questionnaire (/plan)', html: `${DIR}/plan/index.html` },
+  { name: 'PlanView (/my-plan)', html: `${DIR}/my-plan/index.html` },
 ];
 
-const astroDir = resolve('dist/_astro');
+const astroDir = resolve(DIR, '_astro');
 const allChunks = new Set(readdirSync(astroDir).filter((file) => file.endsWith('.js')));
 
 function importsOf(file) {

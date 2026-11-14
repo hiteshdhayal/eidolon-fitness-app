@@ -1,0 +1,11 @@
+name: "Barbell back squat"
+otherNames: ["Back squat"]
+muscles: ["quads", "glutes", "core"]
+equipment: "barbell"
+level: "intermediate"
+summary: "The main strength squat, with the bar across your upper back."
+steps: ["Set the bar on your upper back, not on your neck, and stand up out of the rack.", "Take two steps back and set your feet shoulder-width apart.", "Breathe in, brace your core, and squat down with control.", "Drive up through your feet and breathe out near the top."]
+cues: ["Brace as if someone will poke your stomach", "Keep the bar over the middle of your foot"]
+commonMistakes: ["Letting the knees cave in", "Losing the brace at the bottom"]
+easierVersion: "goblet-squat"
+draft: true

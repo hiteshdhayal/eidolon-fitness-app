@@ -1,0 +1,12 @@
+name: "Bodyweight squat"
+otherNames: ["Uthak-baithak", "Air squat"]
+muscles: ["quads", "glutes"]
+equipment: "none"
+level: "beginner"
+summary: "The basic squat: sit down and stand up without losing your balance."
+steps: ["Stand with your feet a little wider than your hips, toes turned out slightly.", "Push your hips back and bend your knees, keeping your chest up.", "Go down as far as you can without your heels lifting.", "Push through the middle of your foot to stand tall again."]
+cues: ["Knees track over your toes, not inside them", "Breathe in down, out up"]
+commonMistakes: ["Letting the heels lift off the floor", "Rounding the lower back at the bottom"]
+easierVersion: "box-squat"
+harderVersion: "goblet-squat"
+draft: true

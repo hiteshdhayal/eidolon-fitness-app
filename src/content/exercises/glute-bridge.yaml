@@ -1,0 +1,11 @@
+name: "Glute bridge"
+otherNames: ["Bridge"]
+muscles: ["glutes", "hamstrings"]
+equipment: "none"
+level: "beginner"
+summary: "Lifting the hips off the floor while lying on your back."
+steps: ["Lie on your back with knees bent and feet flat, close to your hips.", "Squeeze your glutes and lift your hips off the floor.", "Pause at the top for a second.", "Lower slowly and repeat."]
+cues: ["Push through your heels", "Ribs down, do not arch the lower back"]
+commonMistakes: ["Arching the back instead of using the glutes", "Feet too far from the hips"]
+harderVersion: "single-leg-glute-bridge"
+draft: true

@@ -1,0 +1,11 @@
+name: "Push-up"
+otherNames: ["Press-up"]
+muscles: ["chest", "triceps", "core"]
+equipment: "none"
+level: "intermediate"
+summary: "The full push-up from the floor, in one straight line."
+steps: ["Start in a plank with your hands under your shoulders.", "Lower your chest towards the floor, elbows at about 45 degrees.", "Push back up without letting the hips sag.", "Keep the body straight the whole way."]
+cues: ["Squeeze the glutes and the core", "Push the floor away"]
+commonMistakes: ["Hips sagging or piking", "Neck craning forward"]
+easierVersion: "knee-push-up"
+draft: true

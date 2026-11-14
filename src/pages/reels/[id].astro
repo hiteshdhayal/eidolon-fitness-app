@@ -1,0 +1,142 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import ReelEmbed from '../../components/content/ReelEmbed.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import { getCollection, getEntry, render } from 'astro:content';
+import { publishedOnly } from '../../lib/content/published';
+import { relatedForReel } from '../../lib/content/related';
+import { topicLabel, type Topic } from '../../config/topics';
+import { pageTitle } from '../../config/site';
+import '../../styles/content.css';
+
+export async function getStaticPaths() {
+  const reels = publishedOnly(await getCollection('reels'));
+  return reels.map((reel) => ({ params: { id: reel.id }, props: { reel } }));
+}
+
+const { reel } = Astro.props;
+const { Content } = await render(reel);
+
+const allReels = publishedOnly(await getCollection('reels'));
+const related = relatedForReel(reel, allReels).filter((item) => item.id !== reel.id);
+
+const article = reel.data.relatedArticle ? await getEntry(reel.data.relatedArticle) : undefined;
+const exercise = reel.data.relatedExercise ? await getEntry(reel.data.relatedExercise) : undefined;
+
+const dateFmt = new Intl.DateTimeFormat('en-IN', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<BaseLayout
+  title={pageTitle(reel.data.title)}
+  description={`Notes from my reel: ${reel.data.title}`}
+  noindex={reel.data.draft}
+>
+  <PageHero
+    eyebrow={`Reel · ${dateFmt.format(reel.data.date)}`}
+    titleBefore={reel.data.title}
+    draft={reel.data.draft}
+    tags={reel.data.topics.map((topic) => ({
+      label: topicLabel(topic as Topic),
+      href: `/reels/topic/${topic}/`,
+    }))}
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <div class="reel-detail-grid">
+        <ReelEmbed
+          instagramUrl={reel.data.instagramUrl}
+          title={reel.data.title}
+          slug={reel.id}
+          thumbnail={reel.data.thumbnail}
+        />
+
+        <div>
+          <SectionHeader
+            number="01"
+            eyebrow="What I cover"
+            title="The short version,"
+            accent="written out."
+            rule={false}
+          />
+          <div class="article-body">
+            <Content />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {article || exercise || related.length > 0 ? (
+    <section class="section" data-surface="obsidian">
+      <div class="container">
+        <SectionHeader
+          number="02"
+          eyebrow="Related"
+          title="Go a little"
+          accent="deeper."
+          rule={false}
+        />
+        <ul class="ruled-list">
+          {article && (
+            <li class="ruled-row">
+              <div class="row-body">
+                <p class="row-meta">Article</p>
+                <p class="row-title">
+                  <a href={`/articles/${article.id}/`}>{article.data.title}</a>
+                </p>
+              </div>
+            </li>
+          )}
+          {exercise && (
+            <li class="ruled-row">
+              <div class="row-body">
+                <p class="row-meta">Exercise</p>
+                <p class="row-title">
+                  <a href={`/learn/${exercise.id}/`}>{exercise.data.name}</a>
+                </p>
+              </div>
+            </li>
+          )}
+          {related.map((item) => (
+            <li class="ruled-row">
+              <div class="row-body">
+                <p class="row-meta">Reel</p>
+                <p class="row-title">
+                  <a href={`/reels/${item.id}/`}>{item.data.title}</a>
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ) : null}
+
+  <FinalCta
+    titleBefore="Your plan is"
+    accent="2 minutes"
+    titleAfter="away."
+    location="reel-cta"
+  />
+</BaseLayout>
+
+<style>
+  .reel-detail-grid {
+    display: grid;
+    gap: 40px;
+  }
+
+  @media (min-width: 768px) {
+    .reel-detail-grid {
+      grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+</style>

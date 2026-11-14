@@ -1,0 +1,78 @@
+---
+import Button from '../ui/Button.astro';
+import FollowLink from '../FollowLink.astro';
+
+interface Props {
+  eyebrow?: string;
+  titleBefore: string;
+  accent: string;
+  titleAfter?: string;
+  location: string;
+}
+
+const {
+  eyebrow = 'Free · No sign-up',
+  titleBefore,
+  accent,
+  titleAfter = '',
+  location,
+} = Astro.props;
+---
+
+<section class="final-cta section" data-surface="obsidian">
+  <div class="container section-reveal">
+    <span class="cta-rule" aria-hidden="true"></span>
+
+    <p class="eyebrow-row">
+      <span class="speed-bar" aria-hidden="true"></span>
+      <span class="eyebrow">{eyebrow}</span>
+    </p>
+
+    <h2 class="display cta-title">
+      {titleBefore}{titleBefore ? ' ' : ''}<em class="accent-italic">{accent}</em>{titleAfter
+        ? ` ${titleAfter}`
+        : ''}
+    </h2>
+
+    <div class="cta-actions">
+      <Button href="/plan/" arrow planCta="default">Build my plan</Button>
+      <FollowLink variant="secondary" location={location} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .final-cta {
+    padding-block: clamp(72px, 12vw, 160px);
+  }
+
+  .cta-rule {
+    display: block;
+    width: 120px;
+    height: 2px;
+    margin-bottom: 32px;
+    background: var(--accent);
+  }
+
+  .cta-title {
+    max-width: 18ch;
+    margin-top: 20px;
+  }
+
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  @media (max-width: 767px) {
+    .cta-actions {
+      flex-direction: column;
+    }
+
+    .cta-actions > :global(*) {
+      width: 100%;
+    }
+  }
+</style>

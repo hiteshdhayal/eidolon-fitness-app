@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import ReelThumb from '../../components/content/ReelThumb.astro';
+import FollowLink from '../../components/FollowLink.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+import { publishedOnly } from '../../lib/content/published';
+import { pageTitle } from '../../config/site';
+import { TOPICS, topicLabel, type Topic } from '../../config/topics';
+import '../../styles/content.css';
+
+const reels = publishedOnly(await getCollection('reels')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const topics = (Object.keys(TOPICS) as Topic[]).filter((topic) =>
+  reels.some((reel) => reel.data.topics.includes(topic)),
+);
+---
+
+<BaseLayout
+  title={pageTitle('Reels')}
+  description="Every reel, with the key points written out so you can come back to them."
+>
+  <PageHero
+    eyebrow="Reels"
+    titleBefore="Every reel,"
+    accent="written down."
+    sub="Each reel, with the key points written out so you can come back to them."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader
+        number="01"
+        eyebrow="All reels"
+        title="Watch first,"
+        accent="then read."
+        rule={false}
+      />
+
+      {reels.length > 0 ? (
+        <div class="library">
+          <nav class="filter-row" aria-label="Filter reels by topic">
+            <a href="/reels/" class="is-active" aria-current="page">All</a>
+            {topics.map((topic) => (
+              <a href={`/reels/topic/${topic}/`}>{topicLabel(topic)}</a>
+            ))}
+          </nav>
+
+          <div class="thumb-grid">
+            {reels.map((reel) => (
+              <ReelThumb
+                href={`/reels/${reel.id}/`}
+                title={reel.data.title}
+                date={reel.data.date}
+                thumbnail={reel.data.thumbnail}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>The first reels are being written up. Follow for new ones.</p>
+          <div class="empty-actions">
+            <FollowLink variant="primary" location="reels-empty" />
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <FinalCta
+    titleBefore="Your plan is"
+    accent="2 minutes"
+    titleAfter="away."
+    location="reels-cta"
+  />
+</BaseLayout>

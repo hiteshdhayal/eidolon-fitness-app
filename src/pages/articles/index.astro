@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/content/PageHero.astro';
+import FinalCta from '../../components/content/FinalCta.astro';
+import FollowLink from '../../components/FollowLink.astro';
+import SectionHeader from '../../components/ui/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+import { publishedOnly } from '../../lib/content/published';
+import { readingTime } from '../../lib/content/readingTime';
+import { pageTitle } from '../../config/site';
+import '../../styles/content.css';
+
+const all = publishedOnly(await getCollection('articles'));
+const articles = all
+  .filter((entry) => entry.data.kind === 'article')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const picks = all.filter((entry) => entry.data.hasAffiliateLinks);
+
+const dateFmt = new Intl.DateTimeFormat('en-IN', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<BaseLayout
+  title={pageTitle('Articles')}
+  description="Deep dives that go with my reels: food, training and the numbers behind them."
+>
+  <PageHero
+    eyebrow="Articles"
+    titleBefore="Deep dives that go with"
+    accent="my reels."
+    sub="Longer reads on food, training and the numbers behind them."
+  />
+
+  <section class="section" data-surface="ice">
+    <div class="container">
+      <SectionHeader
+        number="01"
+        eyebrow="Articles"
+        title="Read, then"
+        accent="cook."
+        rule={false}
+      />
+
+      {articles.length > 0 ? (
+        <ul class="ruled-list">
+          {articles.map((entry) => (
+            <li class="ruled-row">
+              <p class="row-date">
+                <time datetime={entry.data.date.toISOString()}>
+                  {dateFmt.format(entry.data.date)}
+                </time>
+              </p>
+              <div class="row-body">
+                <p class="row-title">
+                  <a href={`/articles/${entry.id}/`}>{entry.data.title}</a>
+                </p>
+                <p class="row-dek">{entry.data.description}</p>
+                <p class="row-meta">{readingTime(entry.body ?? '')}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="empty-state">
+          <p>The first articles are on the way.</p>
+          <div class="empty-actions">
+            <FollowLink variant="primary" location="articles-empty" />
+          </div>
+        </div>
+      )}
+
+      {picks.length > 0 && (
+        <p class="section-lead">
+          <a class="text-link" href="/articles/picks/">Things I actually recommend</a>
+        </p>
+      )}
+    </div>
+  </section>
+
+  <FinalCta
+    titleBefore="Your plan is"
+    accent="2 minutes"
+    titleAfter="away."
+    location="articles-cta"
+  />
+</BaseLayout>

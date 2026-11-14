@@ -1,0 +1,11 @@
+name: "Side plank"
+otherNames: ["Side bridge"]
+muscles: ["core"]
+equipment: "none"
+level: "beginner"
+summary: "A plank on one side that trains the obliques."
+steps: ["Lie on one side with your elbow under your shoulder.", "Lift your hips so your body is a straight line.", "Hold, keeping your hips level.", "Lower and swap sides."]
+cues: ["Stack the feet or stagger them", "Push the bottom shoulder down away from the ear"]
+commonMistakes: ["Hips drifting back", "Shoulder collapsing into the ear"]
+easierVersion: "forearm-plank"
+draft: true

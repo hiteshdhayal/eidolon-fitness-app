@@ -1,0 +1,11 @@
+name: "Forearm plank"
+otherNames: ["Plank"]
+muscles: ["core"]
+equipment: "none"
+level: "beginner"
+summary: "Holding the body in a straight line on the forearms."
+steps: ["Lie face down, then prop yourself up on your forearms and toes.", "Keep a straight line from head to heels.", "Brace your core and glutes.", "Hold, breathing steadily."]
+cues: ["Squeeze the glutes", "Ribs down, do not sag"]
+commonMistakes: ["Hips sagging or piking", "Holding your breath"]
+harderVersion: "side-plank"
+draft: true

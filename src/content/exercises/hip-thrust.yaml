@@ -1,0 +1,11 @@
+name: "Barbell hip thrust"
+otherNames: ["Hip thrust"]
+muscles: ["glutes"]
+equipment: "barbell"
+level: "intermediate"
+summary: "Hips driven up with the back on a bench and a bar across the hips."
+steps: ["Sit with your upper back on a bench and the bar across your hips with a pad.", "Plant your feet flat, about shoulder-width apart.", "Drive through your heels and lift the hips to a straight line.", "Lower with control and repeat."]
+cues: ["Chin tucked, ribs down", "Pause and squeeze at the top"]
+commonMistakes: ["Overarching the lower back at the top", "Pushing through the toes"]
+easierVersion: "single-leg-glute-bridge"
+draft: true

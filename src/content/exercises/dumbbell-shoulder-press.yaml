@@ -1,0 +1,10 @@
+name: "Dumbbell shoulder press"
+otherNames: ["DB shoulder press"]
+muscles: ["shoulders", "triceps"]
+equipment: "dumbbells"
+level: "beginner"
+summary: "Pressing dumbbells overhead from the shoulders."
+steps: ["Sit or stand with a dumbbell in each hand at shoulder height.", "Brace your core.", "Press the weights overhead until the arms are straight.", "Lower with control to the shoulders."]
+cues: ["Do not arch the lower back", "Keep the wrists over the elbows"]
+commonMistakes: ["Leaning back too far", "Half reps at the bottom"]
+draft: true

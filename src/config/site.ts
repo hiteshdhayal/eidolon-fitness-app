@@ -1,6 +1,7 @@
 export const site = {
   brandName: 'Eidolon',
   creatorName: 'Hitesh Dhayal',
+  bio: 'Indian food, honest numbers, and training I actually use.',
   instagramHandle: 'hiteshdhayal',
   instagramUrl: 'https://www.instagram.com/hiteshdhayal/',
   domain: 'eidolon.cloud',

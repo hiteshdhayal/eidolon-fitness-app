@@ -1,0 +1,189 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { site } from '../../config/site';
+import { topicLabel, type Topic } from '../../config/topics';
+import { AMAZON_LINE, DISCLOSURE } from '../../lib/content/affiliate';
+import { readingTime } from '../../lib/content/readingTime';
+import Callout from '../ui/Callout.astro';
+import FollowLink from '../FollowLink.astro';
+import PageHero from './PageHero.astro';
+import FinalCta from './FinalCta.astro';
+import ReelThumb from './ReelThumb.astro';
+import '../../styles/content.css';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  entry: CollectionEntry<'articles'>;
+  kind: 'article' | 'guide';
+  headings: Heading[];
+  relatedArticles: CollectionEntry<'articles'>[];
+  relatedReel?: CollectionEntry<'reels'>;
+  hasAmazon: boolean;
+  body: string;
+}
+
+const { entry, kind, headings, relatedArticles, relatedReel, hasAmazon, body } = Astro.props;
+const { title, description, date, updated, tags, draft, hasAffiliateLinks } = entry.data;
+
+const dateFmt = new Intl.DateTimeFormat('en-IN', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
+const metaParts = [dateFmt.format(date)];
+if (updated) metaParts.push(`Updated ${dateFmt.format(updated)}`);
+metaParts.push(readingTime(body));
+
+const h2s = headings.filter((heading) => heading.depth === 2);
+const showToc = h2s.length >= 3;
+
+const canonical = new URL(Astro.url.pathname, site.siteUrl).href;
+const sectionHref = kind === 'guide' ? '/learn/' : '/articles/';
+const sectionLabel = kind === 'guide' ? 'Learn' : 'Articles';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+      datePublished: date.toISOString(),
+      dateModified: (updated ?? date).toISOString(),
+      author: { '@type': 'Person', name: site.creatorName, sameAs: site.instagramUrl },
+      publisher: { '@type': 'Organization', name: site.brandName, url: site.siteUrl },
+      mainEntityOfPage: canonical,
+      url: canonical,
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.siteUrl}/` },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: sectionLabel,
+          item: `${site.siteUrl}${sectionHref}`,
+        },
+        { '@type': 'ListItem', position: 3, name: title, item: canonical },
+      ],
+    },
+  ],
+};
+---
+
+<PageHero
+  eyebrow={`${kind === 'guide' ? 'Guide' : 'Article'} · ${dateFmt.format(date)}`}
+  titleBefore={title}
+  draft={draft}
+  sub={description}
+  tags={tags.map((tag) => ({ label: topicLabel(tag as Topic) }))}
+>
+  <p class="article-meta row-meta">{metaParts.join(' · ')}</p>
+</PageHero>
+
+<section class="section" data-surface="ice">
+  <div class="container">
+    {hasAffiliateLinks && (
+      <div class="article-disclosure">
+        <Callout variant="info" title="Affiliate disclosure">
+          <p>{DISCLOSURE}</p>
+          {hasAmazon && <p>{AMAZON_LINE}</p>}
+        </Callout>
+      </div>
+    )}
+
+    {showToc && (
+      <details class="toc toc-mobile">
+        <summary class="toc-label">On this page</summary>
+        <ul>
+          {h2s.map((heading) => (
+            <li>
+              <a href={`#${heading.slug}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    )}
+
+    <div class={showToc ? 'article-layout' : ''}>
+      {showToc && (
+        <nav class="toc toc-desktop" aria-label="On this page">
+          <p class="toc-label">On this page</p>
+          <ul>
+            {h2s.map((heading) => (
+              <li>
+                <a href={`#${heading.slug}`}>{heading.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+
+      <div class="article-body">
+        <slot />
+      </div>
+    </div>
+
+    <div class="author-box">
+      <p class="author-name">{site.creatorName}</p>
+      <p class="author-bio">{site.bio}</p>
+      {site.credentials && <p class="author-bio">{site.credentials}</p>}
+      <div class="author-links">
+        <FollowLink variant="text" location="article-author" />
+      </div>
+    </div>
+
+    {relatedReel || relatedArticles.length > 0 ? (
+      <div class="article-related">
+        <p class="related-label">Related</p>
+
+        {relatedReel && (
+          <div class="related-reel">
+            <ReelThumb
+              href={`/reels/${relatedReel.id}/`}
+              title={relatedReel.data.title}
+              date={relatedReel.data.date}
+              thumbnail={relatedReel.data.thumbnail}
+            />
+          </div>
+        )}
+
+        {relatedArticles.length > 0 && (
+          <ul class="ruled-list">
+            {relatedArticles.map((item) => (
+              <li class="ruled-row">
+                <p class="row-date">
+                  <time datetime={item.data.date.toISOString()}>
+                    {dateFmt.format(item.data.date)}
+                  </time>
+                </p>
+                <div class="row-body">
+                  <p class="row-title">
+                    <a
+                      href={
+                        item.data.kind === 'guide' ? `/learn/guides/${item.id}/` : `/articles/${item.id}/`
+                      }
+                    >
+                      {item.data.title}
+                    </a>
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    ) : null}
+  </div>
+</section>
+
+<FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location={`${kind}-cta`} />
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

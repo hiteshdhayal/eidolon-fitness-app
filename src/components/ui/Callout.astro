@@ -3,7 +3,7 @@ import Icon from './Icon.astro';
 
 interface Props {
   variant?: 'info' | 'warning' | 'doctor';
-  title: string;
+  title?: string;
   class?: string;
 }
 
@@ -19,7 +19,7 @@ const icons = {
 <div class={`callout callout-${variant} ${className}`}>
   <Icon name={icons[variant]} size={20} class="callout-icon" />
   <div>
-    <p class="callout-title">{title}</p>
+    {title && <p class="callout-title">{title}</p>}
     <div class="callout-body">
       <slot />
     </div>

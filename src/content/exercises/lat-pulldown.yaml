@@ -1,0 +1,11 @@
+name: "Lat pulldown"
+otherNames: ["Pulldown"]
+muscles: ["lats", "biceps"]
+equipment: "machine"
+level: "beginner"
+summary: "Pulling a bar down to your chest to train the back."
+steps: ["Sit at the machine and grip the bar a little wider than your shoulders.", "Sit tall and lean back very slightly.", "Pull the bar to the top of your chest.", "Let it rise back slowly."]
+cues: ["Pull the elbows down, not the hands", "Keep the chest proud"]
+commonMistakes: ["Pulling behind the neck", "Using body weight to swing down"]
+easierVersion: "band-pulldown"
+draft: true

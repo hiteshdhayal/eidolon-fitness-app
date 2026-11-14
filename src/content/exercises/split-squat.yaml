@@ -1,0 +1,11 @@
+name: "Split squat"
+otherNames: ["Static lunge"]
+muscles: ["quads", "glutes"]
+equipment: "none"
+level: "beginner"
+summary: "A lunge with the feet fixed, which builds balance and single-leg strength."
+steps: ["Stand with one foot forward and one back, both flat.", "Lower straight down until both knees are bent.", "Push through the front foot to stand back up.", "Finish the set, then swap sides."]
+cues: ["Drop straight down, not forward", "Front foot stays flat"]
+commonMistakes: ["Front heel lifting", "Twisting the hips to one side"]
+harderVersion: "reverse-lunge"
+draft: true

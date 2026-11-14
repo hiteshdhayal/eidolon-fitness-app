@@ -1,0 +1,114 @@
+---
+import { Picture } from 'astro:assets';
+import { productById, type Product } from '../../data/products';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  id?: string;
+  name?: string;
+  brand?: string;
+  image?: string;
+  bestFor?: string;
+  pros?: string[];
+  cons?: string[];
+  verdict?: string;
+  affiliateUrl?: string;
+  retailer?: 'amazon' | 'brand' | 'other';
+  placeholder?: boolean;
+}
+
+const props = Astro.props;
+
+const found = props.id ? productById(props.id) : undefined;
+const product: Product = found ?? {
+  id: props.id ?? 'product',
+  name: props.name ?? 'Product',
+  brand: props.brand ?? 'Brand',
+  image: props.image,
+  bestFor: props.bestFor ?? '',
+  pros: props.pros ?? [],
+  cons: props.cons ?? [],
+  verdict: props.verdict ?? '',
+  affiliateUrl: props.affiliateUrl ?? '',
+  retailer: props.retailer ?? 'other',
+  placeholder: props.placeholder ?? false,
+};
+
+const imageModules = import.meta.glob('../../assets/products/*.{jpg,jpeg,png,webp}', {
+  eager: true,
+  import: 'default',
+}) as Record<string, ImageMetadata>;
+const imageEntry = product.image
+  ? Object.entries(imageModules).find(([path]) => path.endsWith(`/${product.image}`))
+  : undefined;
+
+const segments = Astro.url.pathname.split('/').filter(Boolean);
+const articleSlug = segments[segments.length - 1] ?? '';
+---
+
+<article class="product-card" data-product={product.id}>
+  <div class="product-media">
+    {imageEntry ? (
+      <Picture
+        src={imageEntry[1]}
+        formats={['avif', 'webp']}
+        widths={[160, 240, 320]}
+        sizes="180px"
+        alt={product.name}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <span>IMAGE COMING</span>
+    )}
+  </div>
+
+  <div>
+    <p class="product-brand">{product.brand}</p>
+    <h3 class="product-name">{product.name}</h3>
+    <p class="product-bestfor">Best for</p>
+    <p>{product.bestFor}</p>
+
+    <div class="product-proscons">
+      <div>
+        <h4>Pros</h4>
+        <ul>
+          {product.pros.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+      <div>
+        <h4>Cons</h4>
+        <ul>
+          {product.cons.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+    </div>
+
+    <p class="product-verdict">{product.verdict}</p>
+
+    <div class="product-actions">
+      {product.affiliateUrl ? (
+        <Button
+          href={product.affiliateUrl}
+          variant="secondary"
+          target="_blank"
+          rel="sponsored nofollow noopener"
+          ariaLabel={`Check price for ${product.name} (opens in a new tab)`}
+          data={{
+            'data-umami-event': 'affiliate_click',
+            'data-umami-event-product': product.id,
+            'data-umami-event-article': articleSlug,
+          }}
+        >
+          Check price ↗
+        </Button>
+      ) : (
+        <span class="row-meta">LINK COMING</span>
+      )}
+    </div>
+
+    {product.placeholder && (
+      <p class="product-flag">PLACEHOLDER — NOT A RECOMMENDATION YET</p>
+    )}
+  </div>
+</article>

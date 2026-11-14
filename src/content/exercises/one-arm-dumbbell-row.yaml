@@ -1,0 +1,12 @@
+name: "One-arm dumbbell row"
+otherNames: ["DB row"]
+muscles: ["back", "lats", "biceps"]
+equipment: "dumbbells"
+level: "beginner"
+summary: "A row with one hand braced on a bench, which is easy to load."
+steps: ["Place one knee and hand on a bench, holding a dumbbell in the other hand.", "Let the arm hang down and keep your back flat.", "Pull the dumbbell towards your hip.", "Lower with control and repeat, then swap sides."]
+cues: ["Elbow drives back towards the hip", "Do not twist the torso"]
+commonMistakes: ["Rounding the back to reach", "Pulling with the bicep only"]
+easierVersion: "band-row"
+harderVersion: "inverted-row"
+draft: true

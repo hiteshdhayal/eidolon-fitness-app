@@ -1,0 +1,22 @@
+---
+import { FOODS } from '../../data/foods';
+import ComparisonTable from './ComparisonTable.astro';
+
+interface Props {
+  ids: string[];
+  caption?: string;
+}
+
+const { ids, caption = "Protein per household serving, from the site's food database" } = Astro.props;
+
+const rows = ids.map((id) => {
+  const food = FOODS.find((item) => item.id === id);
+  return food ? [food.name, food.serving.measure, `${food.perServing.protein} g`] : [id, '—', '—'];
+});
+---
+
+<ComparisonTable
+  caption={caption}
+  columns={['Food', 'One serving', 'Protein']}
+  rows={rows}
+/>

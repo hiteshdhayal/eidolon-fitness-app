@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import type { Entry } from '../../lib/progress/schema';
 import { formatShort } from '../../lib/progress/dates';
 import { formatSigned, smoothedSeries, type Summary } from '../../lib/progress/stats';
@@ -19,14 +19,13 @@ interface Props {
   targetKg?: number;
 }
 
-const WIDTH = 640;
 const HEIGHT = 260;
 const PAD_LEFT = 38;
 const PAD_RIGHT = 54;
 const PAD_TOP = 14;
 const PAD_BOTTOM = 26;
-const INNER_W = WIDTH - PAD_LEFT - PAD_RIGHT;
-const INNER_H = HEIGHT - PAD_TOP - PAD_BOTTOM;
+const MIN_WIDTH = 320;
+const MAX_WIDTH = 640;
 
 const RANGES: { id: ChartRange; label: string }[] = [
   { id: '4w', label: '4W' },
@@ -43,12 +42,34 @@ export default function WeightChart({ entries, today, summary, targetKg }: Props
   const [wide, setWide] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches,
   );
+  // Match the viewBox to the rendered width so labels stay near real size on
+  // phones; cap at 640 so the desktop chart is not stretched oddly.
+  const [width, setWidth] = useState(MAX_WIDTH);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const media = window.matchMedia('(min-width: 768px)');
     const onChange = () => setWide(media.matches);
     media.addEventListener('change', onChange);
     return () => media.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    const element = wrapRef.current;
+    if (!element) return;
+    const apply = () => {
+      const measured = Math.round(element.clientWidth) || MAX_WIDTH;
+      const next = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, measured));
+      setWidth((current) => (current === next ? current : next));
+    };
+    apply();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', apply);
+      return () => window.removeEventListener('resize', apply);
+    }
+    const observer = new ResizeObserver(apply);
+    observer.observe(element);
+    return () => observer.disconnect();
   }, []);
 
   const visible = visibleRange(entries, range, today);
@@ -71,7 +92,7 @@ export default function WeightChart({ entries, today, summary, targetKg }: Props
 
   if (visible.length < 2) {
     return (
-      <div class="pv-chart-wrap">
+      <div class="pv-chart-wrap" ref={wrapRef}>
         {toggle}
         <p class="pv-body-text">Log at least 2 check-ins to see your trend.</p>
       </div>
@@ -82,6 +103,8 @@ export default function WeightChart({ entries, today, summary, targetKg }: Props
   const last = visible[visible.length - 1];
   if (!first || !last) return null;
 
+  const innerW = width - PAD_LEFT - PAD_RIGHT;
+  const innerH = HEIGHT - PAD_TOP - PAD_BOTTOM;
   const domainX = { from: first.date, to: last.date };
   const domainY = yDomain(
     visible.map((entry) => entry.weightKg),
@@ -90,8 +113,8 @@ export default function WeightChart({ entries, today, summary, targetKg }: Props
   const series = smoothedSeries(visible);
   const latestWeight = last.weightKg;
 
-  const x = (date: string) => PAD_LEFT + xScale(date, domainX, INNER_W);
-  const y = (value: number) => PAD_TOP + yScale(value, domainY, INNER_H);
+  const x = (date: string) => PAD_LEFT + xScale(date, domainX, innerW);
+  const y = (value: number) => PAD_TOP + yScale(value, domainY, innerH);
 
   const maxTicks = wide ? 8 : 5;
   const xTickDates = xTicks(
@@ -102,7 +125,7 @@ export default function WeightChart({ entries, today, summary, targetKg }: Props
   const targetY = targetKg !== undefined ? y(targetKg) : 0;
   const currentX = x(last.date);
   const currentY = y(latestWeight);
-  const currentLabelRight = currentX < WIDTH - 90;
+  const currentLabelRight = currentX < width - 90;
 
   const desc =
     `${summary.count} check-ins from ${formatShort(summary.firstDate ?? first.date)} to ` +
@@ -110,11 +133,11 @@ export default function WeightChart({ entries, today, summary, targetKg }: Props
     `change since start ${summary.changeKg !== undefined ? formatSigned(summary.changeKg, 'kg') : '0.0 kg'}.`;
 
   return (
-    <div class="pv-chart-wrap">
+    <div class="pv-chart-wrap" ref={wrapRef}>
       {toggle}
       <svg
         class="pv-chart"
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        viewBox={`0 0 ${width} ${HEIGHT}`}
         width="100%"
         role="img"
         aria-labelledby="chart-title chart-desc"
@@ -127,7 +150,7 @@ export default function WeightChart({ entries, today, summary, targetKg }: Props
             <line
               class="pv-chart-grid"
               x1={PAD_LEFT}
-              x2={PAD_LEFT + INNER_W}
+              x2={PAD_LEFT + innerW}
               y1={y(tick)}
               y2={y(tick)}
             />
@@ -142,11 +165,11 @@ export default function WeightChart({ entries, today, summary, targetKg }: Props
             <line
               class="pv-chart-target"
               x1={PAD_LEFT}
-              x2={PAD_LEFT + INNER_W}
+              x2={PAD_LEFT + innerW}
               y1={targetY}
               y2={targetY}
             />
-            <text class="pv-chart-target-label" x={PAD_LEFT + INNER_W + 6} y={targetY + 4}>
+            <text class="pv-chart-target-label" x={PAD_LEFT + innerW + 6} y={targetY + 4}>
               TARGET {kg(targetKg)} KG
             </text>
           </g>

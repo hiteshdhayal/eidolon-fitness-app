@@ -1,0 +1,24 @@
+---
+import { getEntry } from 'astro:content';
+import ReelEmbed from '../content/ReelEmbed.astro';
+import { isPublished } from '../../lib/content/published';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const reel = await getEntry('reels', slug);
+const visible = reel && isPublished(reel) ? reel : undefined;
+---
+
+{
+  visible && (
+    <ReelEmbed
+      instagramUrl={visible.data.instagramUrl}
+      title={visible.data.title}
+      slug={visible.id}
+      thumbnail={visible.data.thumbnail}
+    />
+  )
+}

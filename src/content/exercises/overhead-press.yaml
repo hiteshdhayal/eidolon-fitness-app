@@ -1,0 +1,10 @@
+name: "Barbell overhead press"
+otherNames: ["Barbell press", "Military press"]
+muscles: ["shoulders", "triceps", "core"]
+equipment: "barbell"
+level: "intermediate"
+summary: "Pressing the bar overhead from the shoulders, standing."
+steps: ["Hold the bar at shoulder height, hands just outside the shoulders.", "Brace the core and squeeze the glutes.", "Press the bar overhead in a straight line.", "Lower it back to the shoulders with control."]
+cues: ["Move your head out of the way, then back", "Keep the ribs down"]
+commonMistakes: ["Leaning back to press", "Pressing the bar forward instead of up"]
+draft: true

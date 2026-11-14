@@ -1,0 +1,10 @@
+name: "Dumbbell swing"
+otherNames: ["DB swing"]
+muscles: ["glutes", "hamstrings"]
+equipment: "dumbbells"
+level: "intermediate"
+summary: "A fast hip hinge that moves a dumbbell with power, not arms."
+steps: ["Hold one dumbbell with both hands in front of you.", "Hinge at the hips and let the dumbbell swing back between your legs.", "Snap your hips forward so the dumbbell rises to about chest height.", "Let it swing back and repeat."]
+cues: ["The hips move the weight, the arms just hold it", "Keep the back flat"]
+commonMistakes: ["Squatting instead of hinging", "Lifting the weight with the shoulders"]
+draft: true

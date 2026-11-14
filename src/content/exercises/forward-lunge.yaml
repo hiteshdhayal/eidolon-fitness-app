@@ -1,0 +1,10 @@
+name: "Forward lunge"
+otherNames: ["Lunge"]
+muscles: ["quads", "glutes"]
+equipment: "none"
+level: "beginner"
+summary: "Stepping forward into a lunge and pushing back to standing."
+steps: ["Stand with your feet under your hips.", "Step one foot forward and lower until both knees are bent.", "Keep the front knee over the ankle.", "Push off the front foot to return."]
+cues: ["Long step, tall chest", "Control the way down"]
+commonMistakes: ["Front knee travelling too far past the toes", "Leaning the chest forward"]
+draft: true

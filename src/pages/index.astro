@@ -4,6 +4,7 @@ import Button from '../components/ui/Button.astro';
 import FollowLink from '../components/FollowLink.astro';
 import HeroStage from '../components/HeroStage.astro';
 import KineticBand from '../components/KineticBand.astro';
+import FinalCta from '../components/content/FinalCta.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
 import { defaultTitle } from '../config/site';
 import { getHeroSlides, heroSizes } from '../lib/hero-slides';
@@ -132,27 +133,7 @@ const steps = [
     </div>
   </section>
 
-  <section class="final-cta section" data-surface="obsidian">
-    <div class="container section-reveal">
-      <span class="cta-rule" aria-hidden="true"></span>
-
-      <p class="eyebrow-row">
-        <span class="speed-bar" aria-hidden="true"></span>
-        <span class="eyebrow">Free · No sign-up</span>
-      </p>
-
-      <h2 class="display cta-title">
-        Your plan is <em class="accent-italic">2 minutes</em> away.
-      </h2>
-
-      <div class="cta-actions">
-        <Button href="/plan/" arrow planCta="default">
-          Build my plan
-        </Button>
-        <FollowLink variant="secondary" location="final-cta" />
-      </div>
-    </div>
-  </section>
+  <FinalCta titleBefore="Your plan is" accent="2 minutes" titleAfter="away." location="final-cta" />
 </BaseLayout>
 
 <style>
@@ -342,30 +323,6 @@ const steps = [
     color: var(--text-muted);
   }
 
-  .final-cta {
-    padding-block: clamp(72px, 12vw, 160px);
-  }
-
-  .cta-rule {
-    display: block;
-    width: 120px;
-    height: 2px;
-    margin-bottom: 32px;
-    background: var(--accent);
-  }
-
-  .cta-title {
-    max-width: 18ch;
-    margin-top: 20px;
-  }
-
-  .cta-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 36px;
-  }
-
   @media (min-width: 768px) {
     .hero {
       height: min(100svh, 940px);
@@ -465,14 +422,6 @@ const steps = [
 
     .step-row > .section-number {
       margin-bottom: 8px;
-    }
-
-    .cta-actions {
-      flex-direction: column;
-    }
-
-    .cta-actions > :global(*) {
-      width: 100%;
     }
   }
 

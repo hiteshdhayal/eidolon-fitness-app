@@ -1,0 +1,10 @@
+name: "Dumbbell bench press"
+otherNames: ["DB bench press"]
+muscles: ["chest", "triceps", "shoulders"]
+equipment: "dumbbells"
+level: "beginner"
+summary: "Pressing two dumbbells up from a bench."
+steps: ["Lie on a bench with a dumbbell in each hand at chest level.", "Keep your feet flat and your shoulder blades pulled back.", "Press the weights up until your arms are straight.", "Lower with control to chest level."]
+cues: ["Wrists stacked over the elbows", "Control the lowering"]
+commonMistakes: ["Letting the elbows flare to 90 degrees", "Bouncing out of the bottom"]
+draft: true

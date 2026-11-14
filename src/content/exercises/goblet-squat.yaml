@@ -1,0 +1,12 @@
+name: "Goblet squat"
+otherNames: ["Dumbbell goblet squat"]
+muscles: ["quads", "glutes", "core"]
+equipment: "dumbbells"
+level: "beginner"
+summary: "A squat holding one dumbbell at the chest, which keeps you upright."
+steps: ["Hold one dumbbell or a kettlebell close to your chest with both hands.", "Stand with feet slightly wider than the hips.", "Squat down between your knees, keeping the weight at your chest.", "Stand up and squeeze your glutes at the top."]
+cues: ["Elbows inside your knees at the bottom", "Keep the weight glued to your chest"]
+commonMistakes: ["Letting the weight drift away from the body", "Rushing the way down"]
+easierVersion: "bodyweight-squat"
+harderVersion: "barbell-back-squat"
+draft: true

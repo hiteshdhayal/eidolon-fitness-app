@@ -1,0 +1,10 @@
+name: "Bird dog"
+otherNames: ["Bird dog"]
+muscles: ["core", "back"]
+equipment: "none"
+level: "beginner"
+summary: "On all fours, reaching opposite arm and leg while keeping a steady back."
+steps: ["Start on your hands and knees, hands under shoulders.", "Reach one arm forward and the opposite leg back.", "Keep your hips level and your back flat.", "Return and repeat on the other side."]
+cues: ["Reach long, not high", "Imagine a glass of water on your lower back"]
+commonMistakes: ["Lifting the leg too high and arching the back", "Twisting the hips"]
+draft: true

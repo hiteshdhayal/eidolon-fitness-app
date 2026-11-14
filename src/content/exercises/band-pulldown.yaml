@@ -1,0 +1,11 @@
+name: "Band pulldown"
+otherNames: ["Band lat pulldown"]
+muscles: ["lats"]
+equipment: "band"
+level: "beginner"
+summary: "A pulldown with a band anchored high, for home training."
+steps: ["Anchor a band high up, or loop it over a door frame anchor.", "Hold the ends with straight arms.", "Pull the elbows down towards your ribs.", "Return slowly with control."]
+cues: ["Keep the chest up", "Pull down and slightly back"]
+commonMistakes: ["Leaning forward to pull", "Letting the band snap back"]
+harderVersion: "lat-pulldown"
+draft: true

@@ -1,0 +1,11 @@
+name: "Inverted row (table or bar)"
+otherNames: ["Australian pull-up", "Table row"]
+muscles: ["back", "biceps"]
+equipment: "none"
+level: "intermediate"
+summary: "A row under a table or a low bar with your body as the weight."
+steps: ["Lie under a sturdy table or a low bar and grip it with straight arms.", "Keep your body in a straight line from head to heels.", "Pull your chest towards the bar.", "Lower slowly."]
+cues: ["Squeeze the shoulder blades first", "Keep the hips up"]
+commonMistakes: ["Sagging hips", "Pulling with the arms only"]
+easierVersion: "one-arm-dumbbell-row"
+draft: true

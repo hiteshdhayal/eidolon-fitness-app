@@ -1,0 +1,11 @@
+name: "Hip hinge drill (with a stick)"
+otherNames: ["Hinge drill"]
+muscles: ["hamstrings", "glutes"]
+equipment: "none"
+level: "beginner"
+summary: "A drill with a stick behind your back to learn to hinge from the hips."
+steps: ["Hold a broomstick behind your back so it touches your head, upper back and tailbone.", "Push your hips back and let your knees bend slightly.", "Keep three points of contact with the stick the whole way.", "Stand up by pushing your hips forward."]
+cues: ["Hips move back, chest moves forward", "The stick must not lift off your back"]
+commonMistakes: ["Squatting instead of hinging", "Rounding the back so the stick lifts off"]
+harderVersion: "dumbbell-romanian-deadlift"
+draft: true

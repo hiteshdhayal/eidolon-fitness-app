@@ -1,0 +1,10 @@
+name: "Dumbbell sumo squat"
+otherNames: ["Sumo squat", "Malasana squat"]
+muscles: ["quads", "glutes"]
+equipment: "dumbbells"
+level: "beginner"
+summary: "A wide-stance squat with a dumbbell, which hits the inner thighs and glutes."
+steps: ["Hold one dumbbell with both hands in front of your hips.", "Stand with a wide stance and toes turned out.", "Squat down, letting your knees travel out over your toes.", "Stand up and squeeze your glutes."]
+cues: ["Push the knees out, not forward", "Keep the dumbbell close to your body"]
+commonMistakes: ["Stance too narrow to hit the glutes", "Leaning forward instead of sitting down"]
+draft: true

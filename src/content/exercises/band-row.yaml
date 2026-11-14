@@ -1,0 +1,11 @@
+name: "Band row"
+otherNames: ["Resistance band row"]
+muscles: ["back", "biceps"]
+equipment: "band"
+level: "beginner"
+summary: "A row with a resistance band, easy to do at home."
+steps: ["Anchor the band at chest height, or loop it around your feet.", "Hold the ends with straight arms.", "Pull the band towards your ribs, squeezing your shoulder blades.", "Return slowly."]
+cues: ["Pull with the elbows, not the hands", "Keep the shoulders down"]
+commonMistakes: ["Leaning back to help the pull", "Shrugging the shoulders"]
+harderVersion: "one-arm-dumbbell-row"
+draft: true

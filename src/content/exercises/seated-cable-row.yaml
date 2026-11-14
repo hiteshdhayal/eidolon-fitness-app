@@ -1,0 +1,10 @@
+name: "Seated cable row"
+otherNames: ["Cable row"]
+muscles: ["back", "biceps"]
+equipment: "machine"
+level: "beginner"
+summary: "A row at a cable machine that keeps tension all the way."
+steps: ["Sit with your feet on the platform and grab the handle.", "Sit tall with a slight bend in the knees.", "Pull the handle towards your ribs.", "Let it go back slowly with control."]
+cues: ["Keep the chest up", "Do not lean back past straight"]
+commonMistakes: ["Rocking the torso for momentum", "Shrugging the shoulders"]
+draft: true

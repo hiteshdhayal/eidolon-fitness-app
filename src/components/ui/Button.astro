@@ -16,6 +16,10 @@ interface Props {
    * href for the saved-plan state. `header` gets the per-page header rules.
    */
   planCta?: 'default' | 'header';
+  target?: string;
+  rel?: string;
+  /** Extra data-* attributes for analytics. */
+  data?: Record<string, string | undefined>;
 }
 
 const {
@@ -29,6 +33,9 @@ const {
   disabled = false,
   ariaLabel,
   planCta,
+  target,
+  rel,
+  data = {},
 } = Astro.props;
 
 const Tag = href ? 'a' : 'button';
@@ -52,7 +59,10 @@ const classes = [
   disabled={href ? undefined : disabled}
   aria-disabled={disabled ? 'true' : undefined}
   aria-label={ariaLabel}
+  target={target}
+  rel={rel}
   data-plan-cta={planCta}
+  {...data}
 >
   <span data-plan-cta-label={planCta ? '' : undefined}>
     <slot />

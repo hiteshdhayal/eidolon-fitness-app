@@ -1,0 +1,12 @@
+name: "Barbell Romanian deadlift"
+otherNames: ["Barbell RDL"]
+muscles: ["hamstrings", "glutes"]
+equipment: "barbell"
+level: "intermediate"
+summary: "The barbell version of the hip hinge, for heavier hamstring work."
+steps: ["Hold the bar at your hips, hands shoulder-width apart.", "Soften your knees and push your hips back, letting the bar slide down your thighs.", "Stop at the stretch, keeping the bar close.", "Drive the hips forward to stand tall."]
+cues: ["Bar stays in contact with the legs", "Squeeze the glutes at the top, do not lean back"]
+commonMistakes: ["Letting the bar swing away from the body", "Bending the knees too much"]
+easierVersion: "dumbbell-romanian-deadlift"
+harderVersion: "deadlift"
+draft: true

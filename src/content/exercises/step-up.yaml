@@ -1,0 +1,10 @@
+name: "Step-up"
+otherNames: ["Box step-up"]
+muscles: ["quads", "glutes"]
+equipment: "none"
+level: "beginner"
+summary: "Stepping onto a low box or stair, one leg at a time."
+steps: ["Stand in front of a step or a low box.", "Place one whole foot on the step.", "Push through that foot to stand up on the step.", "Lower yourself down with control and repeat."]
+cues: ["Push through the top leg, do not push off the floor", "Keep the knee tracking over the foot"]
+commonMistakes: ["Bouncing off the back foot", "Using a step that is too high"]
+draft: true

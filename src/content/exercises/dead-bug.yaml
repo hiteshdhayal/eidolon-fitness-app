@@ -1,0 +1,10 @@
+name: "Dead bug"
+otherNames: ["Dead bug"]
+muscles: ["core"]
+equipment: "none"
+level: "beginner"
+summary: "A core drill lying on your back, moving opposite arm and leg."
+steps: ["Lie on your back with arms up and knees bent at 90 degrees.", "Press your lower back gently into the floor.", "Slowly lower one arm and the opposite leg towards the floor.", "Bring them back and repeat on the other side."]
+cues: ["Keep the lower back flat throughout", "Move slowly"]
+commonMistakes: ["Letting the back arch off the floor", "Rushing the movement"]
+draft: true

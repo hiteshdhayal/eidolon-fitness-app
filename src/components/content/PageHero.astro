@@ -1,0 +1,118 @@
+---
+interface TagItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  eyebrow: string;
+  titleBefore: string;
+  accent?: string;
+  titleAfter?: string;
+  sub?: string;
+  tags?: TagItem[];
+  draft?: boolean;
+}
+
+const {
+  eyebrow,
+  titleBefore,
+  accent,
+  titleAfter = '',
+  sub,
+  tags = [],
+  draft = false,
+} = Astro.props;
+---
+
+<section class="page-hero" data-surface="obsidian">
+  <div class="container">
+    <p class="eyebrow-row">
+      <span class="speed-bar" aria-hidden="true"></span>
+      <span class="eyebrow">{eyebrow}</span>
+    </p>
+
+    <div class="page-title-row">
+      <h1 class="display page-title">
+        {titleBefore}{accent && (
+          <Fragment>{titleBefore ? ' ' : ''}<em class="accent-italic">{accent}</em></Fragment>
+        )}{titleAfter && <Fragment> {titleAfter}</Fragment>}
+      </h1>
+      {draft && <span class="draft-tag">DRAFT</span>}
+    </div>
+
+    {sub && <p class="page-sub">{sub}</p>}
+
+    {tags.length > 0 && (
+      <ul class="page-tags">
+        {tags.map((tag) => (
+          <li>
+            {tag.href ? (
+              <a class="tag" href={tag.href}>{tag.label}</a>
+            ) : (
+              <span class="tag">{tag.label}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    padding-block: 64px 48px;
+  }
+
+  .page-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .page-title {
+    max-width: 20ch;
+    margin: 0;
+    font-size: clamp(2.5rem, 1rem + 5vw, 5rem);
+  }
+
+  .page-sub {
+    max-width: 48ch;
+    margin-top: 24px;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .page-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .draft-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    padding: 4px 8px;
+    border: 1px solid var(--accent);
+    color: var(--accent-text);
+  }
+
+  @media (max-width: 767px) {
+    .page-hero {
+      padding-block: 40px 32px;
+    }
+
+    .page-title {
+      max-width: 16ch;
+    }
+  }
+</style>

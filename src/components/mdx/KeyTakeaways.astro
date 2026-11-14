@@ -1,0 +1,14 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="takeaways">
+  <p class="toc-label">Key takeaways</p>
+  <ul>
+    {items.map((item) => <li>{item}</li>)}
+  </ul>
+</section>

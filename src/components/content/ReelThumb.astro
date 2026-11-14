@@ -1,0 +1,62 @@
+---
+import { Picture } from 'astro:assets';
+
+interface Props {
+  href: string;
+  title: string;
+  date: Date;
+  thumbnail?: ImageMetadata;
+  sizes?: string;
+}
+
+const {
+  href,
+  title,
+  date,
+  thumbnail,
+  sizes = '(min-width: 1024px) 23vw, (min-width: 768px) 30vw, 45vw',
+} = Astro.props;
+
+const formatter = new Intl.DateTimeFormat('en-IN', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<a class="thumb-card" href={href}>
+  <div class="thumb-media">
+    {thumbnail ? (
+      <Picture
+        src={thumbnail}
+        formats={['avif', 'webp']}
+        widths={[240, 360, 480, 720]}
+        sizes={sizes}
+        alt={title}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <span class="thumb-placeholder">THUMBNAIL COMING</span>
+    )}
+  </div>
+  <span class="thumb-title">{title}</span>
+  <span class="thumb-date">
+    <time datetime={date.toISOString()}>{formatter.format(date)}</time>
+  </span>
+</a>
+
+<style>
+  .thumb-card {
+    display: block;
+    text-decoration: none;
+  }
+
+  .thumb-title {
+    display: block;
+  }
+
+  .thumb-date {
+    display: block;
+  }
+</style>
