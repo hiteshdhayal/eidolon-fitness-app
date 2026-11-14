@@ -87,6 +87,7 @@ const buttons = LINKS_ORDER.map((key) => ({ key, ...BUTTONS[key] })).filter(
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        margin: 0;
         font-weight: 800;
         font-size: 1.125rem;
         letter-spacing: 0.02em;
@@ -155,7 +156,7 @@ const buttons = LINKS_ORDER.map((key) => ({ key, ...BUTTONS[key] })).filter(
     </style>
   </head>
   <body>
-    <p class="wordmark"><span class="wordmark-dot" aria-hidden="true"></span> EIDOLON</p>
+    <h1 class="wordmark"><span class="wordmark-dot" aria-hidden="true"></span> EIDOLON</h1>
     <p class="bio">{site.bio}</p>
 
     <ul class="links">

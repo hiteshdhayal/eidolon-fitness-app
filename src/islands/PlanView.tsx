@@ -311,7 +311,11 @@ export default function PlanView({ notes }: Props) {
   );
 
   if (!loaded) {
-    return <div class="pv-shell" aria-busy="true" />;
+    return (
+      <div class="pv-shell" aria-busy="true">
+        <h1 class="sr-only">Your plan</h1>
+      </div>
+    );
   }
 
   if (!saved) {

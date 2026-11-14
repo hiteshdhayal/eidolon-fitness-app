@@ -596,7 +596,11 @@ export default function Questionnaire() {
       (answers[currentQuestion.id as keyof DraftAnswers] as string | number | undefined) === '');
 
   if (!ready) {
-    return <section class="qc-section" aria-busy="true" />;
+    return (
+      <section class="qc-section" aria-busy="true">
+        <h1 class="sr-only">Build your plan</h1>
+      </section>
+    );
   }
 
   if (stepId === INTRO) {
