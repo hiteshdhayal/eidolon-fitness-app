@@ -134,29 +134,6 @@ test.describe('plan page', () => {
     await expect(follow.first()).toHaveAttribute('target', '_blank');
   });
 
-  test('the Preact follow mirror matches the Astro FollowLink', async ({ page }) => {
-    await seedPlan(page, VEG_HARYANA);
-    await page.goto('/my-plan/');
-    await page.getByRole('tab', { name: 'Progress' }).click();
-
-    const attributes = [
-      'href',
-      'target',
-      'rel',
-      'aria-label',
-      'data-umami-event',
-      'data-umami-event-location',
-    ];
-    const read = (selector: string) =>
-      page
-        .locator(selector)
-        .evaluate((el, list) => list.map((name) => el.getAttribute(name)), attributes);
-
-    const astro = await read('.pv-follow-actions a[data-umami-event="follow_click"]');
-    const preact = await read('#panel-progress a[data-umami-event="follow_click"]');
-    expect(preact).toEqual(astro);
-  });
-
   test('edit answers rebuilds the plan', async ({ page }) => {
     await seedPlan(page, VEG_HARYANA);
     await page.goto('/my-plan/');

@@ -4,6 +4,7 @@ import { clearDraft, readDraft, readPlan, writeDraft, writePlan } from '../lib/s
 import {
   INTRO,
   REVIEW,
+  applyWeightParam,
   describeAnswer,
   ftInFromCm,
   heightCmFromFtIn,
@@ -266,7 +267,8 @@ export default function Questionnaire() {
     if (params.get('edit') === '1') {
       const saved = readPlan();
       if (saved) {
-        setAnswers(saved.answers as DraftAnswers);
+        // "Update my plan" passes the latest logged weight as ?weight=.
+        setAnswers(applyWeightParam(saved.answers as DraftAnswers, params));
         setStepId(REVIEW);
         setReady(true);
         return;

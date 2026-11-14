@@ -138,6 +138,16 @@ export function writeGroceries(seed: number, checked: string[]): void {
   save(GROCERIES_KEY, { v: 1, seed, checked } satisfies Groceries);
 }
 
+/** The raw stored groceries object, or null. Used by export/import. */
+export function readStoredGroceries(): Groceries | null {
+  return load(GROCERIES_KEY, GroceriesSchema);
+}
+
+export function writeStoredGroceries(groceries: Groceries | null): void {
+  if (groceries) save(GROCERIES_KEY, groceries);
+  else remove(GROCERIES_KEY);
+}
+
 // ---------------------------------------------------------------------------
 // Progress log (spec §10)
 // ---------------------------------------------------------------------------

@@ -1,8 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import type { ComponentChildren } from 'preact';
-import { site } from '../config/site';
+import type { ComponentChildren, ComponentType } from 'preact';
 import { track } from '../lib/analytics';
-import { readGroceries, readPlan, writeGroceries, writePlan, type SavedPlan } from '../lib/storage';
+import {
+  readGroceries,
+  readPlan,
+  readProgress,
+  setProgressFields,
+  writeGroceries,
+  writePlan,
+  type SavedPlan,
+} from '../lib/storage';
+import type { Progress } from '../lib/progress/schema';
+import { todayLocal } from '../lib/progress/dates';
+import { isNudgeDue } from '../lib/progress/rules';
 import { STATES } from '../lib/engine/regions';
 import { capitalize, itemMeta } from '../lib/plan/format';
 import { formatNumber } from '../lib/utils/format';
@@ -11,6 +21,8 @@ import Callout from './ui/Callout';
 import Stat from './ui/Stat';
 import Tabs from './ui/Tabs';
 import Sheet from './ui/Sheet';
+import DataControls from './progress/DataControls';
+import type { ProgressTabProps } from './progress/ProgressTab';
 
 export interface HealthNoteProp {
   id: string;
@@ -112,6 +124,30 @@ function PlanHeader({ number, eyebrow, intro, children }: PlanHeaderProps) {
   );
 }
 
+interface DataSectionProps {
+  number: string;
+  today: string;
+  onReplaced: () => void;
+  onAnnounce: (message: string) => void;
+}
+
+function DataSection({ number, today, onReplaced, onAnnounce }: DataSectionProps) {
+  return (
+    <section class="section" data-surface="obsidian">
+      <div class="container">
+        <PlanHeader
+          number={number}
+          eyebrow="Your data"
+          intro="Everything — your answers, plan, check-ins and grocery ticks — stays on this phone. Nothing is sent to a server."
+        >
+          Your data <em class="accent-italic">stays here.</em>
+        </PlanHeader>
+        <DataControls today={today} onReplaced={onReplaced} onAnnounce={onAnnounce} />
+      </div>
+    </section>
+  );
+}
+
 export default function PlanView({ notes }: Props) {
   const [saved, setSaved] = useState<SavedPlan | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -122,17 +158,67 @@ export default function PlanView({ notes }: Props) {
   const [busy, setBusy] = useState(false);
   const [announce, setAnnounce] = useState('');
   const [checked, setChecked] = useState<string[]>([]);
+  const [progress, setProgress] = useState<Progress>({ v: 1, entries: [], dismissedRules: {} });
+  const [ProgressTab, setProgressTab] = useState<ComponentType<ProgressTabProps> | null>(null);
+  const [focusSignal, setFocusSignal] = useState(0);
+  const [focusEmpty, setFocusEmpty] = useState(false);
   const engineRef = useRef<Promise<[EngineModule, FoodsModule]> | null>(null);
+  const progressLoadingRef = useRef(false);
+  const today = useMemo(() => todayLocal(), []);
 
-  useEffect(() => {
+  /** Load the Progress tab island the first time it is needed (§17). */
+  function loadProgressTab() {
+    if (progressLoadingRef.current) return;
+    progressLoadingRef.current = true;
+    import('./progress/ProgressTab').then((module) => setProgressTab(() => module.default));
+  }
+
+  /** Re-read everything after an import or "Delete everything". */
+  function reloadFromStorage() {
     const plan = readPlan();
+    const stored = readProgress();
+    setProgress(stored);
     if (plan) {
       setSaved(plan);
       setChecked(readGroceries(plan.plan.seed).checked);
       if (plan.plan.kind === 'recipes') setDay(todayIndex());
+    } else {
+      setSaved(null);
+      setFocusEmpty(true);
+    }
+  }
+
+  useEffect(() => {
+    const plan = readPlan();
+    setProgress(readProgress());
+    if (plan) {
+      setSaved(plan);
+      setChecked(readGroceries(plan.plan.seed).checked);
+      if (plan.plan.kind === 'recipes') setDay(todayIndex());
+      if (plan.plan.kind === 'plateRules') loadProgressTab();
     }
     setLoaded(true);
   }, []);
+
+  useEffect(() => {
+    if (focusEmpty && !saved && loaded) document.getElementById('pv-empty-title')?.focus();
+  }, [focusEmpty, saved, loaded]);
+
+  function openTab(id: string) {
+    setTab(id);
+    if (id === 'progress') loadProgressTab();
+  }
+
+  function dismissNudge() {
+    setProgress(setProgressFields({ nudgeDismissedOn: today }));
+  }
+
+  function logFromNudge() {
+    openTab('progress');
+    setFocusSignal((value) => value + 1);
+    document.getElementById('pv-week')?.scrollIntoView({ block: 'start' });
+    dismissNudge();
+  }
 
   function loadEngine() {
     engineRef.current ??= Promise.all([
@@ -227,23 +313,34 @@ export default function PlanView({ notes }: Props) {
 
   if (!saved) {
     return (
-      <section class="pv-hero pv-hero-empty pv-empty" data-surface="obsidian">
-        <div class="container">
-          <p class="eyebrow-row">
-            <span class="speed-bar" aria-hidden="true" />
-            <span class="eyebrow">Your plan</span>
-          </p>
-          <h1 class="display pv-title">
-            No plan <em class="accent-italic">yet.</em>
-          </h1>
-          <p class="pv-sub">It takes about 2 minutes, and your answers stay on your phone.</p>
-          <div class="pv-actions-row">
-            <a class="qc-next" href="/plan/">
-              Build my plan →
-            </a>
-          </div>
+      <div class="pv-shell">
+        <div class="pv-screen">
+          <section class="pv-hero pv-hero-empty pv-empty" data-surface="obsidian">
+            <div class="container">
+              <p class="eyebrow-row">
+                <span class="speed-bar" aria-hidden="true" />
+                <span class="eyebrow">Your plan</span>
+              </p>
+              <h1 class="display pv-title" id="pv-empty-title" tabIndex={-1}>
+                No plan <em class="accent-italic">yet.</em>
+              </h1>
+              <p class="pv-sub">It takes about 2 minutes, and your answers stay on your phone.</p>
+              <div class="pv-actions-row">
+                <a class="qc-next" href="/plan/">
+                  Build my plan →
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <DataSection
+            number="01"
+            today={today}
+            onReplaced={reloadFromStorage}
+            onAnnounce={setAnnounce}
+          />
         </div>
-      </section>
+      </div>
     );
   }
 
@@ -272,6 +369,37 @@ export default function PlanView({ notes }: Props) {
   const howNumber = targets ? nextNumber() : null;
   const healthNumber = plan.kind !== 'guidance' && healthPresent ? nextNumber() : null;
   const mainNumber = plan.kind === 'guidance' ? '01' : nextNumber();
+  const dataNumber = nextNumber();
+
+  const targetKg =
+    answers.targetWeightKg !== undefined && !plan.safety.targetWeightRejected
+      ? answers.targetWeightKg
+      : undefined;
+
+  const nudgeDue =
+    plan.kind !== 'guidance' &&
+    isNudgeDue({
+      savedAt: saved.savedAt,
+      entries: progress.entries,
+      nudgeDismissedOn: progress.nudgeDismissedOn,
+      today,
+    });
+
+  const progressPanel = ProgressTab ? (
+    <ProgressTab
+      progress={progress}
+      onChange={setProgress}
+      onAnnounce={setAnnounce}
+      planWeightKg={answers.weightKg}
+      effectiveGoal={plan.safety.effectiveGoal}
+      mode={plan.safety.mode}
+      targetKg={targetKg}
+      today={today}
+      focusSignal={focusSignal}
+    />
+  ) : (
+    <p class="pv-body-text">Loading…</p>
+  );
 
   const safetyCallouts = plan.safety.reasons.map((reason) => (
     <Callout tone="warning" key={reason.code}>
@@ -315,6 +443,21 @@ export default function PlanView({ notes }: Props) {
                 </button>
               ) : null}
             </div>
+            {nudgeDue ? (
+              <div class="pv-nudge">
+                <Callout tone="info">
+                  <p>{"It's been a week. Want to log a quick check-in?"}</p>
+                  <div class="pv-nudge-actions">
+                    <button type="button" class="qc-next qc-next-sm" onClick={logFromNudge}>
+                      Log weight
+                    </button>
+                    <button type="button" class="pv-link" onClick={dismissNudge}>
+                      Not now
+                    </button>
+                  </div>
+                </Callout>
+              </div>
+            ) : null}
             {safetyCallouts.length > 0 ? <div class="pv-callouts">{safetyCallouts}</div> : null}
           </div>
         </section>
@@ -395,7 +538,7 @@ export default function PlanView({ notes }: Props) {
 
         {/* 5. Your week (ice) — recipes */}
         {plan.kind === 'recipes' ? (
-          <section class="section" data-surface="ice">
+          <section class="section" id="pv-week" data-surface="ice">
             <div class="container">
               <PlanHeader number={mainNumber} eyebrow="Your week">
                 Seven days, <em class="accent-italic">your food.</em>
@@ -409,7 +552,7 @@ export default function PlanView({ notes }: Props) {
                   { id: 'progress', label: 'Progress' },
                 ]}
                 active={tab}
-                onChange={setTab}
+                onChange={openTab}
                 panelPrefix="panel"
               />
 
@@ -528,11 +671,7 @@ export default function PlanView({ notes }: Props) {
                 aria-labelledby="tab-progress"
                 hidden={tab !== 'progress'}
               >
-                <p class="pv-body-text">
-                  Weekly check-ins and a weight chart are coming next. For now, weigh yourself once
-                  a week, same day, same time.
-                </p>
-                <FollowAnchor location="my-plan" />
+                {progressPanel}
               </div>
             </div>
           </section>
@@ -635,19 +774,23 @@ export default function PlanView({ notes }: Props) {
           </section>
         ) : null}
 
-        {/* Progress for plateRules and guidance */}
-        {plan.kind !== 'recipes' ? (
-          <section class="section" data-surface="ice">
+        {/* Progress (ice) — plateRules only; guidance has no tracker */}
+        {plan.kind === 'plateRules' ? (
+          <section class="section" id="pv-week" data-surface="ice">
             <div class="container">
               <h2 class="pv-block-title">Progress</h2>
-              <p class="pv-body-text">
-                Weekly check-ins and a weight chart are coming next. For now, weigh yourself once a
-                week, same day, same time.
-              </p>
-              <FollowAnchor location="my-plan-progress" />
+              {progressPanel}
             </div>
           </section>
         ) : null}
+
+        {/* Your data (obsidian) — every plan kind */}
+        <DataSection
+          number={dataNumber}
+          today={today}
+          onReplaced={reloadFromStorage}
+          onAnnounce={setAnnounce}
+        />
       </div>
 
       {plan.kind === 'recipes' ? (
@@ -759,32 +902,6 @@ export default function PlanView({ notes }: Props) {
         )}
       </Sheet>
     </div>
-  );
-}
-
-interface FollowAnchorProps {
-  location: string;
-}
-
-/**
- * Preact mirror of the Astro FollowLink, used only inside the island (the
- * Progress tab). The rendered href, target, rel, aria-label and Umami event
- * attributes match the Astro component (asserted in my-plan.spec.ts).
- */
-function FollowAnchor({ location }: FollowAnchorProps) {
-  const label = `Follow @${site.instagramHandle}`;
-  return (
-    <a
-      class="pv-follow-anchor"
-      href={site.instagramUrl}
-      target="_blank"
-      rel="noopener"
-      aria-label={`${label} — Follow ${site.creatorName} on Instagram (opens in a new tab)`}
-      data-umami-event="follow_click"
-      data-umami-event-location={location}
-    >
-      {label}
-    </a>
   );
 }
 
