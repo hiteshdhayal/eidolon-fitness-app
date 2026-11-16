@@ -90,6 +90,10 @@ It's slow (real Chrome, 3 runs × ~20 URLs) and isn't part of `pnpm build` — r
 
 If Chrome won't launch in your environment (a sandboxed container running as root, for instance), set `LHCI_CHROME_PATH` to the Chromium binary and `LHCI_CHROME_FLAGS=--no-sandbox`; neither is needed on a normal machine or CI runner.
 
+## Deploying
+
+See `docs/DEPLOY.md` for the full runbook — server setup, Nginx + TLS, self-hosted Umami, and `scripts/deploy.sh`/`scripts/rollback.sh` for shipping and reverting releases.
+
 ## Structure
 
 ```

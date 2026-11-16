@@ -1,0 +1,17 @@
+# Keeps nginx access/error logs for 14 days, as /privacy/ promises ("Server
+# logs" section). Install: copy to /etc/logrotate.d/eidolon (root:root,
+# 0644) — logrotate's own daily cron/systemd timer picks it up, nothing else
+# to run.
+/var/log/nginx/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 www-data adm
+    sharedscripts
+    postrotate
+        [ -f /run/nginx.pid ] && kill -USR1 "$(cat /run/nginx.pid)" 2>/dev/null || true
+    endscript
+}

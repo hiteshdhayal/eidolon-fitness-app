@@ -1,0 +1,50 @@
+# Self-hosted Umami at stats.eidolon.cloud (reverse-proxied by nginx on the
+# host — see deploy/nginx.conf). Cookieless analytics: no PostHog/GA-style
+# cross-site tracking, no cookie consent banner needed.
+#
+# Install: copy this directory to /opt/eidolon/umami on the VPS, create
+# .env there (see docs/DEPLOY.md for the two required secrets), then
+# `docker compose up -d`.
+
+services:
+  umami:
+    image: docker.umami.is/umami-software/umami:postgresql-latest
+    container_name: eidolon-umami
+    restart: unless-stopped
+    ports:
+      # Bound to localhost only — nginx on the host proxies 443 to this.
+      - "127.0.0.1:3001:3000"
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD}@db:5432/umami
+      DATABASE_TYPE: postgresql
+      APP_SECRET: ${UMAMI_APP_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - umami-internal
+
+  db:
+    image: postgres:16-alpine
+    container_name: eidolon-umami-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD}
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    networks:
+      - umami-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+networks:
+  umami-internal:
+    driver: bridge
+
+volumes:
+  umami-db-data:
